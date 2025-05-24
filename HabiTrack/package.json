@@ -9,8 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "lint-staged": "lint-staged",
-    "prepare": "husky"
+    "lint-staged": "lint-staged -v",
+    "prepare": "cd .. && husky HabiTrack/.husky"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
