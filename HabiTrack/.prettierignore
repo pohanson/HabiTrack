@@ -8,5 +8,5 @@ android/**
 assets/**
 .vscode
 .expo-shared
-.prettirrc
+.prettierrc
 .eslintrc.js
