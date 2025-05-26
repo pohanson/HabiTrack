@@ -1,0 +1,2 @@
+cd HabiTrack
+npm run lint-staged
