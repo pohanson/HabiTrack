@@ -6,6 +6,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
+import { habit } from '@/db/schema';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { useSQLiteContext } from 'expo-sqlite';
+import * as schema from '@/db/schema';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
@@ -15,11 +19,23 @@ export default function CreateHabitScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time');
 
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+
   const onSubmit = handleSubmit(
-    (data) => {
-      Toast.success('Habit Created');
-      useFormReturn.reset();
-      console.log('Form Submitted:\n', data);
+    async (data) => {
+      console.log('Submitting Form:\n', data);
+      try {
+        await drizzleDb.insert(habit).values({
+          name: data.habit,
+          description: data.description || '',
+        });
+        Toast.success('Habit Created');
+        useFormReturn.reset();
+      } catch (error) {
+        console.error('Error inserting habit:', error);
+        Toast.error('Failed to create habit');
+      }
     },
     (errors) => {
       Toast.error('Ensure required inputs are filled in');
