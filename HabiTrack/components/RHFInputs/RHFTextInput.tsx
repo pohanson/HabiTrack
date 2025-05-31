@@ -1,6 +1,7 @@
 import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
-import { TextInput, View } from 'react-native';
+import { TextInput, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
+import { Colors } from '@/constants/Colors';
 
 export function RHFTextInput({
   name,
@@ -13,6 +14,7 @@ export function RHFTextInput({
   useFormReturn: UseFormReturn<FieldValues>;
   isRequired?: boolean;
 }) {
+  const colors = Colors[useColorScheme() || 'light'];
   const errorMessage = useFormReturn.formState.errors[name]?.message?.toString() || null;
   return (
     <View style={{ marginTop: 8 }}>
@@ -32,10 +34,12 @@ export function RHFTextInput({
             value={value}
             style={{
               borderStyle: 'solid',
+              color: colors.text,
+              backgroundColor: colors.background,
               marginBottom: 2,
               borderWidth: 2,
               borderRadius: 10,
-              borderColor: errorMessage ? 'red' : 'black',
+              borderColor: errorMessage ? 'red' : colors.border,
             }}
           />
         )}

@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Button, View } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,6 +10,8 @@ import { habit } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
+import { Colors } from '@/constants/Colors';
+import { getCalendars } from 'expo-localization';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
@@ -17,7 +19,8 @@ export default function CreateHabitScreen() {
   const useFormReturn = useForm();
   const { handleSubmit, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const reminderTime: Date = watch('time');
+  const reminderTime: Date = watch('time') || new Date(0);
+  const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -43,7 +46,8 @@ export default function CreateHabitScreen() {
     },
   );
 
-  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num);
+  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
+  const colors = Colors[useColorScheme() || 'light'];
 
   return (
     <View style={{ padding: 8 }}>
@@ -55,7 +59,6 @@ export default function CreateHabitScreen() {
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
-      {/* <RHFTextInput name="frequency" label="Frequency" useFormReturn={useFormReturn} /> */}
       <ThemedText type="defaultSemiBold">Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
@@ -63,17 +66,24 @@ export default function CreateHabitScreen() {
           style={{
             flex: 1,
             borderWidth: 1,
-            borderColor: 'gray',
+            borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: '#cacaca',
+            backgroundColor: 'gray',
             padding: 8,
             textAlign: 'center',
+            textAlignVertical: 'center',
           }}>
           {reminderTime === undefined
             ? 'No Reminder'
             : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
         </ThemedText>
-        <Button title="Select Time" onPress={() => setShowTimePicker(true)} />
+        <Pressable
+          onPress={() => setShowTimePicker(true)}
+          style={[styles.button, { zIndex: 10 }]}
+          pressRetentionOffset={60}
+          hitSlop={5}>
+          <ThemedText>Select Time</ThemedText>
+        </Pressable>
       </View>
       {showTimePicker && (
         <Controller
@@ -87,12 +97,32 @@ export default function CreateHabitScreen() {
                 onChange(selectedDate);
               }}
               mode="time"
+              timeZoneName={timeZone === 'Asia/Singapore' ? 'UTC' : timeZone}
+              // 8*60=480 SG is UTC+8, required because Locale is not properly working.
+              timeZoneOffsetInMinutes={timeZone === 'Asia/Singapore' ? 480 : undefined}
             />
           )}
         />
       )}
-      <Button title="Submit" onPress={onSubmit} />
+      <Pressable
+        style={[styles.button, { marginTop: 30, width: '100%' }]}
+        onPress={onSubmit}
+        hitSlop={5}
+        pressRetentionOffset={50}>
+        <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
+          Submit
+        </ThemedText>
+      </Pressable>
       <ToastManager />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    alignSelf: 'center',
+    padding: 16,
+    backgroundColor: Colors.light.tint,
+    borderRadius: 10,
+  },
+});

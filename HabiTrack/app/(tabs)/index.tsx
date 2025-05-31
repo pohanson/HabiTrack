@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -14,6 +14,7 @@ import { and, eq } from 'drizzle-orm';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useState } from 'react';
+import { Colors } from '@/constants/Colors';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
@@ -21,6 +22,7 @@ export default function HomeScreen() {
   const drizzleDb = drizzle(db, { schema });
 
   const today = new Date().toJSON().split('T')[0];
+  const colors = Colors[useColorScheme() || 'light'];
   const { data, error } = useLiveQuery(
     drizzleDb
       .select({ habit: habit, habit_completion: habitCompletion })
@@ -56,6 +58,8 @@ export default function HomeScreen() {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            backgroundColor: colors.background,
+            borderColor: colors.border,
             borderWidth: 2,
             borderRadius: 15,
             padding: 10,

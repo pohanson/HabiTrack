@@ -25,7 +25,7 @@ export function FloatingActionButton({
           },
           styles.fab,
         ]}>
-        <IconSymbol name={iconName} color={'#FFFFFF'} />
+        <IconSymbol name={iconName} color={Colors[colorScheme].text} />
       </Pressable>
     </View>
   );
