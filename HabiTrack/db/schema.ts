@@ -15,4 +15,14 @@ export const reminder = sqliteTable('reminder', {
     .references(() => habit.id),
 });
 
+export const habitCompletion = sqliteTable('habit_completion', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  habit_id: integer('habit_id')
+    .notNull()
+    .references(() => habit.id),
+  completedAt: text('completed_at').notNull(), // date: yyyy-mm-dd
+});
+
 export type Habit = typeof habit.$inferSelect;
+export type Reminder = typeof reminder.$inferSelect;
+export type HabitCompletion = typeof habitCompletion.$inferSelect;

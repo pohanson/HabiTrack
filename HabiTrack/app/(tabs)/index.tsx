@@ -1,21 +1,39 @@
 import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
+import { FloatingActionButton } from '@/components/FloatingActionButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { router } from 'expo-router';
 
-import { useSQLiteContext } from 'expo-sqlite';
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { ToggleInput } from '@/components/ToggleInput';
 import * as schema from '@/db/schema';
+import { habit, habitCompletion } from '@/db/schema';
+import { and, eq } from 'drizzle-orm';
+import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useSQLiteContext } from 'expo-sqlite';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+  const [refresh, setRefresh] = useState(0);
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
-  const { data } = useLiveQuery(drizzleDb.query.habit.findMany());
+  const today = new Date().toJSON().split('T')[0];
+  const { data, error } = useLiveQuery(
+    drizzleDb
+      .select({ habit: habit, habit_completion: habitCompletion })
+      .from(habit)
+      .leftJoin(
+        habitCompletion,
+        and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
+      ),
+    [refresh],
+  );
+  if (error) {
+    console.error('Error fetching habits:', error);
+  }
 
   return (
     <ParallaxScrollView
@@ -30,9 +48,43 @@ export default function HomeScreen() {
         <ThemedText type="title">Habit List</ThemedText>
         <FloatingActionButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
-      {data.map((habit, idx) => (
-        <View key={idx} style={{ borderWidth: 2, borderRadius: 15, padding: 10 }}>
+      {data.map(({ habit, habit_completion }, idx) => (
+        <View
+          key={idx}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderRadius: 15,
+            padding: 10,
+          }}>
           <ThemedText>{habit.name}</ThemedText>
+          <ToggleInput
+            label=""
+            iconName="checkmark"
+            selected={habit_completion !== null}
+            toggleSelected={function (): void {
+              if (habit_completion === null) {
+                // habit is not completed today, so add completion
+                drizzleDb
+                  .insert(habitCompletion)
+                  .values({
+                    habit_id: habit.id,
+                    completedAt: today,
+                  })
+                  .execute();
+              } else {
+                // habit is already completed today, remove completion
+                drizzleDb
+                  .delete(habitCompletion)
+                  .where(eq(habitCompletion.id, habit_completion.id))
+                  .execute();
+              }
+              setRefresh((prev) => prev + 1);
+            }}
+          />
         </View>
       ))}
     </ParallaxScrollView>
