@@ -20,6 +20,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   calendar: 'calendar-month',
   plus: 'add',
+  checkmark: 'check',
 } as IconMapping;
 
 /**

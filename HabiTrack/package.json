@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "lint-staged": "lint-staged -v",
-    "prepare": "cd .. && husky HabiTrack/.husky"
+    "prepare": "cd .. && husky HabiTrack/.husky",
+    "generate-migration": "drizzle-kit generate"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
