@@ -74,7 +74,6 @@ We often find ourselves wanting to have a convenient way to become more organise
 - A selection of a few preset habits which users can choose from to compete with their friends by aiming for a higher completion rate.
 
 
-
 ### User Stories
 
 1. As a university student who wants to get better grades, I want to be able to track and record how much I study throughout the day, so I can easily review and adjust my studying habits.
