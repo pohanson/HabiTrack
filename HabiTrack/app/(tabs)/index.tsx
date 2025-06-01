@@ -5,7 +5,7 @@ import { FloatingActionButton } from '@/components/FloatingActionButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 import { ToggleInput } from '@/components/ToggleInput';
 import * as schema from '@/db/schema';
@@ -36,6 +36,8 @@ export default function HomeScreen() {
   if (error) {
     console.error('Error fetching habits:', error);
   }
+
+  useFocusEffect(() => setRefresh((prev) => prev + 1));
 
   return (
     <ParallaxScrollView
