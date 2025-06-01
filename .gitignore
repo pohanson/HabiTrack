@@ -1,3 +1,8 @@
+android
+ios
+.idea
+*.keystore
+*.apk
 # Logs
 logs
 *.log
