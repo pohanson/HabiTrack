@@ -4,7 +4,7 @@
     "slug": "HabiTrack",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/HabiTrackLogo.png",
     "scheme": "habitrack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,10 +13,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/HabiTrackLogo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "icon": "./assets/images/HabiTrackLogo.png",
+      "edgeToEdgeEnabled": true,
+      "package": "com.habitrack.HabiTrack"
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7a6a06e0-bbb6-443a-b62f-2e0d97901ff3"
+      }
     }
   }
 }
