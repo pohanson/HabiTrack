@@ -41,40 +41,37 @@ We often find ourselves wanting to have a convenient way to become more organise
 #### Core Features
 
 ##### 1. Habits
-- The input should support the creation, editing, and deletion of habits. They should be able to have frequency associated with it. For example, it should be done daily or weekly at 1pm.
-- They should be able to be marked as completed for the day, and show all the incomplete habits first, followed by incomplete habits at the bottom.
+- The input should support the creation, editing, and deletion of habits. For each habit, users can specify how often it occurs by selecting the days of the week and at what time.
+- Each habit should be able to be marked as completed for the day. The Habit List should show all incomplete habits at the top, followed by complete habits at the bottom.
 - One non-functional requirement is that it should be able to work offline.
-- It just needs to be able to indicate whether it was done or not, unlike other apps, we keep it simple by limiting the options.
+- Each habit simply has only 2 statuses: complete or incomplete.
 
 ##### 2. Statistics Page
 
-- Textual view of completion rates (since the start of habit completion).
-- Show Consecutive Completion Streak.
-- Calendar view of each habit, showing which days of the month that particular habit has been marked as completed.
+- Calendar heatmap reflecting habit completion.
+- Bar graph (for all habits overview)/pie chart (for each specific habit) reflecting habit completion.
+- Best streak(s): shows the longest streak(s) of consecutive days a habit was successfully completed.
 
 ##### 3. Notifications
 - App notifications at custom timings that remind the user about incomplete habits.
+- App notifications when habit milestones are reached.
 
 ##### 4. Milestones
-- Have badges for consistent completion of habits over certain lengths of time or number of completion time. (1 Week, 1 month, 6 months, 100 times)
+- Have badges for consistent completion of habits over certain lengths of time. (e.g. 1 Week, 1 month, 6 months, 100 times!)
 
 #### Extension Features
 
-##### 1. Account Creation
+##### 1. Habit Extensions
+- Implementation for habits that are measurable in nature, e.g. running distance or study duration.
+- Ability to add optional textual notes after completing a habit (for personal reference and logging).
 
-- Users should be able to sign up for new account, and login into their existing account. Their data should still be retained.
+##### 2. Account Creation
+- Ability for users to create accounts and log in with a username and password.
+- Ability for users to add/edit their profile picture and bio for their own account.
 
-##### 2. Social
-- Users can search and add friends to achieve a common habit together.
-- They can view their friends habit.
-- There are some preset habits that one can do and compete with friends on the completion rates.
-- Copy your friends habit.
-
-##### 3. Habit
-
-- Habits can now be measurable, instead of a binary option. For example, How many km had you ran.
-- It will also require the statistics page to be adjusted, such as showing the total number of distance ran.
-
+##### 3. Social Features
+- Ability for users to search for other usernames to make friend requests or accept them.
+- A selection of a few preset habits which users can choose from to compete with their friends by aiming for a higher completion rate.
 
 ### User Stories
 
