@@ -12,6 +12,7 @@
     - [Extension Features](#extension-features)
   - [User Stories](#user-stories)
   - [Use Cases](#use-cases)
+  - [Wireframe](#wireframe)
 - [Timeline](#timeline)
   - [Milestone 1](#milestone-1)
   - [Milestone 2](#milestone-2)
@@ -179,6 +180,31 @@ MSS:
 2. Tap the Friends Leaderboard button on the Social page
 3. View your habit completion rate against your friends 
 
+### Wireframe
+
+#### Main App Screens
+![Habit List](assets/img/wireframe/HabitList.png)
+![Statistics](assets/img/wireframe/Statistics.png)
+
+#### Habits
+![Create Habit](assets/img/wireframe/CreateHabit.png)
+![Edit Habit](assets/img/wireframe/EditHabit.png)
+
+#### Account
+![Create Account](assets/img/wireframe/CreateAccount.png)
+![Account Settings](assets/img/wireframe/AccountSettings.png)
+
+#### Social Features
+![Social](assets/img/wireframe/Social.png)
+![Friends](assets/img/wireframe/Friends.png)
+![Friend Leaderboard](assets/img/wireframe/FriendLeaderboard.png)
+![Preset Habit](assets/img/wireframe/PresetHabit.png)
+
+#### Settings & Milestones
+![Settings](assets/img/wireframe/Settings.png)
+![Notification Settings](assets/img/wireframe/NotificationSettings.png)
+![Milestones](assets/img/wireframe/Milestones.png)
+
 ## Timeline
 
 ### Milestone 1
@@ -250,3 +276,8 @@ We used Expo SQLite because it is in the official documentation for Expo, which 
 https://typicode.github.io/husky/  
 
 We used husky for pre-commit hooks so we can upload the pre-commit hook into the repository so that collaborators can have the same check. The pre-commit hook performs linting and formatting so that our code will look neat.
+
+
+## Database Schema
+View [Database Schema](https://dbdiagram.io/d/Orbital-ERD-683c83a2bd74709cb78db3cd)
+![Database ERD Image](/assets/img/DatabaseERD.png)
