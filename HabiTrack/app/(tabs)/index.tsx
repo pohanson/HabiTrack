@@ -13,7 +13,7 @@ import { habit, habitCompletion } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Colors } from '@/constants/Colors';
 
 export default function HomeScreen() {
@@ -37,7 +37,7 @@ export default function HomeScreen() {
     console.error('Error fetching habits:', error);
   }
 
-  useFocusEffect(() => setRefresh((prev) => prev + 1));
+  useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
 
   return (
     <ParallaxScrollView
