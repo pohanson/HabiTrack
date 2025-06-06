@@ -50,8 +50,7 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "toastify-react-native": "^7.2.0",
-    "expo-localization": "~16.1.5",
-    "expo-dev-client": "~5.1.8"
+    "expo-localization": "~16.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
