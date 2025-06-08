@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, useColorScheme, View } from 'react-native';
 
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -39,6 +39,15 @@ export default function HomeScreen() {
 
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
 
+  const EditButtonPressed = (habitId: number) => {
+    const habitToEdit = data.find(({ habit }) => habit.id === habitId)?.habit;
+    router.push({
+      pathname: '/habit/edit',
+      params: { id: habitId },
+    });
+    console.log(`Editing ${habitToEdit?.name}`);
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -66,11 +75,18 @@ export default function HomeScreen() {
             borderRadius: 15,
             padding: 10,
           }}>
-          <ThemedText>{habit.name}</ThemedText>
+          <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
+          <TouchableOpacity onPress={() => EditButtonPressed(habit.id)}>
+            <Image
+              source={require('@/assets/images/edit-icon.png')}
+              style={{ width: 24, height: 24 }}
+            />
+          </TouchableOpacity>
           <ToggleInput
             label=""
             iconName="checkmark"
             selected={habit_completion !== null}
+            iconSize={24}
             toggleSelected={function (): void {
               if (habit_completion === null) {
                 // habit is not completed today, so add completion
