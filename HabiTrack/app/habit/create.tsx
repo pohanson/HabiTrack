@@ -138,7 +138,7 @@ export default function CreateHabitScreen() {
           style={[styles.button, { zIndex: 10 }]}
           pressRetentionOffset={60}
           hitSlop={5}>
-          <ThemedText>Select Time</ThemedText>
+          <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
         </Pressable>
       </View>
       {showTimePicker && (
@@ -165,7 +165,7 @@ export default function CreateHabitScreen() {
         onPress={onSubmit}
         hitSlop={5}
         pressRetentionOffset={50}>
-        <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
+        <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
           Submit
         </ThemedText>
       </Pressable>
