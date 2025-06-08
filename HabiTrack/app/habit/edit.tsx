@@ -19,7 +19,7 @@ export default function EditHabitScreen() {
   const navigation = useNavigation();
 
   const useFormReturn = useForm();
-  const { handleSubmit, watch, setValue } = useFormReturn;
+  const { handleSubmit, setValue, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
@@ -28,30 +28,38 @@ export default function EditHabitScreen() {
   const drizzleDb = drizzle(db, { schema });
 
   useEffect(() => {
+    if (!id) return;
+
+    navigation.setOptions({ headerTitle: 'Edit Habit' });
+
     const loadHabit = async () => {
-      if (!id) return;
       try {
         const result = await drizzleDb
           .select()
           .from(habit)
           .where(eq(habit.id, Number(id)));
 
-        if (result.length > 0) {
+        if (result[0]) {
+          console.log('Loaded habit:', result[0]);
           setValue('habit', result[0].name);
-          setValue('description', result[0].description ?? '');
+          setValue('description', result[0].description || '');
+          // Check if 'reminderTime' exists on the result object
+          if ('reminderTime' in result[0]) {
+            setValue('time', new Date(result[0].reminderTime as string));
+          }
         }
       } catch (error) {
         console.error('Error fetching habit:', error);
         Toast.error('Failed to load habit');
       }
-      navigation.setOptions({ headerTitle: 'Edit Habit' });
     };
 
     loadHabit();
-  }, [navigation, id, drizzleDb, setValue]);
+  }, [id, drizzleDb, navigation, setValue]);
 
-  const onSubmit = handleSubmit(
+  const onSaveChanges = handleSubmit(
     async (data) => {
+      console.log('Saving Changes:\n', data);
       try {
         await drizzleDb
           .update(habit)
@@ -75,6 +83,7 @@ export default function EditHabitScreen() {
 
   const onDelete = async () => {
     try {
+      console.log('Deleted habit');
       await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
       Toast.success('Habit Deleted');
       navigation.goBack();
@@ -96,17 +105,13 @@ export default function EditHabitScreen() {
         label="Rename Habit"
         useFormReturn={useFormReturn}
       />
-      <RHFTextInput
-        name="Change Description"
-        label="Change Description"
-        useFormReturn={useFormReturn}
-      />
+      <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
       <ThemedText type="defaultSemiBold">Change Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
         <ThemedText
           style={{
-            flex: 2,
+            flex: 1,
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
@@ -151,7 +156,7 @@ export default function EditHabitScreen() {
       <View>
         <Pressable
           style={[styles.button, { marginTop: 30, width: '100%' }]}
-          onPress={onSubmit}
+          onPress={onSaveChanges}
           hitSlop={5}
           pressRetentionOffset={50}>
           <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
