@@ -64,7 +64,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Habit List</ThemedText>
+        <ThemedText type="title" style={{ fontSize: 26 }}>{`Today's Habits`}</ThemedText>
         <FloatingActionButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
       {data?.length === 0 && <ThemedText>No habits for today.</ThemedText>}
