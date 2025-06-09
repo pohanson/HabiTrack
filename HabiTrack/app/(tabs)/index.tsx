@@ -10,7 +10,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { ToggleInput } from '@/components/ToggleInput';
 import * as schema from '@/db/schema';
 import { reminder, habit, habitCompletion } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
@@ -34,7 +34,8 @@ export default function HomeScreen() {
       .leftJoin(
         habitCompletion,
         and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
-      ),
+      )
+      .orderBy(asc(habitCompletion.completedAt), asc(reminder.time)),
     [refresh],
   );
   if (error) {
