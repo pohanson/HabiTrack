@@ -8,7 +8,7 @@ export const habit = sqliteTable('habit', {
 
 export const reminder = sqliteTable('reminder', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  day: integer('day').notNull(), // 1-7 for Mon-Sun
+  day: integer('day').notNull(), // 0-6 for Sunday-Saturday, following js Date.getDay()
   time: text('time'), // Time in HHMM format, null means no reminder
   habit_id: integer('habit_id')
     .notNull()
