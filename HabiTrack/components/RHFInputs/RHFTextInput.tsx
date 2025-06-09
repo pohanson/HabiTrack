@@ -1,7 +1,7 @@
-import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
+import { Colors } from '@/constants/Colors';
+import { Controller, UseFormReturn } from 'react-hook-form';
 import { TextInput, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
-import { Colors } from '@/constants/Colors';
 
 export function RHFTextInput({
   name,
@@ -11,7 +11,7 @@ export function RHFTextInput({
 }: {
   name: string;
   label: string;
-  useFormReturn: UseFormReturn<FieldValues>;
+  useFormReturn: UseFormReturn;
   isRequired?: boolean;
 }) {
   const colors = Colors[useColorScheme() || 'light'];
