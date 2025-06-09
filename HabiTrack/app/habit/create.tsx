@@ -2,21 +2,31 @@ import { ThemedText } from '@/components/ThemedText';
 import { useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit } from '@/db/schema';
+import { habit, reminder } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
 import { Colors } from '@/constants/Colors';
 import { getCalendars } from 'expo-localization';
+import { RHFToggleInput } from '@/components/RHFInputs/RHFToggleInput';
+import { daysOfWeekArray } from '@/types/DaysOfWeek';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
   useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
-  const useFormReturn = useForm();
+
+  const useFormReturn = useForm<FieldValues>({
+    values: {
+      habit: '',
+      description: '',
+      frequency: new Set<number>(),
+      time: new Date(0),
+    },
+  });
   const { handleSubmit, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
@@ -29,10 +39,23 @@ export default function CreateHabitScreen() {
     async (data) => {
       console.log('Submitting Form:\n', data);
       try {
-        await drizzleDb.insert(habit).values({
+        const habitResult = await drizzleDb.insert(habit).values({
           name: data.habit,
           description: data.description || '',
         });
+        (data.frequency as Set<number>).forEach((day) =>
+          drizzleDb
+            .insert(reminder)
+            .values({
+              day: day,
+              time: reminderTime
+                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
+                : null,
+              habit_id: habitResult.lastInsertRowId,
+            })
+            .execute(),
+        );
+
         Toast.success('Habit Created');
         useFormReturn.reset();
       } catch (error) {
@@ -59,6 +82,39 @@ export default function CreateHabitScreen() {
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
+
+      <ThemedText type="defaultSemiBold">Frequency</ThemedText>
+      <Controller
+        name={'frequency'}
+        control={useFormReturn.control}
+        render={({ field: { onChange, value } }) => (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 8,
+              flexWrap: 'wrap',
+              justifyContent: 'space-evenly',
+            }}>
+            {daysOfWeekArray.map((val, i) => (
+              <RHFToggleInput
+                key={val}
+                label={val.slice(0, 3)}
+                toggleSelected={() => {
+                  if (value.has(i)) {
+                    value.delete(i);
+                  } else {
+                    value.add(i);
+                  }
+                  onChange(value);
+                }}
+                selected={value.has(i)}
+              />
+            ))}
+          </View>
+        )}
+      />
+
       <ThemedText type="defaultSemiBold">Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
