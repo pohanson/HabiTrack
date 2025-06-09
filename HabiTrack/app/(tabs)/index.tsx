@@ -15,6 +15,7 @@ import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import { Colors } from '@/constants/Colors';
+import { Toast } from 'toastify-react-native';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
@@ -22,11 +23,14 @@ export default function HomeScreen() {
   const drizzleDb = drizzle(db, { schema });
 
   const today = new Date().toJSON().split('T')[0];
+  const dayOfWeek = new Date().getDay();
   const colors = Colors[useColorScheme() || 'light'];
   const { data, error } = useLiveQuery(
     drizzleDb
-      .select({ habit: habit, habit_completion: habitCompletion })
-      .from(habit)
+      .select({ habit: habit, habit_completion: habitCompletion, reminder: reminder })
+      .from(reminder)
+      .where(eq(reminder.day, dayOfWeek))
+      .innerJoin(habit, eq(reminder.habit_id, habit.id))
       .leftJoin(
         habitCompletion,
         and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
@@ -36,6 +40,7 @@ export default function HomeScreen() {
   );
   if (error) {
     console.error('Error fetching habits:', error);
+    Toast.error('Error fetching habits.');
   }
 
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
@@ -53,6 +58,7 @@ export default function HomeScreen() {
         <ThemedText type="title">Habit List</ThemedText>
         <FloatingActionButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
+      {data?.length === 0 && <ThemedText>No habits for today.</ThemedText>}
       {data.map(({ habit, habit_completion }, idx) => (
         <View
           key={idx}
