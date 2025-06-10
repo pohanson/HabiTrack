@@ -124,10 +124,11 @@ export default function CreateHabitScreen() {
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: 'gray',
+            backgroundColor: 'dimgray',
             padding: 8,
             textAlign: 'center',
             textAlignVertical: 'center',
+            color: 'white',
           }}>
           {reminderTime === undefined
             ? 'No Reminder'

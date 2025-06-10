@@ -41,6 +41,7 @@ export default function EditHabitScreen() {
     if (!id) return;
     navigation.setOptions({ headerTitle: 'Edit Habit' });
     const loadHabit = async () => {
+      // get habit and reminder data from db
       try {
         const fetchedHabit = await drizzleDb
           .select()
@@ -193,10 +194,11 @@ export default function EditHabitScreen() {
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: 'gray',
+            backgroundColor: 'dimgray',
             padding: 8,
             textAlign: 'center',
             textAlignVertical: 'center',
+            color: 'white',
           }}>
           {reminderTime === undefined
             ? 'No Reminder'
