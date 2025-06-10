@@ -1,13 +1,14 @@
 import { ThemedText } from '@/components/ThemedText';
-import { useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit, reminder } from '@/db/schema';
+import { habit } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
 import { Colors } from '@/constants/Colors';
@@ -15,19 +16,12 @@ import { getCalendars } from 'expo-localization';
 import { RHFToggleInput } from '@/components/RHFInputs/RHFToggleInput';
 import { daysOfWeekArray } from '@/types/DaysOfWeek';
 
-export default function CreateHabitScreen() {
+export default function EditHabitScreen() {
+  const { id } = useLocalSearchParams();
   const navigation = useNavigation();
-  useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
 
-  const useFormReturn = useForm<FieldValues>({
-    values: {
-      habit: '',
-      description: '',
-      frequency: new Set<number>(),
-      time: new Date(0),
-    },
-  });
-  const { handleSubmit, watch } = useFormReturn;
+  const useFormReturn = useForm<FieldValues>({ defaultValues: { frequency: new Set<number>() } });
+  const { handleSubmit, setValue, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
@@ -35,32 +29,58 @@ export default function CreateHabitScreen() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
-  const onSubmit = handleSubmit(
-    async (data) => {
-      console.log('Submitting Form:\n', data);
-      try {
-        const habitResult = await drizzleDb.insert(habit).values({
-          name: data.habit,
-          description: data.description || '',
-        });
-        (data.frequency as Set<number>).forEach((day) =>
-          drizzleDb
-            .insert(reminder)
-            .values({
-              day: day,
-              time: reminderTime
-                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
-                : null,
-              habit_id: habitResult.lastInsertRowId,
-            })
-            .execute(),
-        );
+  useEffect(() => {
+    if (!id) return;
 
-        Toast.success('Habit Created');
-        useFormReturn.reset();
+    navigation.setOptions({ headerTitle: 'Edit Habit' });
+
+    const loadHabit = async () => {
+      try {
+        const result = await drizzleDb
+          .select()
+          .from(habit)
+          .where(eq(habit.id, Number(id)));
+        const freq = await drizzleDb
+          .select({ frequency: schema.reminder.day })
+          .from(schema.reminder)
+          .where(eq(schema.reminder.habit_id, Number(id)))
+          .then((r) => r.map((f) => f.frequency));
+
+        if (result[0]) {
+          console.log('Loaded habit:', result[0]);
+          setValue('habit', result[0].name);
+          setValue('description', result[0].description || '');
+          setValue('frequency', new Set<number>(freq));
+          // Check if 'reminderTime' exists on the result object
+          if ('reminderTime' in result[0]) {
+            setValue('time', new Date(result[0].reminderTime as string));
+          }
+        }
       } catch (error) {
-        console.error('Error inserting habit:', error);
-        Toast.error('Failed to create habit');
+        console.error('Error fetching habit:', error);
+        Toast.error('Failed to load habit');
+      }
+    };
+
+    loadHabit();
+  }, [id, drizzleDb, navigation, setValue]);
+
+  const onSaveChanges = handleSubmit(
+    async (data) => {
+      console.log('Saving Changes:\n', data);
+      try {
+        await drizzleDb
+          .update(habit)
+          .set({
+            name: data.habit,
+            description: data.description || '',
+          })
+          .where(eq(habit.id, Number(id)));
+        Toast.success('Habit Updated');
+        navigation.goBack();
+      } catch (error) {
+        console.error('Error updating habit:', error);
+        Toast.error('Failed to update habit');
       }
     },
     (errors) => {
@@ -69,20 +89,31 @@ export default function CreateHabitScreen() {
     },
   );
 
+  const onDelete = async () => {
+    try {
+      console.log('Deleted habit');
+      await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
+      Toast.success('Habit Deleted');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+      Toast.error('Failed to delete habit');
+    }
+  };
+
   const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
   const colors = Colors[useColorScheme() || 'light'];
 
   return (
     <View style={{ padding: 8 }}>
-      <ThemedText type="title">Create Habit</ThemedText>
+      <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput
         name="habit"
         isRequired={true}
-        label="Habit Name"
+        label="Rename Habit"
         useFormReturn={useFormReturn}
       />
-      <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
-
+      <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
       <ThemedText type="defaultSemiBold">Frequency</ThemedText>
       <Controller
         name={'frequency'}
@@ -114,8 +145,7 @@ export default function CreateHabitScreen() {
           </View>
         )}
       />
-
-      <ThemedText type="defaultSemiBold">Reminder Time</ThemedText>
+      <ThemedText type="defaultSemiBold">Change Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
         <ThemedText
@@ -141,6 +171,7 @@ export default function CreateHabitScreen() {
           <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
         </Pressable>
       </View>
+
       {showTimePicker && (
         <Controller
           name="time"
@@ -160,15 +191,29 @@ export default function CreateHabitScreen() {
           )}
         />
       )}
-      <Pressable
-        style={[styles.button, { marginTop: 30, width: '100%' }]}
-        onPress={onSubmit}
-        hitSlop={5}
-        pressRetentionOffset={50}>
-        <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
-          Submit
-        </ThemedText>
-      </Pressable>
+
+      <View>
+        <Pressable
+          style={[styles.button, { marginTop: 30, width: '100%' }]}
+          onPress={onSaveChanges}
+          hitSlop={5}
+          pressRetentionOffset={50}>
+          <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
+            Save Changes
+          </ThemedText>
+        </Pressable>
+
+        <Pressable
+          style={[styles.deleteButton, { marginTop: 10, width: '100%' }]}
+          onPress={onDelete}
+          hitSlop={5}
+          pressRetentionOffset={50}>
+          <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
+            Delete Habit
+          </ThemedText>
+        </Pressable>
+      </View>
+
       <ToastManager />
     </View>
   );
@@ -179,6 +224,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: 16,
     backgroundColor: Colors.light.tint,
+    borderRadius: 10,
+  },
+  deleteButton: {
+    alignSelf: 'center',
+    padding: 16,
+    backgroundColor: 'red',
     borderRadius: 10,
   },
 });

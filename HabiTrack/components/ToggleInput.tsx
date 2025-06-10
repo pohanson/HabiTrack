@@ -8,11 +8,13 @@ export function ToggleInput({
   iconName,
   selected,
   toggleSelected,
+  iconSize = 32,
 }: {
   label: string;
   iconName: IconSymbolName;
   selected: boolean;
   toggleSelected: () => void;
+  iconSize: number;
 }) {
   const colorScheme = useColorScheme() || 'light';
   return (
@@ -26,13 +28,13 @@ export function ToggleInput({
         pressRetentionOffset={50}
         hitSlop={8}
         style={{
-          padding: 8,
+          padding: iconSize * 0.25,
           borderWidth: 2,
           borderColor: selected ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].text,
           backgroundColor: selected
             ? Colors[colorScheme].tabIconSelected
             : Colors[colorScheme].background,
-          borderRadius: 50,
+          borderRadius: iconSize,
         }}
         onPress={() => {
           toggleSelected();
@@ -41,6 +43,7 @@ export function ToggleInput({
           color={Colors[colorScheme].background}
           style={{ opacity: selected ? 1 : 0 }}
           name={iconName}
+          size={iconSize * 0.6}
         />
       </Pressable>
     </View>
