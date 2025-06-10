@@ -6,7 +6,7 @@ import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit } from '@/db/schema';
+import { habit, reminder, habitCompletion } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -20,7 +20,16 @@ export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
-  const useFormReturn = useForm<FieldValues>({ defaultValues: { frequency: new Set<number>() } });
+
+  const useFormReturn = useForm<FieldValues>({
+    values: {
+      habit: '',
+      description: '',
+      frequency: new Set<number>(),
+      time: new Date(0),
+    },
+  });
+
   const { handleSubmit, setValue, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
@@ -31,12 +40,11 @@ export default function EditHabitScreen() {
 
   useEffect(() => {
     if (!id) return;
-
     navigation.setOptions({ headerTitle: 'Edit Habit' });
-
     const loadHabit = async () => {
+      // get habit and reminder data from db
       try {
-        const result = await drizzleDb
+        const fetchedHabit = await drizzleDb
           .select()
           .from(habit)
           .where(eq(habit.id, Number(id)));
@@ -46,14 +54,33 @@ export default function EditHabitScreen() {
           .where(eq(schema.reminder.habit_id, Number(id)))
           .then((r) => r.map((f) => f.frequency));
 
-        if (result[0]) {
-          console.log('Loaded habit:', result[0]);
-          setValue('habit', result[0].name);
-          setValue('description', result[0].description || '');
-          setValue('frequency', new Set<number>(freq));
-          // Check if 'reminderTime' exists on the result object
-          if ('reminderTime' in result[0]) {
-            setValue('time', new Date(result[0].reminderTime as string));
+
+        if (fetchedHabit[0]) {
+          console.log('Loaded habit:', fetchedHabit[0]);
+          setValue('habit', fetchedHabit[0].name);
+          setValue('description', fetchedHabit[0].description || '');
+
+          const fetchedReminder = await drizzleDb
+            .select()
+            .from(reminder)
+            .where(eq(reminder.habit_id, Number(id)));
+
+          if (fetchedReminder[0]) {
+            const timeString = fetchedReminder[0].time;
+            if (timeString) {
+              const hours = parseInt(timeString.slice(0, 2), 10);
+              const minutes = parseInt(timeString.slice(2, 4), 10);
+              const reminderDate = new Date();
+              reminderDate.setHours(hours, minutes, 0, 0);
+              setValue('time', reminderDate);
+            } else {
+              setValue('time', new Date(0));
+            }
+            const frequencySet = new Set<number>();
+            fetchedReminder.forEach((reminder) => {
+              frequencySet.add(reminder.day);
+            });
+            setValue('frequency', frequencySet);
           }
         }
       } catch (error) {
@@ -61,14 +88,15 @@ export default function EditHabitScreen() {
         Toast.error('Failed to load habit');
       }
     };
-
     loadHabit();
-  }, [id, drizzleDb, navigation, setValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, navigation]);
 
   const onSaveChanges = handleSubmit(
     async (data) => {
       console.log('Saving Changes:\n', data);
       try {
+        // Updata habit name and desc
         await drizzleDb
           .update(habit)
           .set({
@@ -76,6 +104,24 @@ export default function EditHabitScreen() {
             description: data.description || '',
           })
           .where(eq(habit.id, Number(id)));
+
+        // delete current reminders
+        await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
+
+        // add in new reminders
+        (data.frequency as Set<number>).forEach((day) => {
+          drizzleDb
+            .insert(reminder)
+            .values({
+              day: day,
+              time: reminderTime
+                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
+                : null,
+              habit_id: Number(id),
+            })
+            .execute();
+        });
+
         Toast.success('Habit Updated');
         navigation.goBack();
       } catch (error) {
@@ -92,6 +138,9 @@ export default function EditHabitScreen() {
   const onDelete = async () => {
     try {
       console.log('Deleted habit');
+      // delete all instances of this habit from habit, reminder, habitCompletion tables
+      await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
+      await drizzleDb.delete(habitCompletion).where(eq(habitCompletion.habit_id, Number(id)));
       await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
       Toast.success('Habit Deleted');
       navigation.goBack();
@@ -107,13 +156,10 @@ export default function EditHabitScreen() {
   return (
     <View style={{ padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
-      <RHFTextInput
-        name="habit"
-        isRequired={true}
-        label="Rename Habit"
-        useFormReturn={useFormReturn}
-      />
+      <RHFTextInput name="habit" label="Rename Habit" useFormReturn={useFormReturn} />
+
       <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
+
       <ThemedText type="defaultSemiBold">Frequency</ThemedText>
       <Controller
         name={'frequency'}
@@ -145,6 +191,7 @@ export default function EditHabitScreen() {
           </View>
         )}
       />
+
       <ThemedText type="defaultSemiBold">Change Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
@@ -154,10 +201,11 @@ export default function EditHabitScreen() {
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: 'gray',
+            backgroundColor: 'dimgray',
             padding: 8,
             textAlign: 'center',
             textAlignVertical: 'center',
+            color: 'white',
           }}>
           {reminderTime === undefined
             ? 'No Reminder'
@@ -168,7 +216,7 @@ export default function EditHabitScreen() {
           style={[styles.button, { zIndex: 10 }]}
           pressRetentionOffset={60}
           hitSlop={5}>
-          <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
+          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
         </Pressable>
       </View>
 
@@ -229,7 +277,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     alignSelf: 'center',
     padding: 16,
-    backgroundColor: 'red',
+    backgroundColor: '#ff4d4d',
     borderRadius: 10,
   },
 });

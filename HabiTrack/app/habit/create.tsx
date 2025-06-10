@@ -18,6 +18,7 @@ import { daysOfWeekArray } from '@/types/DaysOfWeek';
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
   useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
+  // ^ Not sure if need useEffect here, can move navigation.setOptions outside maybe?
 
   const useFormReturn = useForm<FieldValues>({
     values: {
@@ -82,7 +83,6 @@ export default function CreateHabitScreen() {
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
-
       <ThemedText type="defaultSemiBold">Frequency</ThemedText>
       <Controller
         name={'frequency'}
@@ -124,10 +124,11 @@ export default function CreateHabitScreen() {
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 10,
-            backgroundColor: 'gray',
+            backgroundColor: 'dimgray',
             padding: 8,
             textAlign: 'center',
             textAlignVertical: 'center',
+            color: 'white',
           }}>
           {reminderTime === undefined
             ? 'No Reminder'
@@ -138,7 +139,7 @@ export default function CreateHabitScreen() {
           style={[styles.button, { zIndex: 10 }]}
           pressRetentionOffset={60}
           hitSlop={5}>
-          <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
+          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
         </Pressable>
       </View>
       {showTimePicker && (
