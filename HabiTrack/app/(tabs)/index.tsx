@@ -16,6 +16,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import { Colors } from '@/constants/Colors';
 import { Toast } from 'toastify-react-native';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
@@ -63,7 +64,25 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={styles.titleContainer}>
+      <ThemedView
+        style={{
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: colors.tint,
+            borderRadius: 20,
+            padding: 8,
+            marginRight: 8,
+          }}
+          onPress={() => {
+            router.push('/habit/full-list');
+          }}>
+          <IconSymbol name="list.bullet" color="white" />
+        </TouchableOpacity>
         <ThemedText type="title" style={{ fontSize: 26 }}>{`Today's Habits`}</ThemedText>
         <FloatingActionButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
