@@ -18,6 +18,7 @@ import { daysOfWeekArray } from '@/types/DaysOfWeek';
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
   useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
+  // ^ Not sure if need useEffect here, can move navigation.setOptions outside maybe?
 
   const useFormReturn = useForm<FieldValues>({
     values: {
@@ -82,7 +83,6 @@ export default function CreateHabitScreen() {
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
-
       <ThemedText type="defaultSemiBold">Frequency</ThemedText>
       <Controller
         name={'frequency'}
