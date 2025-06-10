@@ -51,7 +51,7 @@ export default function HomeScreen() {
       pathname: '/habit/edit',
       params: { id: habitId },
     });
-    console.log(`Editing ${habitToEdit?.name}`);
+    console.log(`Editing Habit: ${habitToEdit?.name}`);
   };
 
   return (

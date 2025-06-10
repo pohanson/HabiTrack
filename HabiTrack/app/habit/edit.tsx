@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit } from '@/db/schema';
+import { habit, reminder, habitCompletion } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -34,19 +34,19 @@ export default function EditHabitScreen() {
 
     const loadHabit = async () => {
       try {
-        const result = await drizzleDb
+        const fetchedHabit = await drizzleDb
           .select()
           .from(habit)
           .where(eq(habit.id, Number(id)));
 
-        if (result[0]) {
-          console.log('Loaded habit:', result[0]);
-          setValue('habit', result[0].name);
-          setValue('description', result[0].description || '');
-          // Check if 'reminderTime' exists on the result object
-          if ('reminderTime' in result[0]) {
-            setValue('time', new Date(result[0].reminderTime as string));
-          }
+        const fetchedReminder = await drizzleDb
+          .select()
+          .from(reminder)
+          .where(eq(reminder.habit_id, Number(id)));
+        if (fetchedHabit[0]) {
+          console.log('Loaded habit:', fetchedHabit[0], fetchedReminder[0]);
+          setValue('habit', fetchedHabit[0].name);
+          setValue('description', fetchedHabit[0].description || '');
         }
       } catch (error) {
         console.error('Error fetching habit:', error);
@@ -84,6 +84,8 @@ export default function EditHabitScreen() {
   const onDelete = async () => {
     try {
       console.log('Deleted habit');
+      await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
+      await drizzleDb.delete(habitCompletion).where(eq(habitCompletion.habit_id, Number(id)));
       await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
       Toast.success('Habit Deleted');
       navigation.goBack();
@@ -129,7 +131,7 @@ export default function EditHabitScreen() {
           style={[styles.button, { zIndex: 10 }]}
           pressRetentionOffset={60}
           hitSlop={5}>
-          <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
+          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
         </Pressable>
       </View>
 

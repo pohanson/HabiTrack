@@ -138,7 +138,7 @@ export default function CreateHabitScreen() {
           style={[styles.button, { zIndex: 10 }]}
           pressRetentionOffset={60}
           hitSlop={5}>
-          <ThemedText style={{ color: 'white' }}>Select Time</ThemedText>
+          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
         </Pressable>
       </View>
       {showTimePicker && (
