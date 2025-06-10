@@ -21,6 +21,7 @@ const MAPPING = {
   calendar: 'calendar-month',
   plus: 'add',
   checkmark: 'check',
+  'list.bullet': 'list',
 } as IconMapping;
 
 /**
