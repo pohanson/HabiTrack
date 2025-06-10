@@ -13,8 +13,8 @@ import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
 import { Colors } from '@/constants/Colors';
 import { getCalendars } from 'expo-localization';
-import { RHFToggleInput } from '@/components/RHFInputs/RHFToggleInput';
-import { daysOfWeekArray } from '@/types/DaysOfWeek';
+import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
+import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 
 export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
@@ -152,86 +152,12 @@ export default function EditHabitScreen() {
       <RHFTextInput name="habit" label="Rename Habit" useFormReturn={useFormReturn} />
 
       <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
-
-      <ThemedText type="defaultSemiBold">Frequency</ThemedText>
-      <Controller
-        name={'frequency'}
+      <RHFFrequencyInput name="frequency" control={useFormReturn.control} />
+      <RHFTimeInput
         control={useFormReturn.control}
-        render={({ field: { onChange, value } }) => (
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: 8,
-              flexWrap: 'wrap',
-              justifyContent: 'space-evenly',
-            }}>
-            {daysOfWeekArray.map((val, i) => (
-              <RHFToggleInput
-                key={val}
-                label={val.slice(0, 3)}
-                toggleSelected={() => {
-                  if (value.has(i)) {
-                    value.delete(i);
-                  } else {
-                    value.add(i);
-                  }
-                  onChange(value);
-                }}
-                selected={value.has(i)}
-              />
-            ))}
-          </View>
-        )}
+        label="Change Reminder Time"
+        reminderTime={reminderTime}
       />
-
-      <ThemedText type="defaultSemiBold">Change Reminder Time</ThemedText>
-      <View
-        style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
-        <ThemedText
-          style={{
-            flex: 1,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 10,
-            backgroundColor: 'dimgray',
-            padding: 8,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            color: 'white',
-          }}>
-          {reminderTime === undefined
-            ? 'No Reminder'
-            : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
-        </ThemedText>
-        <Pressable
-          onPress={() => setShowTimePicker(true)}
-          style={[styles.button, { zIndex: 10 }]}
-          pressRetentionOffset={60}
-          hitSlop={5}>
-          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
-        </Pressable>
-      </View>
-
-      {showTimePicker && (
-        <Controller
-          name="time"
-          control={useFormReturn.control}
-          render={({ field: { onChange, value } }) => (
-            <DateTimePicker
-              value={value || new Date(0)}
-              onChange={(event, selectedDate) => {
-                setShowTimePicker(false);
-                onChange(selectedDate);
-              }}
-              mode="time"
-              timeZoneName={timeZone === 'Asia/Singapore' ? 'UTC' : timeZone}
-              // 8*60=480 SG is UTC+8, required because Locale is not properly working.
-              timeZoneOffsetInMinutes={timeZone === 'Asia/Singapore' ? 480 : undefined}
-            />
-          )}
-        />
-      )}
 
       <View>
         <Pressable
