@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
@@ -13,12 +13,14 @@ import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
 import { Colors } from '@/constants/Colors';
 import { getCalendars } from 'expo-localization';
+import { RHFToggleInput } from '@/components/RHFInputs/RHFToggleInput';
+import { daysOfWeekArray } from '@/types/DaysOfWeek';
 
 export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
-  const useFormReturn = useForm();
+  const useFormReturn = useForm<FieldValues>({ defaultValues: { frequency: new Set<number>() } });
   const { handleSubmit, setValue, watch } = useFormReturn;
   const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
@@ -38,11 +40,17 @@ export default function EditHabitScreen() {
           .select()
           .from(habit)
           .where(eq(habit.id, Number(id)));
+        const freq = await drizzleDb
+          .select({ frequency: schema.reminder.day })
+          .from(schema.reminder)
+          .where(eq(schema.reminder.habit_id, Number(id)))
+          .then((r) => r.map((f) => f.frequency));
 
         if (result[0]) {
           console.log('Loaded habit:', result[0]);
           setValue('habit', result[0].name);
           setValue('description', result[0].description || '');
+          setValue('frequency', new Set<number>(freq));
           // Check if 'reminderTime' exists on the result object
           if ('reminderTime' in result[0]) {
             setValue('time', new Date(result[0].reminderTime as string));
@@ -106,6 +114,37 @@ export default function EditHabitScreen() {
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
+      <ThemedText type="defaultSemiBold">Frequency</ThemedText>
+      <Controller
+        name={'frequency'}
+        control={useFormReturn.control}
+        render={({ field: { onChange, value } }) => (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 8,
+              flexWrap: 'wrap',
+              justifyContent: 'space-evenly',
+            }}>
+            {daysOfWeekArray.map((val, i) => (
+              <RHFToggleInput
+                key={val}
+                label={val.slice(0, 3)}
+                toggleSelected={() => {
+                  if (value.has(i)) {
+                    value.delete(i);
+                  } else {
+                    value.add(i);
+                  }
+                  onChange(value);
+                }}
+                selected={value.has(i)}
+              />
+            ))}
+          </View>
+        )}
+      />
       <ThemedText type="defaultSemiBold">Change Reminder Time</ThemedText>
       <View
         style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
