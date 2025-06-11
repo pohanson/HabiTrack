@@ -8,7 +8,7 @@ import * as schema from '@/db/schema';
 import { Colors } from '@/constants/Colors';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
+import { ScrollView, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
 export default function FullHabitListScreen() {
@@ -39,6 +39,12 @@ export default function FullHabitListScreen() {
 
   return (
     <ScrollView style={{ margin: 20 }}>
+      {data?.length === 0 && (
+        <View>
+          <ThemedText>No habits here!</ThemedText>
+          <ThemedText>Create a habit to get started</ThemedText>
+        </View>
+      )}
       {data.map((habitItem, idx) => (
         <ThemedView
           key={idx}

@@ -20,7 +20,6 @@ export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
-
   const useFormReturn = useForm<FieldValues>({
     values: {
       habit: '',
@@ -48,12 +47,11 @@ export default function EditHabitScreen() {
           .select()
           .from(habit)
           .where(eq(habit.id, Number(id)));
-        const freq = await drizzleDb
-          .select({ frequency: schema.reminder.day })
-          .from(schema.reminder)
-          .where(eq(schema.reminder.habit_id, Number(id)))
-          .then((r) => r.map((f) => f.frequency));
-
+        // const freq = await drizzleDb
+        //   .select({ frequency: schema.reminder.day })
+        //   .from(schema.reminder)
+        //   .where(eq(schema.reminder.habit_id, Number(id)))
+        //   .then((r) => r.map((f) => f.frequency));
 
         if (fetchedHabit[0]) {
           console.log('Loaded habit:', fetchedHabit[0]);
