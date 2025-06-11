@@ -41,8 +41,8 @@ export default function FullHabitListScreen() {
     <ScrollView style={{ margin: 20 }}>
       {data?.length === 0 && (
         <View>
-          <ThemedText>No habits here!</ThemedText>
-          <ThemedText>Create a habit to get started</ThemedText>
+          <ThemedText>No habits yet</ThemedText>
+          <ThemedText>Create a habit to get started!</ThemedText>
         </View>
       )}
       {data.map((habitItem, idx) => (
