@@ -1,20 +1,19 @@
 import { ThemedText } from '@/components/ThemedText';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
-import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { Pressable, View } from 'react-native';
+import { FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
 import { habit, reminder, habitCompletion } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
-import { Colors } from '@/constants/Colors';
-import { getCalendars } from 'expo-localization';
 import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
+import { STYLES } from '@/components/Styles';
+import { zeroPad } from '@/utils/zeroPad';
 
 export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
@@ -30,9 +29,7 @@ export default function EditHabitScreen() {
   });
 
   const { handleSubmit, setValue, watch } = useFormReturn;
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const reminderTime: Date = watch('time') || new Date(0);
-  const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -143,9 +140,6 @@ export default function EditHabitScreen() {
     }
   };
 
-  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
-  const colors = Colors[useColorScheme() || 'light'];
-
   return (
     <View style={{ padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
@@ -161,21 +155,21 @@ export default function EditHabitScreen() {
 
       <View>
         <Pressable
-          style={[styles.button, { marginTop: 30, width: '100%' }]}
+          style={[STYLES.button, { marginTop: 30, width: '100%' }]}
           onPress={onSaveChanges}
           hitSlop={5}
           pressRetentionOffset={50}>
-          <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
+          <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
             Save Changes
           </ThemedText>
         </Pressable>
 
         <Pressable
-          style={[styles.deleteButton, { marginTop: 10, width: '100%' }]}
+          style={[STYLES.deleteButton, { marginTop: 10, width: '100%' }]}
           onPress={onDelete}
           hitSlop={5}
           pressRetentionOffset={50}>
-          <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
+          <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
             Delete Habit
           </ThemedText>
         </Pressable>
@@ -185,18 +179,3 @@ export default function EditHabitScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    alignSelf: 'center',
-    padding: 16,
-    backgroundColor: Colors.light.tint,
-    borderRadius: 10,
-  },
-  deleteButton: {
-    alignSelf: 'center',
-    padding: 16,
-    backgroundColor: '#ff4d4d',
-    borderRadius: 10,
-  },
-});

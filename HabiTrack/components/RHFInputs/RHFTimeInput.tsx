@@ -1,9 +1,11 @@
 import { Colors } from '@/constants/Colors';
+import { zeroPad } from '@/utils/zeroPad';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { Pressable, useColorScheme, View } from 'react-native';
+import { STYLES } from '../Styles';
 import { ThemedText } from '../ThemedText';
 
 export function RHFTimeInput({
@@ -16,7 +18,6 @@ export function RHFTimeInput({
   reminderTime?: Date | undefined;
 }) {
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
   const colors = Colors[useColorScheme() || 'light'];
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
   return (
@@ -42,7 +43,7 @@ export function RHFTimeInput({
         </ThemedText>
         <Pressable
           onPress={() => setShowTimePicker(true)}
-          style={[styles.button, { zIndex: 10 }]}
+          style={[STYLES.button]}
           pressRetentionOffset={60}
           hitSlop={5}>
           <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
@@ -70,12 +71,3 @@ export function RHFTimeInput({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    alignSelf: 'center',
-    padding: 16,
-    backgroundColor: Colors.light.tint,
-    borderRadius: 10,
-  },
-});

@@ -1,16 +1,17 @@
 import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
+import { STYLES } from '@/components/Styles';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/Colors';
 import * as schema from '@/db/schema';
 import { habit, reminder } from '@/db/schema';
+import { zeroPad } from '@/utils/zeroPad';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useNavigation } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function CreateHabitScreen() {
@@ -34,7 +35,6 @@ export default function CreateHabitScreen() {
 
   const onSubmit = handleSubmit(
     async (data) => {
-      console.log('Submitting Form:\n', data);
       try {
         const habitResult = await drizzleDb.insert(habit).values({
           name: data.habit,
@@ -66,8 +66,6 @@ export default function CreateHabitScreen() {
     },
   );
 
-  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
-
   return (
     <View style={{ padding: 8 }}>
       <ThemedText type="title">Create Habit</ThemedText>
@@ -82,11 +80,11 @@ export default function CreateHabitScreen() {
       <RHFFrequencyInput control={useFormReturn.control} name="frequency" />
       <RHFTimeInput control={useFormReturn.control} />
       <Pressable
-        style={[styles.button, { marginTop: 30, width: '100%' }]}
+        style={[STYLES.button, { marginTop: 30, width: '100%' }]}
         onPress={onSubmit}
         hitSlop={5}
         pressRetentionOffset={50}>
-        <ThemedText type="defaultSemiBold" style={{ color: 'white', textAlign: 'center' }}>
+        <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
           Submit
         </ThemedText>
       </Pressable>
@@ -94,12 +92,3 @@ export default function CreateHabitScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    alignSelf: 'center',
-    padding: 16,
-    backgroundColor: Colors.light.tint,
-    borderRadius: 10,
-  },
-});

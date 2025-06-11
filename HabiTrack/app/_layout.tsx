@@ -17,14 +17,14 @@ import { ActivityIndicator } from 'react-native';
 export default function RootLayout() {
   const expoDb = openDatabaseSync(DATABASE_NAME);
   const db = drizzle(expoDb);
-  const { success, error } = useMigrations(db, migrations);
+  const { error } = useMigrations(db, migrations);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  if (!success) {
+  if (error) {
     console.log('Database migration failed:', error);
     return null;
   }
