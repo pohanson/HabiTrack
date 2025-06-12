@@ -24,12 +24,11 @@ export default function EditHabitScreen() {
       habit: '',
       description: '',
       frequency: new Set<number>(),
-      time: new Date(0),
+      time: null,
     },
   });
 
-  const { handleSubmit, setValue, watch } = useFormReturn;
-  const reminderTime: Date = watch('time') || new Date(0);
+  const { handleSubmit, setValue } = useFormReturn;
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -62,8 +61,6 @@ export default function EditHabitScreen() {
               const reminderDate = new Date();
               reminderDate.setHours(hours, minutes, 0, 0);
               setValue('time', reminderDate);
-            } else {
-              setValue('time', new Date(0));
             }
             const frequencySet = new Set<number>();
             fetchedReminder.forEach((reminder) => {
@@ -102,9 +99,10 @@ export default function EditHabitScreen() {
             .insert(reminder)
             .values({
               day: day,
-              time: reminderTime
-                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
-                : null,
+              time:
+                data.time != null
+                  ? `${zeroPad(data.time.getHours())}${zeroPad(data.time.getMinutes())}`
+                  : null,
               habit_id: Number(id),
             })
             .execute();
@@ -144,11 +142,7 @@ export default function EditHabitScreen() {
 
       <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
       <RHFFrequencyInput name="frequency" control={useFormReturn.control} />
-      <RHFTimeInput
-        control={useFormReturn.control}
-        label="Change Reminder Time"
-        reminderTime={reminderTime}
-      />
+      <RHFTimeInput control={useFormReturn.control} label="Change Reminder Time" />
 
       <View>
         <TextButton

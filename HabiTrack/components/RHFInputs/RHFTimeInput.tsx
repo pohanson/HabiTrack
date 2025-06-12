@@ -1,61 +1,71 @@
-import { Colors } from '@/constants/Colors';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { zeroPad } from '@/utils/zeroPad';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
-import { Pressable, useColorScheme, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { IconButton } from '../IconButton';
 import { STYLES } from '../Styles';
 import { ThemedText } from '../ThemedText';
 
 export function RHFTimeInput({
   control,
   label = 'Reminder Time',
-  reminderTime = undefined,
 }: {
   control: Control<any>;
   label?: string;
-  reminderTime?: Date | undefined;
 }) {
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const colors = Colors[useColorScheme() || 'light'];
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
+  const borderColor = useThemeColor({}, 'border');
   return (
-    <>
-      <ThemedText type="defaultSemiBold">{label}</ThemedText>
-      <View
-        style={{ marginVertical: 8, display: 'flex', flexDirection: 'row', gap: 8, width: '100%' }}>
-        <ThemedText
-          style={{
-            flex: 1,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 10,
-            backgroundColor: 'dimgray',
-            padding: 8,
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            color: 'white',
-          }}>
-          {reminderTime === undefined
-            ? 'No Reminder'
-            : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
-        </ThemedText>
-        <Pressable
-          onPress={() => setShowTimePicker(true)}
-          style={[STYLES.button]}
-          pressRetentionOffset={60}
-          hitSlop={5}>
-          <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
-        </Pressable>
-      </View>
-      {showTimePicker && (
-        <Controller
-          name="time"
-          control={control}
-          render={({ field: { onChange, value } }) => (
+    <Controller
+      name="time"
+      control={control}
+      render={({ field: { onChange, value: reminderTime } }) => (
+        <>
+          <ThemedText type="defaultSemiBold">{label}</ThemedText>
+          <View
+            style={{
+              marginVertical: 8,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 8,
+              width: '100%',
+            }}>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flex: 1,
+                borderWidth: 1,
+                borderColor: borderColor,
+                borderRadius: 10,
+                backgroundColor: 'dimgray',
+                paddingHorizontal: 16,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <ThemedText>
+                {reminderTime == null
+                  ? 'No Reminder'
+                  : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
+              </ThemedText>
+              <IconButton iconName="xmark" onPress={() => onChange(null)} />
+            </View>
+
+            <Pressable
+              onPress={() => setShowTimePicker(true)}
+              style={[STYLES.button]}
+              pressRetentionOffset={60}
+              hitSlop={5}>
+              <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
+            </Pressable>
+          </View>
+          {showTimePicker && (
             <DateTimePicker
-              value={value || new Date(0)}
+              value={reminderTime || new Date(0)}
               onChange={(event, selectedDate) => {
                 setShowTimePicker(false);
                 onChange(selectedDate);
@@ -66,8 +76,8 @@ export function RHFTimeInput({
               timeZoneOffsetInMinutes={timeZone === 'Asia/Singapore' ? 480 : undefined}
             />
           )}
-        />
+        </>
       )}
-    </>
+    />
   );
 }

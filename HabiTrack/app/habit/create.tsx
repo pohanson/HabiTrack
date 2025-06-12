@@ -24,11 +24,10 @@ export default function CreateHabitScreen() {
       habit: '',
       description: '',
       frequency: new Set<number>(),
-      time: new Date(0),
+      time: null,
     },
   });
-  const { handleSubmit, watch } = useFormReturn;
-  const reminderTime: Date = watch('time') || new Date(0);
+  const { handleSubmit } = useFormReturn;
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -45,9 +44,10 @@ export default function CreateHabitScreen() {
             .insert(reminder)
             .values({
               day: day,
-              time: reminderTime
-                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
-                : null,
+              time:
+                data.time != null
+                  ? `${zeroPad(data.time.getHours())}${zeroPad(data.time.getMinutes())}`
+                  : null,
               habit_id: habitResult.lastInsertRowId,
             })
             .execute(),
