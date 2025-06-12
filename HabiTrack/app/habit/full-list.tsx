@@ -27,10 +27,10 @@ export default function FullHabitListScreen() {
   }, [navigation]);
 
   return data?.length === 0 ? (
-    <View>
+    <ThemedView>
       <ThemedText>No habits yet</ThemedText>
       <ThemedText>Create a habit to get started!</ThemedText>
-    </View>
+    </ThemedView>
   ) : (
     <ScrollView>
       <ThemedView style={{ padding: 10, gap: 10 }}>

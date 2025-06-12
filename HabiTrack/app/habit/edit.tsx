@@ -1,7 +1,8 @@
+import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import ToastManager, { Toast } from 'toastify-react-native';
@@ -12,7 +13,6 @@ import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
 import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
-import { STYLES } from '@/components/Styles';
 import { zeroPad } from '@/utils/zeroPad';
 
 export default function EditHabitScreen() {
@@ -46,7 +46,6 @@ export default function EditHabitScreen() {
           .where(eq(habit.id, Number(id)));
 
         if (fetchedHabit[0]) {
-          console.log('Loaded habit:', fetchedHabit[0]);
           setValue('habit', fetchedHabit[0].name);
           setValue('description', fetchedHabit[0].description || '');
 
@@ -84,7 +83,6 @@ export default function EditHabitScreen() {
 
   const onSaveChanges = handleSubmit(
     async (data) => {
-      console.log('Saving Changes:\n', data);
       try {
         // Updata habit name and desc
         await drizzleDb
@@ -127,7 +125,6 @@ export default function EditHabitScreen() {
 
   const onDelete = async () => {
     try {
-      console.log('Deleted habit');
       // delete all instances of this habit from habit, reminder, habitCompletion tables
       await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
       await drizzleDb.delete(habitCompletion).where(eq(habitCompletion.habit_id, Number(id)));
@@ -154,25 +151,18 @@ export default function EditHabitScreen() {
       />
 
       <View>
-        <Pressable
-          style={[STYLES.button, { marginTop: 30, width: '100%' }]}
+        <TextButton
+          label="Save Changes"
           onPress={onSaveChanges}
-          hitSlop={5}
-          pressRetentionOffset={50}>
-          <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
-            Save Changes
-          </ThemedText>
-        </Pressable>
+          style={{ marginTop: 30, width: '100%' }}
+        />
 
-        <Pressable
-          style={[STYLES.deleteButton, { marginTop: 10, width: '100%' }]}
+        <TextButton
+          label="Delete Habit"
+          variant="delete"
           onPress={onDelete}
-          hitSlop={5}
-          pressRetentionOffset={50}>
-          <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
-            Delete Habit
-          </ThemedText>
-        </Pressable>
+          style={{ marginTop: 10, width: '100%' }}
+        />
       </View>
 
       <ToastManager />

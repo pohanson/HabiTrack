@@ -1,7 +1,7 @@
 import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
-import { STYLES } from '@/components/Styles';
+import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import * as schema from '@/db/schema';
 import { habit, reminder } from '@/db/schema';
@@ -11,7 +11,7 @@ import { useNavigation } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function CreateHabitScreen() {
@@ -79,15 +79,7 @@ export default function CreateHabitScreen() {
 
       <RHFFrequencyInput control={useFormReturn.control} name="frequency" />
       <RHFTimeInput control={useFormReturn.control} />
-      <Pressable
-        style={[STYLES.button, { marginTop: 30, width: '100%' }]}
-        onPress={onSubmit}
-        hitSlop={5}
-        pressRetentionOffset={50}>
-        <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
-          Submit
-        </ThemedText>
-      </Pressable>
+      <TextButton label="Submit" onPress={onSubmit} style={{ marginTop: 30, width: '100%' }} />
       <ToastManager />
     </View>
   );
