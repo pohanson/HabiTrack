@@ -28,7 +28,7 @@ export function ToggleInput({
         pressRetentionOffset={50}
         hitSlop={8}
         style={{
-          padding: iconSize * 0.25,
+          padding: iconSize * 0.1,
           borderWidth: 2,
           borderColor: selected ? Colors[colorScheme].tabIconSelected : Colors[colorScheme].text,
           backgroundColor: selected
