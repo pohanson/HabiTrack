@@ -1,6 +1,7 @@
 import { STYLES } from '@/components/Styles';
 import { ThemedText } from '@/components/ThemedText';
 import { Pressable, PressableProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { Shadows } from '../constants/Shadows';
 
 interface TextButtonProps extends Omit<PressableProps, 'style'> {
   label: string;
@@ -22,7 +23,7 @@ export function TextButton({
     <Pressable
       hitSlop={4}
       pressRetentionOffset={50}
-      style={[buttonStyle, style]}
+      style={[buttonStyle, style, Shadows.large]}
       {...pressableProps}>
       <ThemedText type="defaultSemiBold" style={[{ textAlign: 'center' }, textStyle]}>
         {label}

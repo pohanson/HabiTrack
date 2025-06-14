@@ -20,6 +20,7 @@ export function RHFTimeInput({
   const [showTimePicker, setShowTimePicker] = useState(false);
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
   const cardColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
   return (
     <Controller
       name="time"
@@ -47,7 +48,7 @@ export function RHFTimeInput({
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 },
-                Shadows.large,
+                Shadows.medium,
               ]}>
               <ThemedText>
                 {reminderTime == null
@@ -62,7 +63,7 @@ export function RHFTimeInput({
               style={[STYLES.button]}
               pressRetentionOffset={60}
               hitSlop={5}>
-              <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
+              <ThemedText style={{ color: textColor, fontWeight: 'bold' }}>Select Time</ThemedText>
             </Pressable>
           </View>
           {showTimePicker && (

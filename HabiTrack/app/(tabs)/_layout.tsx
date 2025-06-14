@@ -8,17 +8,23 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const theme = Colors[colorScheme ?? 'light'];
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: true,
+        headerStyle: {
+          backgroundColor: theme.card,
+        },
         tabBarStyle: Platform.select({
           ios: {
             position: 'absolute',
+            backgroundColor: theme.card,
           },
-          default: {},
+          default: {
+            backgroundColor: theme.card,
+          },
         }),
       }}>
       <Tabs.Screen
