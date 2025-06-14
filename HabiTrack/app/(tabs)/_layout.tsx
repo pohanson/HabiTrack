@@ -29,6 +29,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="milestones"
+        options={{
+          title: 'Milestones',
+          headerTitle: 'Milestones',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="star" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }

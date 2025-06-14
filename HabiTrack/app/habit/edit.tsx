@@ -1,8 +1,8 @@
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import ToastManager, { Toast } from 'toastify-react-native';
@@ -136,7 +136,7 @@ export default function EditHabitScreen() {
   };
 
   return (
-    <View style={{ padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput name="habit" label="Rename Habit" useFormReturn={useFormReturn} />
 
@@ -144,7 +144,7 @@ export default function EditHabitScreen() {
       <RHFFrequencyInput name="frequency" control={useFormReturn.control} />
       <RHFTimeInput control={useFormReturn.control} label="Change Reminder Time" />
 
-      <View>
+      <ThemedView>
         <TextButton
           label="Save Changes"
           onPress={onSaveChanges}
@@ -157,9 +157,9 @@ export default function EditHabitScreen() {
           onPress={onDelete}
           style={{ marginTop: 10, width: '100%' }}
         />
-      </View>
+      </ThemedView>
 
       <ToastManager />
-    </View>
+    </ThemedView>
   );
 }

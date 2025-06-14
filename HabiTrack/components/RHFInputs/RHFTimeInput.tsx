@@ -8,6 +8,7 @@ import { Pressable, View } from 'react-native';
 import { IconButton } from '../IconButton';
 import { STYLES } from '../Styles';
 import { ThemedText } from '../ThemedText';
+import { Shadows } from '@/constants/Shadows';
 
 export function RHFTimeInput({
   control,
@@ -18,7 +19,7 @@ export function RHFTimeInput({
 }) {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
-  const borderColor = useThemeColor({}, 'border');
+  const cardColor = useThemeColor({}, 'card');
   return (
     <Controller
       name="time"
@@ -35,18 +36,19 @@ export function RHFTimeInput({
               width: '100%',
             }}>
             <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flex: 1,
-                borderWidth: 1,
-                borderColor: borderColor,
-                borderRadius: 10,
-                backgroundColor: 'dimgray',
-                paddingHorizontal: 16,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
+              style={[
+                {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flex: 1,
+                  borderRadius: 10,
+                  backgroundColor: cardColor,
+                  paddingHorizontal: 16,
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                },
+                Shadows.large,
+              ]}>
               <ThemedText>
                 {reminderTime == null
                   ? 'No Reminder'
