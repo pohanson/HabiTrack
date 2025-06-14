@@ -77,7 +77,11 @@ export default function CreateHabitScreen() {
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
 
-      <RHFFrequencyInput control={useFormReturn.control} name="frequency" />
+      <RHFFrequencyInput
+        control={useFormReturn.control}
+        name="frequency"
+        errorState={useFormReturn.formState.errors}
+      />
       <RHFTimeInput control={useFormReturn.control} />
       <TextButton label="Submit" onPress={onSubmit} style={{ marginTop: 30, width: '100%' }} />
       <ToastManager />
