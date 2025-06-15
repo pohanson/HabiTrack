@@ -23,7 +23,7 @@ export function TextButton({
     <Pressable
       hitSlop={4}
       pressRetentionOffset={50}
-      style={[buttonStyle, style, Shadows.large]}
+      style={[buttonStyle, style, Shadows.medium]}
       {...pressableProps}>
       <ThemedText type="defaultSemiBold" style={[{ textAlign: 'center' }, textStyle]}>
         {label}

@@ -10,6 +10,7 @@ import { View } from 'react-native';
 import { IconButton } from './IconButton';
 import { ThemedText } from './ThemedText';
 import { ToggleInput } from './ToggleInput';
+import { Shadows } from '../constants/Shadows';
 
 export function HabitCard({
   habit,
@@ -56,27 +57,20 @@ export function HabitCard({
   };
   return (
     <View
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: useThemeColor({}, 'card'),
-        borderColor: useThemeColor({}, 'border'),
-        borderWidth: 0,
-        borderRadius: 15,
-        padding: 14,
-
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 5,
+      style={[
+        {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: useThemeColor({}, 'card'),
+          borderColor: useThemeColor({}, 'border'),
+          borderWidth: 0,
+          borderRadius: 15,
+          padding: 14,
         },
-        shadowOpacity: 0.35,
-        shadowRadius: 6.25,
-
-        elevation: 10,
-      }}>
+        Shadows.large,
+      ]}>
       <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
