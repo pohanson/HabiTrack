@@ -7,7 +7,7 @@ import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit, reminder } from '@/db/schema';
+import { habit, reminder, habitMilestone } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as schema from '@/db/schema';
@@ -56,6 +56,11 @@ export default function CreateHabitScreen() {
             })
             .execute(),
         );
+
+        // add milestone row to habitMilestone table
+        await drizzleDb.insert(habitMilestone).values({
+          habit_id: habitResult.lastInsertRowId,
+        });
 
         Toast.success('Habit Created');
         useFormReturn.reset();
