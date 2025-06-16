@@ -5,6 +5,7 @@ import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import * as schema from '@/db/schema';
 import { habit, reminder } from '@/db/schema';
+import { NotificationManager } from '@/services/NotificationManager';
 import { zeroPad } from '@/utils/zeroPad';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useNavigation } from 'expo-router';
@@ -53,6 +54,7 @@ export default function CreateHabitScreen() {
             .execute(),
         );
 
+        NotificationManager.upsertPushNotificationForHabit(habitResult.lastInsertRowId);
         Toast.success('Habit Created');
         useFormReturn.reset();
       } catch (error) {

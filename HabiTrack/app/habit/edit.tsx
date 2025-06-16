@@ -14,6 +14,7 @@ import * as schema from '@/db/schema';
 import { RHFFrequencyInput } from '@/components/RHFInputs/RHFFrequencyInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 import { zeroPad } from '@/utils/zeroPad';
+import { NotificationManager } from '@/services/NotificationManager';
 
 export default function EditHabitScreen() {
   const { id } = useLocalSearchParams();
@@ -109,6 +110,7 @@ export default function EditHabitScreen() {
         });
 
         Toast.success('Habit Updated');
+        NotificationManager.upsertPushNotificationForHabit(Number(id));
         navigation.goBack();
       } catch (error) {
         console.error('Error updating habit:', error);

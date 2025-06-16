@@ -10,19 +10,25 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
-import React, { Suspense } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NotificationManager } from '@/services/NotificationManager';
 
+const expoDb = openDatabaseSync(DATABASE_NAME);
+const db = drizzle(expoDb);
+NotificationManager.init(db);
 export default function RootLayout() {
-  const expoDb = openDatabaseSync(DATABASE_NAME);
-  const db = drizzle(expoDb);
-  const { error } = useMigrations(db, migrations);
+  useEffect(() => {
+    NotificationManager.registerForPushNotificationsAsync().catch(console.error);
+    NotificationManager.regeneratePushNotifications().catch(console.error);
+  }, []);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const { error } = useMigrations(db, migrations);
 
   if (error) {
     console.log('Database migration failed:', error);
