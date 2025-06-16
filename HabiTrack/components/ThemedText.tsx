@@ -5,7 +5,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: keyof typeof styles;
 };
 
 export function ThemedText({
@@ -37,6 +37,10 @@ const styles = StyleSheet.create({
   default: {
     fontSize: 16,
     lineHeight: 24,
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
   },
   defaultSemiBold: {
     fontSize: 16,

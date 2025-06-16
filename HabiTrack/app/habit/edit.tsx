@@ -138,10 +138,19 @@ export default function EditHabitScreen() {
   return (
     <View style={{ padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
-      <RHFTextInput name="habit" label="Rename Habit" useFormReturn={useFormReturn} />
+      <RHFTextInput
+        name="habit"
+        label="Rename Habit"
+        isRequired={true}
+        useFormReturn={useFormReturn}
+      />
 
       <RHFTextInput name="description" label="Change Description" useFormReturn={useFormReturn} />
-      <RHFFrequencyInput name="frequency" control={useFormReturn.control} />
+      <RHFFrequencyInput
+        name="frequency"
+        control={useFormReturn.control}
+        errorState={useFormReturn.formState.errors}
+      />
       <RHFTimeInput control={useFormReturn.control} label="Change Reminder Time" />
 
       <View>
