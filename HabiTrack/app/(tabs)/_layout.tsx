@@ -49,51 +49,55 @@ export default function TabLayout() {
   }
 
   useEffect(() => {
-    data.forEach(({ habit_id, last_completed_at, day_frequency }) => {
-      if (last_completed_at !== null) {
-        // calculate the no. of days since last expected habit day
-        const frequencyArray = JSON.parse(day_frequency as string);
-        let backTrackCount = 1;
-        for (let i = yesterdayOfWeek; ; i = i === 0 ? 6 : i - 1) {
-          if (frequencyArray.includes(i)) {
-            break;
+    try {
+      data.forEach(({ habit_id, last_completed_at, day_frequency }) => {
+        if (last_completed_at !== null) {
+          // calculate the no. of days since last expected habit day
+          const frequencyArray = JSON.parse(day_frequency as string);
+          let backTrackCount = 1;
+          for (let i = yesterdayOfWeek; ; i = i === 0 ? 6 : i - 1) {
+            if (frequencyArray.includes(i)) {
+              break;
+            }
+            backTrackCount++;
+            if ((i === 0 ? 6 : i - 1) === yesterdayOfWeek) {
+              break;
+            }
           }
-          backTrackCount++;
-          if ((i === 0 ? 6 : i - 1) === yesterdayOfWeek) {
-            break;
+
+          // calculate the last expected date of completion
+          const daysBack = backTrackCount > 7 ? 1 : backTrackCount;
+          const todayDate = new Date();
+          const lastExpectedCompletedDate = new Date();
+          lastExpectedCompletedDate.setDate(todayDate.getDate() - daysBack);
+
+          // check if streak has been broken
+          const lastCompletedStr = last_completed_at.split('T')[0];
+          const lastExpectedStr = lastExpectedCompletedDate.toJSON().split('T')[0];
+          console.log('last expected date of completion', lastExpectedStr);
+          const streakBroken = lastCompletedStr < lastExpectedStr;
+          console.log('streak broken?:', streakBroken);
+
+          // if streak is broken, reset week_streak to 0
+          if (streakBroken) {
+            try {
+              drizzleDb
+                .update(habitMilestone)
+                .set({ week_streak: 0 })
+                .where(eq(habitMilestone.habit_id, habit_id))
+                .execute();
+
+              console.log(`Reset streak for habit ${habit_id}`);
+            } catch (error) {
+              console.error(`Failed to reset streak for habit ${habit_id}:`, error);
+            }
           }
         }
-
-        // calculate the last expected date of completion
-        const daysBack = backTrackCount > 7 ? 1 : backTrackCount;
-        const todayDate = new Date();
-        const lastExpectedCompletedDate = new Date();
-        lastExpectedCompletedDate.setDate(todayDate.getDate() - daysBack);
-
-        // check if streak has been broken
-        const lastCompletedStr = last_completed_at.split('T')[0];
-        const lastExpectedStr = lastExpectedCompletedDate.toJSON().split('T')[0];
-        console.log('last expected date of completion', lastExpectedStr);
-        const streakBroken = lastCompletedStr < lastExpectedStr;
-        console.log('streak broken?:', streakBroken);
-
-        // if streak is broken, reset week_streak to 0
-        if (streakBroken) {
-          try {
-            drizzleDb
-              .update(habitMilestone)
-              .set({ week_streak: 0 })
-              .where(eq(habitMilestone.habit_id, habit_id))
-              .execute();
-
-            console.log(`Reset streak for habit ${habit_id}`);
-          } catch (error) {
-            console.error(`Failed to reset streak for habit ${habit_id}:`, error);
-          }
-        }
-      }
-      console.log(data);
-    });
+        console.log(data);
+      });
+    } catch (error) {
+      console.error('Error processing habit data:', error);
+    }
     // might want to change the dependency array
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
