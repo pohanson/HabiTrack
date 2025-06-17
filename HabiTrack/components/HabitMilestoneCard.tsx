@@ -14,7 +14,9 @@ export function HabitMilestoneCard() {
         { alignItems: 'center', backgroundColor: theme.card, borderRadius: 20, padding: 10 },
         Shadows.large,
       ]}>
-      <ThemedText style={{ fontSize: 24, fontWeight: 'bold', padding: 15 }}>Habit Name</ThemedText>
+      <ThemedText style={{ fontSize: 24, fontWeight: 'regular', padding: 15 }}>
+        Habit Name
+      </ThemedText>
       <RowOfBadges />
     </ThemedView>
   );

@@ -77,6 +77,23 @@ export function HabitCard({
     }
   }
 
+  // calculate the badges_earned for a given week_streak
+  function getBadgesEarned(weekStreak: number) {
+    if (weekStreak < 1) {
+      return 0;
+    } else if (weekStreak >= 1 && weekStreak < 3) {
+      return 1;
+    } else if (weekStreak >= 3 && weekStreak < 12) {
+      return 2;
+    } else if (weekStreak >= 12 && weekStreak < 26) {
+      return 3;
+    } else if (weekStreak >= 26 && weekStreak < 52) {
+      return 4;
+    } else if (weekStreak >= 52) {
+      return 5;
+    }
+  }
+
   const toggleHabitCompletion = async () => {
     if (today == null) {
       return;
@@ -100,15 +117,19 @@ export function HabitCard({
       // Then check if all habits for the week are completed
       const completionsThisWeek = await getCompletionsThisWeek(habit.id);
       const noOfCompletionsThisWeek = completionsThisWeek.length;
-      // If so, increment week_streak
+      // If so, increment week_streak and update badges_earned
       if (noOfCompletionsThisWeek >= frequencyArray.length) {
-        drizzleDb
+        const newWeekStreak = (habit_milestone?.week_streak || 0) + 1;
+        const newBadgesEarned = getBadgesEarned(newWeekStreak);
+        await drizzleDb
           .update(habitMilestone)
           .set({
-            week_streak: (habit_milestone?.week_streak || 0) + 1,
+            week_streak: newWeekStreak,
+            badges_earned: newBadgesEarned,
           })
           .where(eq(habitMilestone.habit_id, habit.id))
           .execute();
+        console.log('Badges_earned for habit.id', habit.id, ':', newBadgesEarned);
       }
     } else {
       // Removing completion
@@ -119,23 +140,26 @@ export function HabitCard({
       // get current completions before removing today's completion
       const currentCompletions = await getCompletionsThisWeek(habit.id);
 
+      if (todayDOW === lastDOW && currentCompletions.length >= frequencyArray.length) {
+        // decrement week_streak and update badges_earned
+        const newWeekStreak = Math.max(0, (habit_milestone?.week_streak || 0) - 1);
+        const newBadgesEarned = getBadgesEarned(newWeekStreak);
+        await drizzleDb
+          .update(habitMilestone)
+          .set({
+            week_streak: newWeekStreak,
+            badges_earned: newBadgesEarned,
+          })
+          .where(eq(habitMilestone.habit_id, habit.id))
+          .execute();
+        console.log('Badges_earned for habit.id', habit.id, ':', newBadgesEarned);
+      }
+
       // remove completion
       await drizzleDb
         .delete(habitCompletion)
         .where(eq(habitCompletion.id, habit_completion.id))
         .execute();
-
-      if (todayDOW === lastDOW && currentCompletions.length >= frequencyArray.length) {
-        // decrement week_streak
-        await drizzleDb
-          .update(habitMilestone)
-          .set({
-            week_streak:
-              (habit_milestone?.week_streak || 0) > 0 ? (habit_milestone?.week_streak || 0) - 1 : 0,
-          })
-          .where(eq(habitMilestone.habit_id, habit.id))
-          .execute();
-      }
     }
 
     // refresh UI

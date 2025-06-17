@@ -36,7 +36,12 @@ export default function FullHabitListScreen() {
       <ScrollView>
         <ThemedView style={{ padding: 10, gap: 10 }}>
           {data.map((habitItem) => (
-            <HabitCard key={habitItem.id} habit={habitItem} habit_completion={null} />
+            <HabitCard
+              key={habitItem.id}
+              habit={habitItem}
+              habit_completion={null}
+              habit_milestone={null}
+            />
           ))}
         </ThemedView>
       </ScrollView>

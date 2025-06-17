@@ -60,6 +60,8 @@ export default function CreateHabitScreen() {
         // add milestone row to habitMilestone table
         await drizzleDb.insert(habitMilestone).values({
           habit_id: habitResult.lastInsertRowId,
+          week_streak: 0,
+          badges_earned: 0,
         });
 
         Toast.success('Habit Created');

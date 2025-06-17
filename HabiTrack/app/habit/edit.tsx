@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit, reminder, habitCompletion } from '@/db/schema';
+import { habit, reminder, habitCompletion, habitMilestone } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -123,9 +123,10 @@ export default function EditHabitScreen() {
 
   const onDelete = async () => {
     try {
-      // delete all instances of this habit from habit, reminder, habitCompletion tables
+      // delete all instances of this habit from habit, reminder, habitCompletion, habitMilestone tables
       await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
       await drizzleDb.delete(habitCompletion).where(eq(habitCompletion.habit_id, Number(id)));
+      await drizzleDb.delete(habitMilestone).where(eq(habitMilestone.habit_id, Number(id)));
       await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
       Toast.success('Habit Deleted');
       navigation.goBack();
