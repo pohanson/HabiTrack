@@ -81,9 +81,15 @@ export function HabitCard({
     if (today == null) {
       return;
     }
+
+    const frequencyArray = await getHabitFrequencyArray(habit.id);
+    const todayDOW = new Date(today).getDay();
+
     if (habit_completion === null) {
+      // Adding completion
+
       // habit is not completed today, so add completion
-      drizzleDb
+      await drizzleDb
         .insert(habitCompletion)
         .values({
           habit_id: habit.id,
@@ -91,11 +97,11 @@ export function HabitCard({
         })
         .execute();
 
-      // Then check if all habits for the week are completed. If so, increment week_streak
-      const completionsThisWeek = getCompletionsThisWeek(habit.id);
-      const noOfCompletionsThisWeek = (await completionsThisWeek).length;
-      const frequencyArray = getHabitFrequencyArray(habit.id);
-      if (noOfCompletionsThisWeek >= (await frequencyArray).length) {
+      // Then check if all habits for the week are completed
+      const completionsThisWeek = await getCompletionsThisWeek(habit.id);
+      const noOfCompletionsThisWeek = completionsThisWeek.length;
+      // If so, increment week_streak
+      if (noOfCompletionsThisWeek >= frequencyArray.length) {
         drizzleDb
           .update(habitMilestone)
           .set({
@@ -105,12 +111,34 @@ export function HabitCard({
           .execute();
       }
     } else {
-      // habit is already completed today, remove completion
-      drizzleDb
+      // Removing completion
+
+      // check if today's DOW is the habit frequency's last DOW
+      const lastDOW = frequencyArray[frequencyArray.length - 1];
+
+      // get current completions before removing today's completion
+      const currentCompletions = await getCompletionsThisWeek(habit.id);
+
+      // remove completion
+      await drizzleDb
         .delete(habitCompletion)
         .where(eq(habitCompletion.id, habit_completion.id))
         .execute();
+
+      if (todayDOW === lastDOW && currentCompletions.length >= frequencyArray.length) {
+        // decrement week_streak
+        await drizzleDb
+          .update(habitMilestone)
+          .set({
+            week_streak:
+              (habit_milestone?.week_streak || 0) > 0 ? (habit_milestone?.week_streak || 0) - 1 : 0,
+          })
+          .where(eq(habitMilestone.habit_id, habit.id))
+          .execute();
+      }
     }
+
+    // refresh UI
     setRefresh((prev) => prev + 1);
   };
 
