@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "expo-module-scripts": "^4.1.7"
+  },
+  "dependencies": {
+    "react-native-reanimated": "~3.17.4"
   }
 }

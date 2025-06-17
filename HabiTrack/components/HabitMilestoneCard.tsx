@@ -4,20 +4,32 @@ import { Shadows } from '../constants/Shadows';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 
-export function HabitMilestoneCard() {
+export function HabitMilestoneCard({
+  habitName,
+  badgeCompletions,
+  badgesEarned,
+}: {
+  habitName: string;
+  badgeCompletions: DimensionValue[];
+  badgesEarned: number;
+}) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
   return (
     <ThemedView
       style={[
-        { alignItems: 'center', backgroundColor: theme.card, borderRadius: 20, padding: 10 },
+        {
+          alignItems: 'center',
+          backgroundColor: theme.card,
+          borderRadius: 20,
+          padding: 12,
+          overflow: 'hidden',
+        },
         Shadows.large,
       ]}>
-      <ThemedText style={{ fontSize: 24, fontWeight: 'regular', padding: 15 }}>
-        Habit Name
-      </ThemedText>
-      <RowOfBadges />
+      <ThemedText style={{ fontSize: 22, fontWeight: 'bold', padding: 10 }}>{habitName}</ThemedText>
+      <RowOfBadges badgeCompletions={badgeCompletions} badgesEarned={badgesEarned} />
     </ThemedView>
   );
 }
@@ -25,7 +37,8 @@ export function HabitMilestoneCard() {
 type BadgeProps = {
   title: string;
   color: string;
-  completion: DimensionValue | undefined;
+  completed: boolean;
+  completion: DimensionValue | undefined; // percentage as string e.g. "80%"
 };
 
 const Badge = (props: BadgeProps) => {
@@ -38,6 +51,7 @@ const Badge = (props: BadgeProps) => {
           backgroundColor: props.color,
           borderRadius: 100,
           justifyContent: 'center',
+          opacity: (props.completed ?? false) ? 1 : 0.65, // set opacity for incomplete badges here
         }}>
         <Text
           style={{
@@ -51,15 +65,27 @@ const Badge = (props: BadgeProps) => {
         </Text>
       </View>
       <View>
-        <ProgressBar completion={props.completion} />
+        <ProgressBar completion={props.completion} completed={props.completed} />
       </View>
     </View>
   );
 };
 
-const RowOfBadges = () => {
+const RowOfBadges = ({
+  badgeCompletions,
+  badgesEarned,
+}: {
+  badgeCompletions: DimensionValue[];
+  badgesEarned: number;
+}) => {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const firstBadgeCompletion = badgeCompletions[0];
+  const secondBadgeCompletion = badgeCompletions[1];
+  const thirdBadgeCompletion = badgeCompletions[2];
+  const fourthBadgeCompletion = badgeCompletions[3];
+  const fifthBadgeCompletion = badgeCompletions[4];
+
   return (
     <ThemedView
       style={{
@@ -70,24 +96,60 @@ const RowOfBadges = () => {
         width: '95%',
         justifyContent: 'space-between',
       }}>
-      <Badge title={'1\nweek'} color={theme.tint} completion="100%" />
-      <Badge title="3 weeks" color={theme.tint} completion="70%" />
-      <Badge title="12 weeks" color={theme.tint} completion="50%" />
-      <Badge title="26 weeks" color={theme.tint} completion="20%" />
-      <Badge title="52 weeks" color={theme.tint} completion="10%" />
+      <Badge
+        title={'1\nweek'}
+        color={theme.tint}
+        completion={firstBadgeCompletion}
+        completed={badgesEarned >= 1}
+      />
+      <Badge
+        title={'3\nweeks'}
+        color={theme.tint}
+        completion={secondBadgeCompletion}
+        completed={badgesEarned >= 2}
+      />
+      <Badge
+        title={'12\nweeks'}
+        color={theme.tint}
+        completion={thirdBadgeCompletion}
+        completed={badgesEarned >= 3}
+      />
+      <Badge
+        title={'26\nweeks'}
+        color={theme.tint}
+        completion={fourthBadgeCompletion}
+        completed={badgesEarned >= 4}
+      />
+      <Badge
+        title={'52\nweeks'}
+        color={theme.tint}
+        completion={fifthBadgeCompletion}
+        completed={badgesEarned >= 5}
+      />
     </ThemedView>
   );
 };
 
-const ProgressBar = ({ completion }: { completion: DimensionValue | undefined }) => {
+const ProgressBar = ({
+  completion,
+  completed,
+}: {
+  completion: DimensionValue | undefined;
+  completed: boolean;
+}) => {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
-  return (
+
+  const progressBarWidth = 50;
+  const progressBarHeight = 10;
+
+  return !completed ? (
+    // incomplete progress bar
     <View
       style={{
         position: 'relative',
-        width: 50,
-        height: 10,
+        width: progressBarWidth,
+        height: progressBarHeight,
         borderRadius: 10,
         backgroundColor: '#e0e0e0',
         overflow: 'hidden',
@@ -95,14 +157,17 @@ const ProgressBar = ({ completion }: { completion: DimensionValue | undefined })
       <View
         style={{
           position: 'absolute',
-          left: 0,
-          top: 0,
           width: completion,
-          height: 10,
+          height: progressBarHeight,
           borderRadius: 10,
           backgroundColor: theme.tint,
         }}
       />
+    </View>
+  ) : (
+    // complete progress bar
+    <View style={{ width: progressBarWidth, height: progressBarHeight, alignItems: 'center' }}>
+      <Text style={{ fontSize: 8 }}>Completed!</Text>
     </View>
   );
 };
