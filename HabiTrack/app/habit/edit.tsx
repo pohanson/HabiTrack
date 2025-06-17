@@ -81,7 +81,7 @@ export default function EditHabitScreen() {
   const onSaveChanges = handleSubmit(
     async (data) => {
       try {
-        // Updata habit name and desc
+        // Update habit name and desc
         await drizzleDb
           .update(habit)
           .set({

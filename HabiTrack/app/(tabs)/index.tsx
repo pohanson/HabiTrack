@@ -6,7 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 
 import { IconButton } from '@/components/IconButton';
 import * as schema from '@/db/schema';
-import { habit, habitCompletion, reminder } from '@/db/schema';
+import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
 import { and, asc, eq } from 'drizzle-orm';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -24,7 +24,12 @@ export default function HomeScreen() {
   // const colors = Colors[useColorScheme() || 'light'];
   const { data, error } = useLiveQuery(
     drizzleDb
-      .select({ habit: habit, habit_completion: habitCompletion, reminder: reminder })
+      .select({
+        habit: habit,
+        habit_completion: habitCompletion,
+        reminder: reminder,
+        habit_milestone: habitMilestone,
+      })
       .from(reminder)
       .where(eq(reminder.day, dayOfWeek))
       .innerJoin(habit, eq(reminder.habit_id, habit.id))
@@ -32,6 +37,8 @@ export default function HomeScreen() {
         habitCompletion,
         and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
       )
+      // added for habitMilestone
+      .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
       .orderBy(asc(habitCompletion.completedAt), asc(reminder.time)),
     [refresh],
   );
@@ -66,11 +73,12 @@ export default function HomeScreen() {
       {data?.length === 0 && <ThemedText>No habits for today.</ThemedText>}
       <ScrollView>
         <ThemedView style={{ gap: 10, padding: 10 }}>
-          {data.map(({ habit, habit_completion }) => (
+          {data.map(({ habit, habit_completion, habit_milestone }) => (
             <HabitCard
               key={habit.id}
               habit={habit}
               habit_completion={habit_completion}
+              habit_milestone={habit_milestone}
               today={today}
               setRefresh={setRefresh}
             />

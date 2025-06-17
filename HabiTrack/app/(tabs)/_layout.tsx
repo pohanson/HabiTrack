@@ -79,11 +79,17 @@ export default function TabLayout() {
 
         // if streak is broken, reset week_streak to 0
         if (streakBroken) {
-          drizzleDb
-            .update(habitMilestone)
-            .set({ week_streak: 0 })
-            .where(eq(habitMilestone.habit_id, habit_id))
-            .execute();
+          try {
+            drizzleDb
+              .update(habitMilestone)
+              .set({ week_streak: 0 })
+              .where(eq(habitMilestone.habit_id, habit_id))
+              .execute();
+
+            console.log(`Reset streak for habit ${habit_id}`);
+          } catch (error) {
+            console.error(`Failed to reset streak for habit ${habit_id}:`, error);
+          }
         }
       }
       console.log(data);
