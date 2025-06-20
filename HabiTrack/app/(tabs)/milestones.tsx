@@ -48,7 +48,7 @@ export default function Milestones() {
   }
 
   return (
-    <ThemedView>
+    <ThemedView style={{ flex: 1 }}>
       {data?.length === 0 && (
         <ThemedView>
           <ThemedText>{'No habits yet\nCreate a habit to get started!'}</ThemedText>

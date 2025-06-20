@@ -42,6 +42,9 @@ type BadgeProps = {
 };
 
 const Badge = (props: BadgeProps) => {
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
+
   return (
     <View style={{ rowGap: 5 }}>
       <View
@@ -51,14 +54,14 @@ const Badge = (props: BadgeProps) => {
           backgroundColor: props.color,
           borderRadius: 100,
           justifyContent: 'center',
-          opacity: (props.completed ?? false) ? 1 : 0.65, // set opacity for incomplete badges here
+          opacity: (props.completed ?? false) ? 1 : 0.5, // set opacity for incomplete badges here
         }}>
         <Text
           style={{
             fontSize: 12,
             fontWeight: 'bold',
             textAlign: 'center',
-            color: 'white',
+            color: colorScheme === 'light' ? 'white' : theme.card,
             padding: 5,
           }}>
           {props.title}
@@ -151,7 +154,7 @@ const ProgressBar = ({
         width: progressBarWidth,
         height: progressBarHeight,
         borderRadius: 10,
-        backgroundColor: '#e0e0e0',
+        backgroundColor: colorScheme === 'light' ? '#e0e0e0' : '#3d3d3d',
         overflow: 'hidden',
       }}>
       <View
@@ -167,7 +170,9 @@ const ProgressBar = ({
   ) : (
     // complete progress bar
     <View style={{ width: progressBarWidth, height: progressBarHeight, alignItems: 'center' }}>
-      <Text style={{ fontSize: 8 }}>Completed!</Text>
+      <Text style={{ fontSize: 8, color: colorScheme === 'light' ? 'black' : 'white' }}>
+        Completed!
+      </Text>
     </View>
   );
 };
