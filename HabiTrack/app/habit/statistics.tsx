@@ -32,7 +32,7 @@ export default function StatisticsScreen() {
         return [];
       } else {
         const freq = JSON.parse(result.day_frequency as string);
-        return freq.sort((a: number, b: number) => a - b);
+        return freq.sort((e: number, f: number) => e - f);
       }
     } catch (error) {
       console.error('Error in getHabitFrequencyArray:', error);
@@ -40,36 +40,40 @@ export default function StatisticsScreen() {
     }
   }
 
-  function calculateExpectedDays(createdAtDate: string, freq: number[]): number {
-    const createdAtDay = new Date(createdAtDate).getDay();
+  function calculateExpectedDays(startDate: string, freq: number[]): number {
+    if (startDate < createdAtDate) {
+      startDate = createdAtDate;
+    }
+    const startDay = new Date(startDate).getDay();
     const today = new Date();
     const todayDay = today.getDay();
 
-    // edge case: createdAtDate and todayDate fall within the same calendar week
-    // find the following sunday after createdAt date
-    const startOfWeeksBetweenDate = new Date(createdAtDate);
-    const daysUntilFollowingSunday = createdAtDay === 0 ? 7 : 7 - createdAtDay;
+    // edge case: startDate and todayDate fall within the same calendar week
+    // find the following sunday after startDate date
+    const startOfWeeksBetweenDate = new Date(startDate);
+    const daysUntilFollowingSunday = startDay === 0 ? 7 : 7 - startDay;
     startOfWeeksBetweenDate.setDate(startOfWeeksBetweenDate.getDate() + daysUntilFollowingSunday);
-    // if today's date < startOfWeeksBetweenDate, then createdAtDate and todayDate fall within the same calendar week
+    // if today's date < startOfWeeksBetweenDate, then startDate and todayDate fall within the same calendar week
     const sameCalendarWeek =
       today?.toJSON()?.split('T')[0] < startOfWeeksBetweenDate?.toJSON()?.split('T')[0];
     if (sameCalendarWeek) {
       let expectedNoOfDays = 0;
       // if in same calendar week, only count days b/w createdAt and today
       for (let i = 0; i < freq.length; i++) {
-        if (freq[i] >= createdAtDay && freq[i] <= todayDay) {
+        if (freq[i] >= startDay && freq[i] <= todayDay) {
           expectedNoOfDays++;
         }
       }
       return expectedNoOfDays;
     }
-    // 1. Calculate expectedDays (createdWeekExpectedDays + thisWeekExpectedDays + weeksBetweenExpectedDays)
 
-    // 1.1 createdWeekExpectedDays calculation
-    let createdWeekExpectedDays = 0;
+    // 1. Calculate expectedDays (startWeekExpectedDays + thisWeekExpectedDays + weeksBetweenExpectedDays)
+
+    // 1.1 startWeekExpectedDays calculation
+    let startWeekExpectedDays = 0;
     for (let i = 0; i < freq.length; i++) {
-      if (freq[i] >= createdAtDay) {
-        createdWeekExpectedDays++;
+      if (freq[i] >= startDay) {
+        startWeekExpectedDays++;
       }
     }
 
@@ -94,7 +98,7 @@ export default function StatisticsScreen() {
 
     // 1.4 calculate expectedDays
     const expectedNoOfDays =
-      createdWeekExpectedDays + weeksBetween * freq.length + thisWeekExpectedDays;
+      startWeekExpectedDays + weeksBetween * freq.length + thisWeekExpectedDays;
     return expectedNoOfDays;
   }
 
@@ -138,11 +142,29 @@ export default function StatisticsScreen() {
   // get frequency array for this habit
   const freq = getHabitFrequencyArray(Number(id));
 
-  // get expectedNoOfDays for this habit (calculated since createdAtDate)
+  // get expectedNoOfDays for this habit (calculated since createdAtDate) (All Time)
   const expectedNoOfDays = calculateExpectedDays(createdAtDate, freq);
   console.log(completedAtData);
   const actualNoOfDays = completedAtData.filter(
     (entry) => String(entry.completed_at) >= createdAtDate,
+  ).length;
+
+  // get monthExpectedNoOfDays for this habit (calculated since 1st of this month) (This Month)
+  const firstOfThisMonthDate = `${createdAtDate.substring(0, 4)}-${createdAtDate.substring(5, 7)}-01`;
+  const monthExpectedNoOfDays = calculateExpectedDays(firstOfThisMonthDate, freq);
+  const monthActualNoOfDays = completedAtData.filter(
+    (entry) => String(entry.completed_at) >= firstOfThisMonthDate,
+  ).length;
+
+  // get weekExpectedNoOfDays for this habit (calculated since Sunday of this week) (This Week)
+  const today = new Date();
+  const daysSinceSunday = today.getDay();
+  const startOfThisWeek = new Date();
+  startOfThisWeek.setDate(startOfThisWeek.getDate() - daysSinceSunday);
+  const startOfThisWeekDate = startOfThisWeek.toJSON().split('T')[0];
+  const weekExpectedNoOfDays = calculateExpectedDays(startOfThisWeekDate, freq);
+  const weekActualNoOfDays = completedAtData.filter(
+    (entry) => String(entry.completed_at) >= startOfThisWeekDate,
   ).length;
 
   return (
@@ -152,6 +174,12 @@ export default function StatisticsScreen() {
         createdAt={createdAtDate}
         actualNoOfDays={actualNoOfDays}
         expectedNoOfDays={expectedNoOfDays}
+        firstOfThisMonthDate={firstOfThisMonthDate}
+        monthExpectedNoOfDays={monthExpectedNoOfDays}
+        monthActualNoOfDays={monthActualNoOfDays}
+        startOfThisWeekDate={startOfThisWeekDate}
+        weekExpectedNoOfDays={weekExpectedNoOfDays}
+        weekActualNoOfDays={weekActualNoOfDays}
         pieChartSize={85}
       />
       <DayStreakView />
