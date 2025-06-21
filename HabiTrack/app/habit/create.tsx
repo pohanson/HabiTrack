@@ -40,9 +40,11 @@ export default function CreateHabitScreen() {
     async (data) => {
       console.log('Submitting Form:\n', data);
       try {
+        const today = new Date();
         const habitResult = await drizzleDb.insert(habit).values({
           name: data.habit,
           description: data.description || '',
+          createdAt: today.toJSON().split('T')[0],
         });
         (data.frequency as Set<number>).forEach((day) =>
           drizzleDb

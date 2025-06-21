@@ -42,6 +42,13 @@ export function HabitCard({
     });
   };
 
+  const onStatsButtonPressed = (habitId: number, habitName: string) => {
+    router.push({
+      pathname: '/habit/statistics',
+      params: { id: habitId, name: habitName },
+    });
+  };
+
   // get the completedAt dates for a habit since Sunday as an array of date strings
   async function getCompletionsThisWeek(habitId: number): Promise<string[]> {
     try {
@@ -233,7 +240,10 @@ export function HabitCard({
       <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
-
+        <IconButton
+          iconName="chart.bar"
+          onPress={() => onStatsButtonPressed(habit.id, habit.name)}
+        />
         {today == null || (
           <ToggleInput
             label=""

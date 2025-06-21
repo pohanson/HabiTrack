@@ -4,6 +4,7 @@ export const habit = sqliteTable('habit', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   description: text('description').default(''),
+  createdAt: text('createdAt').notNull(), // date: yyyy-mm-dd
 });
 
 export const reminder = sqliteTable('reminder', {
@@ -28,7 +29,7 @@ export const habitMilestone = sqliteTable('habit_milestone', {
     .primaryKey()
     .notNull()
     .references(() => habit.id),
-  week_streak: integer('week_streak').notNull().default(10),
+  week_streak: integer('week_streak').notNull().default(0),
   badges_earned: integer('badges_earned').notNull().default(0), // 0 for 0 badges, 1 for 1 badge, 2 for 2 badges, so on, up to 5
 });
 

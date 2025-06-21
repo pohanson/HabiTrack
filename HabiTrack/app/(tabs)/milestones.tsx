@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { HabitMilestoneCard } from '@/components/HabitMilestoneCard';
 import { useSQLiteContext } from 'expo-sqlite';
 import { habit, habitMilestone } from '@/db/schema';
@@ -20,15 +20,6 @@ export default function Milestones() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log('milestones page refeshed');
-      console.log('milestone data loaded:', data);
-      setRefresh((prev) => prev + 1);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []),
-  );
-
   const { data, error } = useLiveQuery(
     drizzleDb
       .select({
@@ -46,6 +37,20 @@ export default function Milestones() {
     console.error('Error fetching milestones:', error);
     Toast.error('Error fetching milestones.');
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('milestones page refeshed');
+      setRefresh((prev) => prev + 1);
+    }, []),
+  );
+
+  // for console log testing
+  useEffect(() => {
+    if (data) {
+      console.log('milestone data loaded:', data);
+    }
+  }, [data]);
 
   return (
     <ThemedView style={{ flex: 1 }}>
