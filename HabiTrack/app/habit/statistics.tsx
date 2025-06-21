@@ -9,6 +9,7 @@ import { eq, sql } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Toast } from 'toastify-react-native';
+import { CompletionRateView } from '@/components/CompletionRateView';
 
 export default function StatisticsScreen() {
   const { id, name } = useLocalSearchParams();
@@ -30,7 +31,8 @@ export default function StatisticsScreen() {
       if (!result || !result.day_frequency) {
         return [];
       } else {
-        return JSON.parse(result.day_frequency as string);
+        const freq = JSON.parse(result.day_frequency as string);
+        return freq.sort((a: number, b: number) => a - b);
       }
     } catch (error) {
       console.error('Error in getHabitFrequencyArray:', error);
@@ -49,7 +51,8 @@ export default function StatisticsScreen() {
     const daysUntilFollowingSunday = createdAtDay === 0 ? 7 : 7 - createdAtDay;
     startOfWeeksBetweenDate.setDate(startOfWeeksBetweenDate.getDate() + daysUntilFollowingSunday);
     // if today's date < startOfWeeksBetweenDate, then createdAtDate and todayDate fall within the same calendar week
-    const sameCalendarWeek = today < startOfWeeksBetweenDate;
+    const sameCalendarWeek =
+      today?.toJSON()?.split('T')[0] < startOfWeeksBetweenDate?.toJSON()?.split('T')[0];
     if (sameCalendarWeek) {
       let expectedNoOfDays = 0;
       // if in same calendar week, only count days b/w createdAt and today
@@ -98,7 +101,7 @@ export default function StatisticsScreen() {
   // set header title
   useEffect(() => {
     if (!id) return;
-    navigation.setOptions({ headerTitle: 'Statistics (' + name + ')' });
+    navigation.setOptions({ headerTitle: 'Statistics [' + name + ']' });
   }, [id, name, navigation]);
 
   // get created_at data
@@ -139,16 +142,17 @@ export default function StatisticsScreen() {
   const expectedNoOfDays = calculateExpectedDays(createdAtDate, freq);
   console.log(completedAtData);
   const actualNoOfDays = completedAtData.filter(
-    (entry) => String(entry.completed_at) > createdAtDate,
+    (entry) => String(entry.completed_at) >= createdAtDate,
   ).length;
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1, gap: 10, padding: 10 }}>
       <CalendarView />
-      <PieChartView
-        createdAt={createdAtDate + ' ' + freq + ' ' + expectedNoOfDays}
-        actualDays={actualNoOfDays}
-        expectedDays={expectedNoOfDays}
+      <CompletionRateView
+        createdAt={createdAtDate}
+        actualNoOfDays={actualNoOfDays}
+        expectedNoOfDays={expectedNoOfDays}
+        pieChartSize={85}
       />
       <DayStreakView />
     </ScrollView>
@@ -159,26 +163,6 @@ const CalendarView = () => {
   return (
     <ThemedView>
       <ThemedText>Calendar View</ThemedText>
-    </ThemedView>
-  );
-};
-
-const PieChartView = ({
-  createdAt,
-  actualDays,
-  expectedDays,
-}: {
-  createdAt: string;
-  actualDays: number;
-  expectedDays: number;
-}) => {
-  return (
-    <ThemedView>
-      <ThemedText>Pie Chart View</ThemedText>
-      <ThemedText>Evaluated from: {createdAt}</ThemedText>
-      <ThemedText>
-        {actualDays} / {expectedDays}
-      </ThemedText>
     </ThemedView>
   );
 };

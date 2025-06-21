@@ -86,7 +86,8 @@ export function HabitCard({
       if (!result || !result.day_frequency) {
         return [];
       } else {
-        return JSON.parse(result.day_frequency as string);
+        const freq = JSON.parse(result.day_frequency as string);
+        return freq.sort((a: number, b: number) => a - b);
       }
     } catch (error) {
       console.error('Error in getHabitFrequencyArray:', error);
