@@ -64,6 +64,10 @@ export default function CreateHabitScreen() {
           habit_id: habitResult.lastInsertRowId,
           week_streak: 0,
           badges_earned: 0,
+
+          // new columns for streak tracking
+          streak_started_at: 'inactive',
+          best_day_streak: 0,
         });
 
         Toast.success('Habit Created');

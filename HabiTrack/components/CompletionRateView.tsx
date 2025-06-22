@@ -101,8 +101,7 @@ export const CompletionRateView = ({
         color={pieChartColorForPercentage}
         textColor={pieChartColorForPercentage}
       />
-      <ThemedText style={{ fontSize: 16, padding: 5, textAlign: 'center', width: '80%' }}>
-        You completed{' '}
+      <ThemedText style={{ fontSize: 14, padding: 5, textAlign: 'center', width: '100%' }}>
         <ThemedText style={{ color: pieChartColorForPercentage, fontWeight: 'bold' }}>
           {actual}
         </ThemedText>{' '}
@@ -110,10 +109,10 @@ export const CompletionRateView = ({
         <ThemedText style={{ color: pieChartColorForPercentage, fontWeight: 'bold' }}>
           {expected}
         </ThemedText>{' '}
-        days
-        {timeframe === 'all' && <ThemedText> in total</ThemedText>}
-        {timeframe === 'month' && <ThemedText> since the start of this month</ThemedText>}
-        {timeframe === 'week' && <ThemedText> since the start of this week</ThemedText>}
+        days completed
+        {timeframe === 'all' && ' in total'}
+        {timeframe === 'month' && ' since the start of this month'}
+        {timeframe === 'week' && ' since the start of this week'}
       </ThemedText>
       <ThemedText style={{ padding: 10, fontSize: 16, fontWeight: 'bold' }}>
         {getProgressMessage(adjustedPercentage, timeframe)}
@@ -144,7 +143,7 @@ function getProgressMessage(adjustedPercentage: number, timeframe: string) {
     m0: "Don't give up yet! 📅",
     m0to10: "Let's try harder this month! 🌱",
     m10to20: 'More consistency needed this month! 📝',
-    m20to30: 'Slow but steady monthly progress! 📊',
+    m20to30: 'Slow progress, but you will get there! 📊',
     m30to40: 'Good effort, but you can do better! 🛠️',
     m40to50: 'Decent progress this month! 📌',
     m50to60: 'Good effort this month! 👍',

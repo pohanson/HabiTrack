@@ -10,6 +10,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Toast } from 'toastify-react-native';
 import { CompletionRateView } from '@/components/CompletionRateView';
+import { DayStreakView } from '@/components/DayStreakView';
 
 export default function StatisticsScreen() {
   const { id, name } = useLocalSearchParams();
@@ -168,21 +169,23 @@ export default function StatisticsScreen() {
   ).length;
 
   return (
-    <ScrollView style={{ flex: 1, gap: 10, padding: 10 }}>
-      <CalendarView />
-      <CompletionRateView
-        createdAt={createdAtDate}
-        actualNoOfDays={actualNoOfDays}
-        expectedNoOfDays={expectedNoOfDays}
-        firstOfThisMonthDate={firstOfThisMonthDate}
-        monthExpectedNoOfDays={monthExpectedNoOfDays}
-        monthActualNoOfDays={monthActualNoOfDays}
-        startOfThisWeekDate={startOfThisWeekDate}
-        weekExpectedNoOfDays={weekExpectedNoOfDays}
-        weekActualNoOfDays={weekActualNoOfDays}
-        pieChartSize={85}
-      />
-      <DayStreakView />
+    <ScrollView>
+      <ThemedView style={{ flex: 1, gap: 10, padding: 10 }}>
+        <CalendarView />
+        <CompletionRateView
+          createdAt={createdAtDate}
+          actualNoOfDays={actualNoOfDays}
+          expectedNoOfDays={expectedNoOfDays}
+          firstOfThisMonthDate={firstOfThisMonthDate}
+          monthExpectedNoOfDays={monthExpectedNoOfDays}
+          monthActualNoOfDays={monthActualNoOfDays}
+          startOfThisWeekDate={startOfThisWeekDate}
+          weekExpectedNoOfDays={weekExpectedNoOfDays}
+          weekActualNoOfDays={weekActualNoOfDays}
+          pieChartSize={85}
+        />
+        <DayStreakView />
+      </ThemedView>
     </ScrollView>
   );
 }
@@ -191,14 +194,6 @@ const CalendarView = () => {
   return (
     <ThemedView>
       <ThemedText>Calendar View</ThemedText>
-    </ThemedView>
-  );
-};
-
-const DayStreakView = () => {
-  return (
-    <ThemedView>
-      <ThemedText>Day Streak View</ThemedText>
     </ThemedView>
   );
 };
