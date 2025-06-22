@@ -7,17 +7,17 @@ import 'react-native-reanimated';
 import { DATABASE_NAME } from '@/constants';
 import migrations from '@/drizzle/migrations';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { DatabaseService } from '@/services';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
 import React, { Suspense } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
+const databaseService = DatabaseService.init(expoDb);
 export default function RootLayout() {
-  const expoDb = openDatabaseSync(DATABASE_NAME);
-  const db = drizzle(expoDb);
-  const { error } = useMigrations(db, migrations);
+  const { error } = useMigrations(databaseService.db, migrations);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({

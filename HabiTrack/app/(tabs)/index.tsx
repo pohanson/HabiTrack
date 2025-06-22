@@ -1,27 +1,23 @@
-import { ScrollView } from 'react-native';
-
+import { HabitCard } from '@/components/HabitCard';
+import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { router, useFocusEffect } from 'expo-router';
-
-import { IconButton } from '@/components/IconButton';
-import * as schema from '@/db/schema';
 import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
+import { DatabaseService } from '@/services';
 import { and, asc, eq } from 'drizzle-orm';
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
-import { HabitCard } from '@/components/HabitCard';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
 
-  const today = new Date().toJSON().split('T')[0];
-  const dayOfWeek = new Date().getDay();
-  // const colors = Colors[useColorScheme() || 'light'];
+  const databaseService = DatabaseService.instance;
+  const drizzleDb = databaseService.db;
+
+  const today = new Date().toISOString().split('T')[0];
   const { data, error } = useLiveQuery(
     drizzleDb
       .select({
@@ -31,7 +27,7 @@ export default function HomeScreen() {
         habit_milestone: habitMilestone,
       })
       .from(reminder)
-      .where(eq(reminder.day, dayOfWeek))
+      .where(eq(reminder.day, new Date().getDay()))
       .innerJoin(habit, eq(reminder.habit_id, habit.id))
       .leftJoin(
         habitCompletion,
@@ -79,7 +75,6 @@ export default function HomeScreen() {
               habit={habit}
               habit_completion={habit_completion}
               habit_milestone={habit_milestone}
-              today={today}
               setRefresh={setRefresh}
             />
           ))}

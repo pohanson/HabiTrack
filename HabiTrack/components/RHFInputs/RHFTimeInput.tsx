@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { zeroPad } from '@/utils/zeroPad';
+import { paddedTimeFromDate } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
@@ -51,9 +51,7 @@ export function RHFTimeInput({
                 Shadows.medium,
               ]}>
               <ThemedText>
-                {reminderTime == null
-                  ? 'No Reminder'
-                  : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
+                {reminderTime == null ? 'No Reminder' : paddedTimeFromDate(reminderTime)}
               </ThemedText>
               <IconButton iconName="xmark" onPress={() => onChange(null)} />
             </View>
