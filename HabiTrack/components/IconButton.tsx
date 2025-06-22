@@ -1,6 +1,8 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Pressable, View } from 'react-native';
 import { IconSymbol, IconSymbolName } from './ui/IconSymbol';
+import { Shadows } from '../constants/Shadows';
+
 export function IconButton({
   onPress,
   iconName,
@@ -19,7 +21,8 @@ export function IconButton({
           {
             opacity: isPressed.pressed ? 0.7 : 1,
           },
-          { elevation: 6, backgroundColor: backgroundColor, borderRadius: '50%', padding: 10 },
+          { backgroundColor: backgroundColor, borderRadius: '50%', padding: 10 },
+          Shadows.medium,
         ]}>
         <IconSymbol name={iconName} color={useThemeColor({}, 'icon')} size={iconSize} />
       </Pressable>

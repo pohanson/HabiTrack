@@ -3,37 +3,37 @@ import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import * as schema from '@/db/schema';
-import { habit, reminder } from '@/db/schema';
-import { zeroPad } from '@/utils/zeroPad';
+import { habit, habitMilestone, reminder } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useNavigation } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { View } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
   useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
-  // ^ Not sure if need useEffect here, can move navigation.setOptions outside maybe?
 
   const useFormReturn = useForm<FieldValues>({
     values: {
       habit: '',
       description: '',
       frequency: new Set<number>(),
-      time: null,
+      time: new Date(0),
     },
   });
-  const { handleSubmit } = useFormReturn;
+  const { handleSubmit, watch } = useFormReturn;
+  const reminderTime: Date = watch('time') || new Date(0);
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
   const onSubmit = handleSubmit(
     async (data) => {
+      console.log('Submitting Form:\n', data);
       try {
         const habitResult = await drizzleDb.insert(habit).values({
           name: data.habit,
@@ -44,14 +44,20 @@ export default function CreateHabitScreen() {
             .insert(reminder)
             .values({
               day: day,
-              time:
-                data.time != null
-                  ? `${zeroPad(data.time.getHours())}${zeroPad(data.time.getMinutes())}`
-                  : null,
+              time: reminderTime
+                ? `${zeroPad(reminderTime.getHours())}${zeroPad(reminderTime.getMinutes())}`
+                : null,
               habit_id: habitResult.lastInsertRowId,
             })
             .execute(),
         );
+
+        // add milestone row to habitMilestone table
+        await drizzleDb.insert(habitMilestone).values({
+          habit_id: habitResult.lastInsertRowId,
+          week_streak: 0,
+          badges_earned: 0,
+        });
 
         Toast.success('Habit Created');
         useFormReturn.reset();
@@ -66,8 +72,10 @@ export default function CreateHabitScreen() {
     },
   );
 
+  const zeroPad = (num: number) => (num < 10 ? `0${num}` : num.toString());
+
   return (
-    <View style={{ padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText type="title">Create Habit</ThemedText>
       <RHFTextInput
         name="habit"
@@ -85,6 +93,6 @@ export default function CreateHabitScreen() {
       <RHFTimeInput control={useFormReturn.control} />
       <TextButton label="Submit" onPress={onSubmit} style={{ marginTop: 30, width: '100%' }} />
       <ToastManager />
-    </View>
+    </ThemedView>
   );
 }

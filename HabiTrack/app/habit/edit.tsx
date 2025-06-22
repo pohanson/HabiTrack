@@ -1,12 +1,12 @@
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
 import { FieldValues, useForm } from 'react-hook-form';
 import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import ToastManager, { Toast } from 'toastify-react-native';
-import { habit, reminder, habitCompletion } from '@/db/schema';
+import { habit, reminder, habitCompletion, habitMilestone } from '@/db/schema';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -81,7 +81,7 @@ export default function EditHabitScreen() {
   const onSaveChanges = handleSubmit(
     async (data) => {
       try {
-        // Updata habit name and desc
+        // Update habit name and desc
         await drizzleDb
           .update(habit)
           .set({
@@ -123,9 +123,10 @@ export default function EditHabitScreen() {
 
   const onDelete = async () => {
     try {
-      // delete all instances of this habit from habit, reminder, habitCompletion tables
+      // delete all instances of this habit from habit, reminder, habitCompletion, habitMilestone tables
       await drizzleDb.delete(reminder).where(eq(reminder.habit_id, Number(id)));
       await drizzleDb.delete(habitCompletion).where(eq(habitCompletion.habit_id, Number(id)));
+      await drizzleDb.delete(habitMilestone).where(eq(habitMilestone.habit_id, Number(id)));
       await drizzleDb.delete(habit).where(eq(habit.id, Number(id)));
       Toast.success('Habit Deleted');
       navigation.goBack();
@@ -136,7 +137,7 @@ export default function EditHabitScreen() {
   };
 
   return (
-    <View style={{ padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput
         name="habit"
@@ -153,7 +154,7 @@ export default function EditHabitScreen() {
       />
       <RHFTimeInput control={useFormReturn.control} label="Change Reminder Time" />
 
-      <View>
+      <ThemedView>
         <TextButton
           label="Save Changes"
           onPress={onSaveChanges}
@@ -166,9 +167,9 @@ export default function EditHabitScreen() {
           onPress={onDelete}
           style={{ marginTop: 10, width: '100%' }}
         />
-      </View>
+      </ThemedView>
 
       <ToastManager />
-    </View>
+    </ThemedView>
   );
 }

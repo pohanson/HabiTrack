@@ -23,6 +23,16 @@ export const habitCompletion = sqliteTable('habit_completion', {
   completedAt: text('completed_at').notNull(), // date: yyyy-mm-dd
 });
 
+export const habitMilestone = sqliteTable('habit_milestone', {
+  habit_id: integer('habit_id')
+    .primaryKey()
+    .notNull()
+    .references(() => habit.id),
+  week_streak: integer('week_streak').notNull().default(10),
+  badges_earned: integer('badges_earned').notNull().default(0), // 0 for 0 badges, 1 for 1 badge, 2 for 2 badges, so on, up to 5
+});
+
 export type Habit = typeof habit.$inferSelect;
 export type Reminder = typeof reminder.$inferSelect;
 export type HabitCompletion = typeof habitCompletion.$inferSelect;
+export type HabitMilestone = typeof habitMilestone.$inferSelect;
