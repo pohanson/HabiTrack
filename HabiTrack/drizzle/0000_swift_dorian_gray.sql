@@ -1,3 +1,14 @@
+CREATE TABLE `user` (
+	`id` text PRIMARY KEY NOT NULL,
+	`username` text NOT NULL,
+	`name` text NOT NULL,
+	`bio` text DEFAULT '',
+	`profile_picture` text DEFAULT '',
+	`created_at` text NOT NULL,
+	`modified_at` text NOT NULL,
+	`is_deleted` integer DEFAULT false NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `habit` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -28,17 +39,6 @@ CREATE TABLE `reminder` (
 	`modified_at` text NOT NULL,
 	`is_deleted` integer DEFAULT false NOT NULL,
 	FOREIGN KEY (`habit_id`) REFERENCES `habit`(`id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE TABLE `user` (
-	`id` text PRIMARY KEY NOT NULL,
-	`username` text NOT NULL,
-	`name` text NOT NULL,
-	`bio` text DEFAULT '',
-	`profile_picture` text DEFAULT '',
-	`created_at` text NOT NULL,
-	`modified_at` text NOT NULL,
-	`is_deleted` integer DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_username_unique` ON `user` (`username`);
