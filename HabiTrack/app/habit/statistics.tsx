@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/ThemedView';
 import React, { useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import * as schema from '@/db/schema';
-import { habit, habitCompletion, reminder } from '@/db/schema';
+import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { eq, sql } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -11,6 +11,7 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Toast } from 'toastify-react-native';
 import { CompletionRateView } from '@/components/CompletionRateView';
 import { DayStreakView } from '@/components/DayStreakView';
+import { calculateDaysBetweenDates } from '@/utils/dateUtils';
 
 export default function StatisticsScreen() {
   const { id, name } = useLocalSearchParams();
@@ -18,6 +19,14 @@ export default function StatisticsScreen() {
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
+
+  const today = new Date();
+
+  // set header title
+  useEffect(() => {
+    if (!id) return;
+    navigation.setOptions({ headerTitle: 'Statistics [' + name + ']' });
+  }, [id, name, navigation]);
 
   // helper functions
   function getHabitFrequencyArray(habitId: number) {
@@ -93,8 +102,10 @@ export default function StatisticsScreen() {
     endOfWeeksBetweenDate.setDate(endOfWeeksBetweenDate.getDate() - daysSincePreviousSaturday);
     // calculate no. of weeks b/w these 2 dates
     const weeksBetween = Math.ceil(
-      (endOfWeeksBetweenDate.getTime() - startOfWeeksBetweenDate.getTime()) /
-        (1000 * 60 * 60 * 24 * 7),
+      calculateDaysBetweenDates(
+        startOfWeeksBetweenDate?.toJSON()?.split('T')[0],
+        endOfWeeksBetweenDate?.toJSON()?.split('T')[0],
+      ) / 7,
     );
 
     // 1.4 calculate expectedDays
@@ -103,11 +114,7 @@ export default function StatisticsScreen() {
     return expectedNoOfDays;
   }
 
-  // set header title
-  useEffect(() => {
-    if (!id) return;
-    navigation.setOptions({ headerTitle: 'Statistics [' + name + ']' });
-  }, [id, name, navigation]);
+  // COMPLETION RATE VIEW CALCULATIONS
 
   // get created_at data
   const { data: createdAtData, error: createdAtError } = useLiveQuery(
@@ -158,7 +165,6 @@ export default function StatisticsScreen() {
   ).length;
 
   // get weekExpectedNoOfDays for this habit (calculated since Sunday of this week) (This Week)
-  const today = new Date();
   const daysSinceSunday = today.getDay();
   const startOfThisWeek = new Date();
   startOfThisWeek.setDate(startOfThisWeek.getDate() - daysSinceSunday);
@@ -167,6 +173,54 @@ export default function StatisticsScreen() {
   const weekActualNoOfDays = completedAtData.filter(
     (entry) => String(entry.completed_at) >= startOfThisWeekDate,
   ).length;
+
+  // DAY STREAK VIEW CALCULATIONS
+
+  // get streak_started_at & best_day_streak data
+  const { data, error } = useLiveQuery(
+    drizzleDb
+      .select({
+        streak_started_at: habitMilestone.streak_started_at,
+        best_day_streak: habitMilestone.best_day_streak,
+      })
+      .from(habitMilestone)
+      .where(eq(habitMilestone.habit_id, Number(id))),
+  );
+  if (error) {
+    console.error('Error fetching created_at', error);
+    Toast.error('Error fetching created_at data.');
+  }
+
+  // get streak_started_at as a string
+  const streakStartedAt = data?.[0]?.streak_started_at || '';
+
+  // get best_day_streak as a number
+  const bestStreak = Number(data?.[0]?.best_day_streak);
+
+  // Calculate active streak
+  const todayStr = today.toJSON()?.split('T')[0];
+  const todayDOW = today.getDay();
+  // check if today is an expected day
+  const todayIsAnExpectedDay = freq.includes(todayDOW);
+  // check if today was completed for this habit
+  const todayHasCompletedAt = completedAtData.some(
+    (entry) => String(entry.completed_at) === todayStr,
+  );
+  let activeStreak = 0;
+  if (streakStartedAt === 'inactive') {
+    activeStreak = 0;
+  } else {
+    const daysBetween = calculateDaysBetweenDates(streakStartedAt, todayStr);
+    if (todayIsAnExpectedDay) {
+      if (todayHasCompletedAt) {
+        activeStreak = daysBetween + 1;
+      } else {
+        activeStreak = daysBetween;
+      }
+    } else {
+      activeStreak = daysBetween + 1;
+    }
+  }
 
   return (
     <ScrollView>
@@ -184,7 +238,7 @@ export default function StatisticsScreen() {
           weekActualNoOfDays={weekActualNoOfDays}
           pieChartSize={85}
         />
-        <DayStreakView />
+        <DayStreakView activeStreak={activeStreak} bestStreak={bestStreak} />
       </ThemedView>
     </ScrollView>
   );

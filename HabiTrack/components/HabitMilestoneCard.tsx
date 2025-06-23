@@ -143,8 +143,8 @@ const ProgressBar = ({
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
-  const progressBarWidth = 50;
-  const progressBarHeight = 10;
+  const progressBarWidth = 52;
+  const progressBarHeight = 12;
 
   return !completed ? (
     // incomplete progress bar
@@ -170,7 +170,12 @@ const ProgressBar = ({
   ) : (
     // complete progress bar
     <View style={{ width: progressBarWidth, height: progressBarHeight, alignItems: 'center' }}>
-      <Text style={{ fontSize: 8, color: colorScheme === 'light' ? 'black' : 'white' }}>
+      <Text
+        style={{
+          fontSize: 9,
+          fontWeight: 'bold',
+          color: colorScheme === 'light' ? 'black' : 'white',
+        }}>
         Completed!
       </Text>
     </View>

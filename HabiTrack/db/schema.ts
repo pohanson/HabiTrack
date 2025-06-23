@@ -31,8 +31,9 @@ export const habitMilestone = sqliteTable('habit_milestone', {
     .references(() => habit.id),
   week_streak: integer('week_streak').notNull().default(0),
   badges_earned: integer('badges_earned').notNull().default(0), // 0 for 0 badges, 1 for 1 badge, 2 for 2 badges, so on, up to 5
-  streak_started_at: text('streak_started_at').default('inactive'),
+  streak_started_at: text('streak_started_at').default('inactive'), // date: yyyy-mm-dd
   best_day_streak: integer('best_day_streak').default(0),
+  prev_best_day_streak: integer('prev_best_day_streak').default(-1),
 });
 
 export type Habit = typeof habit.$inferSelect;

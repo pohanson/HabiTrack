@@ -68,6 +68,7 @@ export default function CreateHabitScreen() {
           // new columns for streak tracking
           streak_started_at: 'inactive',
           best_day_streak: 0,
+          prev_best_day_streak: -1,
         });
 
         Toast.success('Habit Created');

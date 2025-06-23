@@ -87,7 +87,7 @@ export const CompletionRateView = ({
         <Picker.Item label="This Month" value="month" />
         <Picker.Item label="This Week" value="week" />
       </Picker>
-      <ThemedText style={{ fontWeight: 'bold', fontSize: 24, padding: 10 }}>
+      <ThemedText style={{ fontWeight: 'bold', fontSize: 24, padding: 10, color: theme.header }}>
         Completion Rate
         {timeframe === 'all' && ' [Lifetime]'}
         {timeframe === 'month' && ' [Month]'}
@@ -102,17 +102,14 @@ export const CompletionRateView = ({
         textColor={pieChartColorForPercentage}
       />
       <ThemedText style={{ fontSize: 14, padding: 5, textAlign: 'center', width: '100%' }}>
+        You completed{' '}
         <ThemedText style={{ color: pieChartColorForPercentage, fontWeight: 'bold' }}>
-          {actual}
+          {actual} / {expected}
         </ThemedText>{' '}
-        of{' '}
-        <ThemedText style={{ color: pieChartColorForPercentage, fontWeight: 'bold' }}>
-          {expected}
-        </ThemedText>{' '}
-        days completed
+        scheduled days
         {timeframe === 'all' && ' in total'}
-        {timeframe === 'month' && ' since the start of this month'}
-        {timeframe === 'week' && ' since the start of this week'}
+        {timeframe === 'month' && ' since the start of the month'}
+        {timeframe === 'week' && ' since the start of the week'}
       </ThemedText>
       <ThemedText style={{ padding: 10, fontSize: 16, fontWeight: 'bold' }}>
         {getProgressMessage(adjustedPercentage, timeframe)}
@@ -140,7 +137,7 @@ function getProgressMessage(adjustedPercentage: number, timeframe: string) {
 
   // month-specific messages
   const monthMessages = {
-    m0: "Don't give up yet! 📅",
+    m0: "Don't give up! 📅",
     m0to10: "Let's try harder this month! 🌱",
     m10to20: 'More consistency needed this month! 📝',
     m20to30: 'Slow progress, but you will get there! 📊',
@@ -186,31 +183,18 @@ function getProgressMessage(adjustedPercentage: number, timeframe: string) {
   }
 
   // Return message based on percentage
-  if (adjustedPercentage <= 0) {
-    return messages.m0;
-  } else if (adjustedPercentage < 10) {
-    return messages.m0to10;
-  } else if (adjustedPercentage < 20) {
-    return messages.m10to20;
-  } else if (adjustedPercentage < 30) {
-    return messages.m20to30;
-  } else if (adjustedPercentage < 40) {
-    return messages.m30to40;
-  } else if (adjustedPercentage < 50) {
-    return messages.m40to50;
-  } else if (adjustedPercentage < 60) {
-    return messages.m50to60;
-  } else if (adjustedPercentage < 70) {
-    return messages.m60to70;
-  } else if (adjustedPercentage < 80) {
-    return messages.m70to80;
-  } else if (adjustedPercentage < 90) {
-    return messages.m80to90;
-  } else if (adjustedPercentage < 100) {
-    return messages.m90to100;
-  } else {
-    return messages.m100;
-  }
+  if (adjustedPercentage <= 0) return messages.m0;
+  if (adjustedPercentage < 10) return messages.m0to10;
+  if (adjustedPercentage < 20) return messages.m10to20;
+  if (adjustedPercentage < 30) return messages.m20to30;
+  if (adjustedPercentage < 40) return messages.m30to40;
+  if (adjustedPercentage < 50) return messages.m40to50;
+  if (adjustedPercentage < 60) return messages.m50to60;
+  if (adjustedPercentage < 70) return messages.m60to70;
+  if (adjustedPercentage < 80) return messages.m70to80;
+  if (adjustedPercentage < 90) return messages.m80to90;
+  if (adjustedPercentage < 100) return messages.m90to100;
+  return messages.m100;
 }
 
 function getColorForPercentage(adjustedPercentage: number) {
