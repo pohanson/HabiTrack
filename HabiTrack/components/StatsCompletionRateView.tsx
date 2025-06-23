@@ -7,7 +7,7 @@ import { ThemedText } from './ThemedText';
 import { Picker } from '@react-native-picker/picker';
 import PieChart from './PieChart';
 
-export const CompletionRateView = ({
+export const StatsCompletionRateView = ({
   createdAt,
   actualNoOfDays,
   expectedNoOfDays,
@@ -34,7 +34,7 @@ export const CompletionRateView = ({
   weekExpectedNoOfDays: number;
   weekActualNoOfDays: number;
 
-  pieChartSize: number;
+  pieChartSize?: number;
 }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];

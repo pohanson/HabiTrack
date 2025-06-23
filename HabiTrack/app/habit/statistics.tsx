@@ -1,7 +1,6 @@
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import React, { useEffect } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, useColorScheme } from 'react-native';
 import * as schema from '@/db/schema';
 import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
@@ -9,9 +8,13 @@ import { eq, sql } from 'drizzle-orm';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Toast } from 'toastify-react-native';
-import { CompletionRateView } from '@/components/CompletionRateView';
-import { DayStreakView } from '@/components/DayStreakView';
-import { calculateDaysBetweenDates } from '@/utils/dateUtils';
+
+import { calculateDaysBetweenDates, getExpectedDates } from '@/utils/dateUtils';
+import { StatsDayStreakView } from '@/components/StatsDayStreakView';
+import { StatsCalendarView } from '@/components/StatsCalendarView';
+import { StatsCompletionRateView } from '@/components/StatsCompletionRateView';
+import { Colors } from '@/constants/Colors';
+import { StatsHeader } from '@/components/StatsHeader';
 
 export default function StatisticsScreen() {
   const { id, name } = useLocalSearchParams();
@@ -20,12 +23,15 @@ export default function StatisticsScreen() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
 
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
+
   const today = new Date();
 
   // set header title
   useEffect(() => {
     if (!id) return;
-    navigation.setOptions({ headerTitle: 'Statistics [' + name + ']' });
+    navigation.setOptions({ headerTitle: 'Statistics' });
   }, [id, name, navigation]);
 
   // helper functions
@@ -222,11 +228,58 @@ export default function StatisticsScreen() {
     }
   }
 
+  // CALENDAR VIEW CALCULATIONS
+
+  const yesterdayDate = new Date(todayStr);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayStr = yesterdayDate?.toJSON()?.split('T')[0];
+
+  // Initialise completed dates object for calendar props:
+  const markedDatesObj: { [key: string]: any } = {};
+
+  // Obtain completed dates:
+  const completedAtDatesSinceModified = completedAtData
+    .filter((entry) => String(entry.completed_at) >= createdAtDate)
+    .map((entry) => String(entry.completed_at));
+  // mark completed dates in green
+  completedAtDatesSinceModified.forEach((dateStr) => {
+    markedDatesObj[dateStr] = {
+      marked: true,
+      dotColor: theme.green,
+    };
+  });
+
+  // Obtaining missed dates: (initialise array of expected dates b/w lastModified & today, filter out completed dates)
+
+  const expectedDates = getExpectedDates(createdAtDate, yesterdayStr, freq);
+  // for O(1) completedAt lookup:
+  const completedDatesSet = new Set(completedAtDatesSinceModified);
+  // marked missed dates in red
+  expectedDates.forEach((dateStr) => {
+    if (!completedDatesSet.has(dateStr)) {
+      markedDatesObj[dateStr] = {
+        marked: true,
+        dotColor: theme.red,
+      };
+    }
+  });
+
   return (
     <ScrollView>
-      <ThemedView style={{ flex: 1, gap: 10, padding: 10 }}>
-        <CalendarView />
-        <CompletionRateView
+      <ThemedView style={{ gap: 10, padding: 10 }}>
+        <StatsHeader
+          habitName={String(name)}
+          todayDate={todayStr}
+          createdAt={createdAtDate}
+          reminderTime="hello"
+          lastModifiedAt="placeholder"
+        />
+        <StatsCalendarView
+          today={todayStr}
+          createdAt={createdAtDate}
+          completedAtDates={markedDatesObj}
+        />
+        <StatsCompletionRateView
           createdAt={createdAtDate}
           actualNoOfDays={actualNoOfDays}
           expectedNoOfDays={expectedNoOfDays}
@@ -238,16 +291,8 @@ export default function StatisticsScreen() {
           weekActualNoOfDays={weekActualNoOfDays}
           pieChartSize={85}
         />
-        <DayStreakView activeStreak={activeStreak} bestStreak={bestStreak} />
+        <StatsDayStreakView activeStreak={activeStreak} bestStreak={bestStreak} />
       </ThemedView>
     </ScrollView>
   );
 }
-
-const CalendarView = () => {
-  return (
-    <ThemedView>
-      <ThemedText>Calendar View</ThemedText>
-    </ThemedView>
-  );
-};

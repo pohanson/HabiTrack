@@ -1,11 +1,10 @@
 import { useColorScheme, View } from 'react-native';
-import React from 'react';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { Shadows } from '@/constants/Shadows';
 import { Colors } from '@/constants/Colors';
 
-export const DayStreakView = ({
+export const StatsDayStreakView = ({
   activeStreak,
   bestStreak,
 }: {
@@ -70,21 +69,21 @@ export const DayStreakView = ({
 
 function getStreakEmoji(activeStreak: number): string {
   if (activeStreak <= 0) return '😴';
-  if (activeStreak === 1) return '🔥';
-  if (activeStreak <= 3) return '🔥🔥';
-  if (activeStreak <= 7) return '🔥🔥🔥';
-  if (activeStreak <= 14) return '🔥🔥🔥🔥';
-  if (activeStreak <= 30) return '⚡';
-  if (activeStreak <= 60) return '⚡⚡';
-  if (activeStreak <= 90) return '⚡⚡⚡';
-  if (activeStreak <= 120) return '⚡⚡⚡⚡';
-  if (activeStreak <= 150) return '🏆';
-  if (activeStreak <= 180) return '🏆🏆';
-  if (activeStreak <= 210) return '🏆🏆🏆';
-  if (activeStreak <= 240) return '🏆🏆🏆🏆';
-  if (activeStreak <= 270) return '💎';
-  if (activeStreak <= 300) return '💎💎';
-  if (activeStreak <= 330) return '💎💎💎';
-  if (activeStreak <= 365) return '💎💎💎💎';
+  if (activeStreak === 1) return '🌱';
+  if (activeStreak <= 3) return '⚡';
+  if (activeStreak <= 7) return '⚡⚡';
+  if (activeStreak <= 14) return '⚡⚡⚡';
+  if (activeStreak <= 30) return '🔥';
+  if (activeStreak <= 60) return '🔥🔥';
+  if (activeStreak <= 90) return '🔥🔥🔥';
+  if (activeStreak <= 120) return '🏆';
+  if (activeStreak <= 150) return '🏆🏆';
+  if (activeStreak <= 180) return '🏆🏆🏆';
+  if (activeStreak <= 210) return '⭐';
+  if (activeStreak <= 240) return '⭐⭐';
+  if (activeStreak <= 270) return '⭐⭐⭐';
+  if (activeStreak <= 300) return '💎';
+  if (activeStreak <= 330) return '💎💎';
+  if (activeStreak <= 365) return '💎💎💎';
   return '👑👑👑';
 }
