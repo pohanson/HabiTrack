@@ -50,6 +50,46 @@ export const StatsCalendarView = ({
         }}
         minDate={createdAt}
         maxDate={today}
+        disableAllTouchEventsForDisabledDays={true}
+        disableAllTouchEventsForInactiveDays={true}
+        onDayPress={() => {}}
+        // to disable touch day effect
+        dayComponent={({ date, state, marking }) => {
+          return (
+            <ThemedView
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 32,
+                height: 32,
+                backgroundColor: theme.card,
+              }}>
+              <ThemedText
+                style={{
+                  color:
+                    state === 'today'
+                      ? theme.blue
+                      : state === 'disabled'
+                        ? theme.lightGray
+                        : theme.text,
+                  fontWeight: state === 'today' ? 'bold' : 'normal',
+                }}>
+                {date?.day}
+              </ThemedText>
+              {marking?.marked && (
+                <ThemedView
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: marking.dotColor || theme.blue,
+                    marginTop: 1,
+                  }}
+                />
+              )}
+            </ThemedView>
+          );
+        }}
       />
 
       <ThemedView
