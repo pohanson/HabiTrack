@@ -25,6 +25,7 @@ const MAPPING = {
   pencil: 'edit',
   xmark: 'close',
   star: 'star',
+  'chart.bar': 'bar-chart',
 } as IconMapping;
 
 /**

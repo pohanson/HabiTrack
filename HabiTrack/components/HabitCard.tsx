@@ -18,6 +18,7 @@ import { IconButton } from './IconButton';
 import { ThemedText } from './ThemedText';
 import { ToggleInput } from './ToggleInput';
 import { Shadows } from '../constants/Shadows';
+import { calculateDaysBetweenDates } from '@/utils/dateUtils';
 
 export function HabitCard({
   habit,
@@ -39,6 +40,13 @@ export function HabitCard({
     router.push({
       pathname: '/habit/edit',
       params: { id: habitId },
+    });
+  };
+
+  const onStatsButtonPressed = (habitId: number, habitName: string) => {
+    router.push({
+      pathname: '/habit/statistics',
+      params: { id: habitId, name: habitName },
     });
   };
 
@@ -79,7 +87,8 @@ export function HabitCard({
       if (!result || !result.day_frequency) {
         return [];
       } else {
-        return JSON.parse(result.day_frequency as string);
+        const freq = JSON.parse(result.day_frequency as string);
+        return freq.sort((e: number, f: number) => e - f);
       }
     } catch (error) {
       console.error('Error in getHabitFrequencyArray:', error);
@@ -119,9 +128,12 @@ export function HabitCard({
 
       const frequencyArray = await getHabitFrequencyArray(habit.id);
       const todayDOW = new Date(today).getDay();
+      const todayDateStr = new Date().toJSON().split('T')[0];
 
       if (habit_completion === null) {
-        // Adding completion
+        // TICKING HABIT (1. Completion data handling, 2. Milestone data handling, 3. Daily streaks data handling)
+
+        // 1. Completion data handling
 
         // habit is not completed today, so add completion
         await drizzleDb
@@ -132,6 +144,8 @@ export function HabitCard({
           })
           .execute();
 
+        // 2. Milestone data handling
+
         // Then check if all habits for the week are completed
         const completionsThisWeek = await getCompletionsThisWeek(habit.id);
         const noOfCompletionsThisWeek = completionsThisWeek.length;
@@ -140,6 +154,7 @@ export function HabitCard({
           const newWeekStreak = (habit_milestone?.week_streak || 0) + 1;
           const calculatedBadges = Number(getBadgesEarned(newWeekStreak));
           const newBadgesEarned = Math.max(calculatedBadges, habit_milestone?.badges_earned || 0);
+
           await drizzleDb
             .update(habitMilestone)
             .set({
@@ -150,8 +165,36 @@ export function HabitCard({
             .execute();
           console.log('Badges_earned for habit.id', habit.id, ':', newBadgesEarned);
         }
+
+        // 3. Daily streaks data handling
+
+        const updatedStreakStartedAt =
+          String(habit_milestone?.streak_started_at) === 'inactive'
+            ? todayDateStr
+            : String(habit_milestone?.streak_started_at);
+        const currentStreak =
+          String(habit_milestone?.streak_started_at) === 'inactive'
+            ? 1
+            : calculateDaysBetweenDates(String(habit_milestone?.streak_started_at), todayDateStr) +
+              1;
+        const updatedPrevBestDayStreak = Number(habit_milestone?.best_day_streak);
+        const updatedBestDayStreak = Math.max(
+          currentStreak,
+          Number(habit_milestone?.best_day_streak),
+        );
+        await drizzleDb
+          .update(habitMilestone)
+          .set({
+            streak_started_at: updatedStreakStartedAt,
+            best_day_streak: updatedBestDayStreak,
+            prev_best_day_streak: updatedPrevBestDayStreak,
+          })
+          .where(eq(habitMilestone.habit_id, habit.id))
+          .execute();
       } else {
-        // Removing completion
+        // UNTICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling, 3. Completion data handling)
+
+        // 1. Milestone data handling
 
         // get current completions (all completions since Sunday)
         const currentCompletions = await getCompletionsThisWeek(habit.id);
@@ -200,6 +243,33 @@ export function HabitCard({
           console.log('Badges_earned for habit.id', habit.id, ':', UpdatedBadgesEarned);
         }
 
+        // 2. Daily streaks data handling
+
+        const updatedStreakStartedAt =
+          String(habit_milestone?.streak_started_at) === todayDateStr
+            ? 'inactive'
+            : String(habit_milestone?.streak_started_at);
+        const currentStreak =
+          String(habit_milestone?.streak_started_at) === 'inactive'
+            ? 0
+            : calculateDaysBetweenDates(String(habit_milestone?.streak_started_at), todayDateStr); // Don't include today into current streak (since today is an expected day)
+        const updatedBestDayStreak = Math.max(
+          currentStreak,
+          Number(habit_milestone?.prev_best_day_streak),
+        );
+
+        await drizzleDb
+          .update(habitMilestone)
+          .set({
+            streak_started_at: updatedStreakStartedAt,
+            best_day_streak: updatedBestDayStreak,
+            prev_best_day_streak: -1,
+          })
+          .where(eq(habitMilestone.habit_id, habit.id))
+          .execute();
+
+        // 3. Completion data handling
+
         // remove completion
         await drizzleDb
           .delete(habitCompletion)
@@ -233,7 +303,10 @@ export function HabitCard({
       <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
-
+        <IconButton
+          iconName="chart.bar"
+          onPress={() => onStatsButtonPressed(habit.id, habit.name)}
+        />
         {today == null || (
           <ToggleInput
             label=""

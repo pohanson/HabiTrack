@@ -35,9 +35,11 @@ export default function CreateHabitScreen() {
     async (data) => {
       console.log('Submitting Form:\n', data);
       try {
+        const today = new Date();
         const habitResult = await drizzleDb.insert(habit).values({
           name: data.habit,
           description: data.description || '',
+          createdAt: today.toJSON().split('T')[0],
         });
         (data.frequency as Set<number>).forEach((day) =>
           drizzleDb
@@ -57,6 +59,11 @@ export default function CreateHabitScreen() {
           habit_id: habitResult.lastInsertRowId,
           week_streak: 0,
           badges_earned: 0,
+
+          // new columns for streak tracking
+          streak_started_at: 'inactive',
+          best_day_streak: 0,
+          prev_best_day_streak: -1,
         });
 
         Toast.success('Habit Created');
