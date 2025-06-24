@@ -2,15 +2,18 @@ import { Reminder } from '@/db/schema';
 import { ReminderRepository } from '@/repositories/ReminderRepository';
 import { paddedTimeFromDate } from '@/utils';
 import { DatabaseService } from './DatabaseService';
+import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 
-export class ReminderService {
+export class ReminderService extends BaseSyncableRepoService {
   static #instance: ReminderService;
   private dbService: DatabaseService;
   private _reminderRepository: ReminderRepository;
 
   private constructor(dbService: DatabaseService) {
+    const reminderRepo = new ReminderRepository(dbService.db);
+    super(reminderRepo, 'reminder');
+    this._reminderRepository = reminderRepo;
     this.dbService = dbService;
-    this._reminderRepository = new ReminderRepository(dbService.db);
   }
 
   public static get instance() {

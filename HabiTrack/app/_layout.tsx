@@ -5,9 +5,10 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { DATABASE_NAME } from '@/constants';
-import migrations from '@/drizzle/migrations';
+import migrations from '@/drizzle/local/migrations';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DatabaseService } from '@/services';
+import { SyncService } from '@/services/SyncService';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
 import React, { Suspense } from 'react';
@@ -33,6 +34,8 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
+  SyncService.init();
+  SyncService.instance.syncAll();
 
   return (
     <SafeAreaProvider>

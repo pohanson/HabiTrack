@@ -1,5 +1,5 @@
 import { SyncableModel } from '@/types/SyncableModel';
-import { eq } from 'drizzle-orm';
+import { eq, gte, lte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core';
 import { SQLiteRunResult } from 'expo-sqlite';
@@ -13,7 +13,6 @@ type PartialSync<TModel> = Omit<TModel, keyof SyncableModel> & Partial<SyncableM
 export abstract class SyncableRepository<TModel extends SyncableModel> {
   protected db: ReturnType<typeof drizzle>;
   protected table: SQLiteTableWithColumns<any>;
-  protected syncInProgress: boolean = false;
 
   constructor(db: ReturnType<typeof drizzle>, table: SQLiteTableWithColumns<any>) {
     this.db = db;
@@ -43,7 +42,10 @@ export abstract class SyncableRepository<TModel extends SyncableModel> {
       item.createdAt = item.createdAt || now;
       item.modifiedAt = now;
 
-      const result = await this.db.insert(this.table).values(item).returning();
+      const result = (await this.db
+        .insert(this.table)
+        .values(item as TModel)
+        .returning()) as TModel[];
       return result[0] as TModel;
     } catch (error) {
       console.error('Error creating item:', error);
@@ -65,7 +67,7 @@ export abstract class SyncableRepository<TModel extends SyncableModel> {
         id: item.id || SyncableRepository.generateId(),
         createdAt: item.createdAt || now,
         modifiedAt: now,
-      }));
+      })) as TModel[];
       return (await this.db.insert(this.table).values(itemsWithTimestamps).returning()) as TModel[];
     } catch (error) {
       console.error('Error creating multiple items:', error);
@@ -159,5 +161,39 @@ export abstract class SyncableRepository<TModel extends SyncableModel> {
         `Failed to delete item: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
+  }
+
+  // syncing logic
+  public async getModifiedAfter(lastSyncTimestamp: string): Promise<TModel[]> {
+    try {
+      return (await this.db
+        .select()
+        .from(this.table)
+        .where(gte(this.table.modifiedAt, lastSyncTimestamp))) as TModel[];
+    } catch (error) {
+      console.error('Error fetching modified items:', error);
+      throw new Error(
+        `Failed to fetch modified items: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  public async updateModifiedItems(items: TModel[]) {
+    this.db.transaction(async (tx) => {
+      items.forEach((item) =>
+        tx
+          .insert(this.table)
+          .values(item)
+          .onConflictDoUpdate({
+            target: this.table.id,
+            set: {
+              ...item,
+            },
+            // Only update newer items
+            where: lte(this.table.modifiedAt, item.modifiedAt),
+          })
+          .execute(),
+      );
+    });
   }
 }

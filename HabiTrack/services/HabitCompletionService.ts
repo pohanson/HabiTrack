@@ -1,14 +1,16 @@
 import { HabitCompletionRepository } from '@/repositories/HabitCompletionRepository';
 import { DatabaseService } from './DatabaseService';
-import { HabitCompletion, HabitCompletionInsert } from '@/db/schema';
+import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 
-export class HabitCompletionService {
+export class HabitCompletionService extends BaseSyncableRepoService {
   static #instance: HabitCompletionService;
   private dbService: DatabaseService;
   private _habitCompletionRepository: HabitCompletionRepository;
 
   private constructor(dbService: DatabaseService) {
-    this._habitCompletionRepository = new HabitCompletionRepository(dbService.db);
+    const tempRepo = new HabitCompletionRepository(dbService.db);
+    super(tempRepo, 'habit_completion');
+    this._habitCompletionRepository = tempRepo;
     this.dbService = dbService;
   }
 

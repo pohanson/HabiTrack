@@ -1,5 +1,6 @@
 import { Habit, Reminder } from '@/db/schema';
 import { HabitRepository } from '@/repositories/HabitRepository';
+import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 import { DatabaseService } from './DatabaseService';
 
 export type HabitInsertionData = Pick<Habit, 'name' | 'description' | 'user_id'> & {
@@ -7,14 +8,16 @@ export type HabitInsertionData = Pick<Habit, 'name' | 'description' | 'user_id'>
   frequency: number[];
 };
 
-export class HabitService {
+export class HabitService extends BaseSyncableRepoService {
   static #instance: HabitService;
   private dbService: DatabaseService;
   private _habitRepository: HabitRepository;
 
   private constructor(dbService: DatabaseService) {
+    const habitRepo = new HabitRepository(dbService.db);
+    super(habitRepo, 'habit');
+    this._habitRepository = habitRepo;
     this.dbService = dbService;
-    this._habitRepository = new HabitRepository(dbService.db);
   }
 
   public static get instance() {

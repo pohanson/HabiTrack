@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7a76e7b5-c4e9-4de0-802e-d1e66cf7ff14",
+  "id": "9e588f1b-35dd-4536-a32c-4841d6295e6e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "habit": {
@@ -36,22 +36,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "modified_at": {
-          "name": "modified_at",
+        "modifiedAt": {
+          "name": "modifiedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "is_deleted": {
-          "name": "is_deleted",
+        "isDeleted": {
+          "name": "isDeleted",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -92,29 +92,29 @@
           "notNull": true,
           "autoincrement": false
         },
-        "completed_at": {
-          "name": "completed_at",
+        "completedAt": {
+          "name": "completedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "modified_at": {
-          "name": "modified_at",
+        "modifiedAt": {
+          "name": "modifiedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "is_deleted": {
-          "name": "is_deleted",
+        "isDeleted": {
+          "name": "isDeleted",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -169,22 +169,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "modified_at": {
-          "name": "modified_at",
+        "modifiedAt": {
+          "name": "modifiedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "is_deleted": {
-          "name": "is_deleted",
+        "isDeleted": {
+          "name": "isDeleted",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -240,30 +240,30 @@
           "autoincrement": false,
           "default": "''"
         },
-        "profile_picture": {
-          "name": "profile_picture",
+        "profilePicture": {
+          "name": "profilePicture",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
           "default": "''"
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "modified_at": {
-          "name": "modified_at",
+        "modifiedAt": {
+          "name": "modifiedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "is_deleted": {
-          "name": "is_deleted",
+        "isDeleted": {
+          "name": "isDeleted",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
