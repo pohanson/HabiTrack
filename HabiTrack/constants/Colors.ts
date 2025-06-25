@@ -23,6 +23,7 @@ export const Colors = {
     lightGray: '#bababa',
     green: green,
     red: red,
+    progressBarIncomplete: '#878787',
   },
   dark: {
     text: '#ECEDEE',
@@ -38,5 +39,6 @@ export const Colors = {
     lightGray: 'dimgray',
     green: green,
     red: red,
+    progressBarIncomplete: '#5c5c5c',
   },
 };

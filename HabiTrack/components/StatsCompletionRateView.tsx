@@ -6,6 +6,8 @@ import { Shadows } from '@/constants/Shadows';
 import { ThemedText } from './ThemedText';
 import { Picker } from '@react-native-picker/picker';
 import PieChart from './PieChart';
+import { reorderDateString } from '@/utils/dateUtils';
+import { getColorForPercentage } from '@/utils/colorUtils';
 
 export const StatsCompletionRateView = ({
   createdAt,
@@ -40,7 +42,7 @@ export const StatsCompletionRateView = ({
   const theme = Colors[colorScheme];
   const [timeframe, setTimeframe] = useState('all');
 
-  let startDate = createdAt;
+  let startDate = reorderDateString(createdAt);
   let expected = expectedNoOfDays;
   let actual = actualNoOfDays;
 
@@ -195,19 +197,4 @@ function getProgressMessage(adjustedPercentage: number, timeframe: string) {
   if (adjustedPercentage < 90) return messages.m80to90;
   if (adjustedPercentage < 100) return messages.m90to100;
   return messages.m100;
-}
-
-function getColorForPercentage(adjustedPercentage: number) {
-  // red rgb: 255 0 0
-  // green rgb: 0 180 60
-
-  const r = Math.round(255 - 255 * (adjustedPercentage / 100));
-  const g = Math.round(180 * (adjustedPercentage / 100));
-  const b = Math.round(60 * (adjustedPercentage / 100));
-
-  const rx = isNaN(r) ? '00' : Math.max(0, Math.min(255, r)).toString(16).padStart(2, '0');
-  const gx = isNaN(g) ? '00' : Math.max(0, Math.min(255, g)).toString(16).padStart(2, '0');
-  const bx = isNaN(b) ? '00' : Math.max(0, Math.min(255, b)).toString(16).padStart(2, '0');
-
-  return `#${rx}${gx}${bx}`;
 }
