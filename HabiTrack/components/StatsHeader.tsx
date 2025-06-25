@@ -3,7 +3,7 @@ import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { Image } from 'react-native';
 
-export const StatsHeader = ({
+export function StatsHeader({
   habitName,
   todayDate,
   createdAt,
@@ -17,7 +17,7 @@ export const StatsHeader = ({
   badgesEarned: number;
   lastModifiedAt: string;
   reminderTime: string;
-}) => {
+}) {
   function getBadgeImageFromBadgesEarned(badgesEarned: number) {
     if (badgesEarned === 1) return require('../assets/images/badges/colored/msb1.png');
     if (badgesEarned === 2) return require('../assets/images/badges/colored/msb2.png');
@@ -106,4 +106,4 @@ export const StatsHeader = ({
       </ThemedView>
     </ThemedView>
   );
-};
+}

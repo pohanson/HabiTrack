@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 const boolean = (fieldName: string) => integer(fieldName, { mode: 'boolean' });
 
 export const user = sqliteTable('user', {
@@ -63,12 +63,33 @@ export const habitCompletion = sqliteTable('habit_completion', {
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 
+export const habitMilestone = sqliteTable('habit_milestone', {
+  id: text('id').primaryKey(),
+  habit_id: text('habit_id')
+    .notNull()
+    .references(() => habit.id),
+  week_streak: integer('week_streak').notNull().default(0),
+  badges_earned: integer('badges_earned').notNull().default(0), // 0 for 0 badges, 1 for 1 badge, 2 for 2 badges, so on, up to 5
+  streak_started_at: text('streak_started_at').default('inactive'), // date: yyyy-mm-dd
+  best_day_streak: integer('best_day_streak').default(0),
+  prev_best_day_streak: integer('prev_best_day_streak').default(-1),
+  createdAt: text('createdAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  modifiedAt: text('modifiedAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});
+
 export type Habit = typeof habit.$inferSelect;
 export type Reminder = typeof reminder.$inferSelect;
 export type HabitCompletion = typeof habitCompletion.$inferSelect;
 export type User = typeof user.$inferSelect;
+export type HabitMilestone = typeof habitMilestone.$inferSelect;
 
 export type InsertHabit = typeof habit.$inferInsert;
 export type InsertReminder = typeof reminder.$inferInsert;
 export type InsertHabitCompletion = typeof habitCompletion.$inferInsert;
 export type InsertUser = typeof user.$inferInsert;
+export type InsertHabitMilestone = typeof habitMilestone.$inferInsert;

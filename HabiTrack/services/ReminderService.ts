@@ -28,6 +28,13 @@ export class ReminderService extends BaseSyncableRepoService {
   }
 
   /**
+   * Retrieves all reminders for a habit as a query.
+   */
+  public getRemindersForHabitQuery(habitId: string, includeDeleted: boolean = false) {
+    return this._reminderRepository.getRemindersForHabitQuery(habitId, includeDeleted);
+  }
+
+  /**
    * Retrieves all reminders for a habit.
    */
   public getRemindersForHabit(

@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core';
 import { SQLiteRunResult } from 'expo-sqlite';
 
-type PartialSync<TModel> = Omit<TModel, keyof SyncableModel> & Partial<SyncableModel>;
+export type PartialSync<TModel> = Omit<TModel, keyof SyncableModel> & Partial<SyncableModel>;
 /**
  * Abstract class for repositories that handle syncable models.
  *
@@ -111,11 +111,26 @@ export abstract class SyncableRepository<TModel extends SyncableModel> {
 
   /**
    * Retrieves an item by its id.
+   * @returns A query that retrieves the item by its id.
+   */
+  public getByIdQuery(id: string) {
+    try {
+      return this.db.select().from(this.table).where(eq(this.table.id, id));
+    } catch (error) {
+      console.error('Error fetching item by ID query:', error);
+      throw new Error(
+        `Failed to fetch item by ID: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
+  /**
+   * Retrieves an item by its id.
    * @returns The item if found, or null if not found.
    */
   public async getById(id: string): Promise<TModel | null> {
     try {
-      const results = await this.db.select().from(this.table).where(eq(this.table.id, id));
+      const results = await this.getByIdQuery(id);
       return results.length > 0 ? (results[0] as TModel) : null;
     } catch (error) {
       console.error('Error fetching item by ID:', error);

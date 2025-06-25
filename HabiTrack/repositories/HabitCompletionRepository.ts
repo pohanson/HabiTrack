@@ -1,5 +1,5 @@
 import { HabitCompletion, habitCompletion } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, gte, lte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SyncableRepository } from './SyncRepository';
 
@@ -9,27 +9,36 @@ export class HabitCompletionRepository extends SyncableRepository<HabitCompletio
   }
 
   /**
-   * Get all completions given a habit Id.
+   * Get all completions given a habit Id as a query.
    * @param habitId Habit Id to get all completions for
-   * @param completedAt yyyy-mm-dd format, defaults to null for no filtering by date
+   * @param filtering defaults to null which means no filtering, and conditions are unioned. Pass a ISO datetime str.
+   *  - completedStart: filter completions starting from this date (inclusive) and
+   *  - completedAt: filter completions for this exact date and
+   *  - completedEnd: filter completions up to this date (inclusive)
    * @param includeDeleted whether to include soft deleted completions, defaults to false
    */
-  public async getCompletionsForHabit(
+  public getCompletionsForHabitQuery(
     habitId: string,
-    completedAt: string | null = null,
-    includeDeleted = false,
-  ): Promise<HabitCompletion[]> {
+    filtering: {
+      completedStart?: string | null;
+      completedAt?: string | null;
+      completedEnd?: string | null;
+    } = {},
+    includeDeleted: boolean = false,
+  ) {
+    const { completedStart = null, completedAt = null, completedEnd = null } = filtering || {};
     return this.db
       .select()
       .from(habitCompletion)
       .where(
         and(
           eq(habitCompletion.habit_id, habitId),
+          completedStart ? gte(habitCompletion.completedAt, completedStart) : undefined,
           completedAt ? eq(habitCompletion.completedAt, completedAt) : undefined,
+          completedEnd ? lte(habitCompletion.completedAt, completedEnd) : undefined,
           includeDeleted ? undefined : eq(habitCompletion.isDeleted, false),
         ),
-      )
-      .execute();
+      );
   }
 
   /**

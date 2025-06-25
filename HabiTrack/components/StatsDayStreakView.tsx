@@ -4,13 +4,13 @@ import { ThemedText } from './ThemedText';
 import { Shadows } from '@/constants/Shadows';
 import { Colors } from '@/constants/Colors';
 
-export const StatsDayStreakView = ({
+export function StatsDayStreakView({
   activeStreak,
   bestStreak,
 }: {
   activeStreak: number;
   bestStreak: number;
-}) => {
+}) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   return (
@@ -65,7 +65,7 @@ export const StatsDayStreakView = ({
       </ThemedView>
     </View>
   );
-};
+}
 
 function getStreakEmoji(activeStreak: number): string {
   if (activeStreak <= 0) return '😴';

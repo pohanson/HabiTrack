@@ -4,6 +4,8 @@ import { HabitCompletionService } from './HabitCompletionService';
 import { HabitService } from './HabitService';
 import { ReminderService } from './ReminderService';
 import { UserService } from './UserService';
+import { HabitMilestoneService } from './HabitMilestoneService';
+import { StatisticService } from './StatisticService';
 
 export class DatabaseService {
   static #instance: DatabaseService;
@@ -14,6 +16,8 @@ export class DatabaseService {
   private _habitService: HabitService;
   private _reminderService: ReminderService;
   private _userService: UserService;
+  private _habitMilestoneService: HabitMilestoneService; // Placeholder for HabitMilestoneService, if needed
+  private _statisticService: StatisticService;
 
   private constructor(expoDb: SQLiteDatabase) {
     this._db = drizzle(expoDb);
@@ -25,6 +29,8 @@ export class DatabaseService {
     this._habitService = HabitService.init(this);
     this._reminderService = ReminderService.init(this);
     this._habitCompletionService = HabitCompletionService.init(this);
+    this._habitMilestoneService = HabitMilestoneService.init(this);
+    this._statisticService = StatisticService.init(this);
   }
 
   public static init(db: SQLiteDatabase, userId: string = 'CURRENT_USER') {
@@ -65,5 +71,13 @@ export class DatabaseService {
 
   public get user() {
     return this._userService;
+  }
+
+  public get habitMilestone() {
+    return this._habitMilestoneService;
+  }
+
+  public get statistic() {
+    return this._statisticService;
   }
 }

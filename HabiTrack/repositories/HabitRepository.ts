@@ -1,7 +1,7 @@
-import { habit, Habit, habitCompletion, reminder } from '@/db/schema';
-import { SyncableRepository } from './SyncRepository';
+import { habit, Habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
+import { and, asc, eq, max, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { and, asc, eq } from 'drizzle-orm';
+import { SyncableRepository } from './SyncRepository';
 
 export class HabitRepository extends SyncableRepository<Habit> {
   constructor(db: ReturnType<typeof drizzle>) {
@@ -41,17 +41,19 @@ export class HabitRepository extends SyncableRepository<Habit> {
   }
 
   /**
-   * Get all habits for a user with today's completions and reminder as a query.
+   * Get all habits for a user with today's completions, reminder, milestone as a query.
    * @param userId - The ID of the user to filter habits by. If null, retrieves all habits.
    */
-  public getAllHabitsWithTodayCompletionsQuery(
-    userId: string | null,
-    includeDeleted: boolean = false,
-  ) {
+  public getAllHabitsTodayQuery(userId: string | null, includeDeleted: boolean = false) {
     const today = new Date().toJSON().split('T')[0];
     const dayOfWeek = new Date().getDay();
     return this.db
-      .select({ habit: habit, habit_completion: habitCompletion, reminder: reminder })
+      .select({
+        habit: habit,
+        habit_completion: habitCompletion,
+        reminder: reminder,
+        habit_milestone: habitMilestone,
+      })
       .from(reminder)
       .innerJoin(
         habit,
@@ -76,6 +78,35 @@ export class HabitRepository extends SyncableRepository<Habit> {
             : and(eq(reminder.isDeleted, false), eq(habit.isDeleted, false)),
         ),
       )
+      .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
       .orderBy(asc(habitCompletion.completedAt), asc(reminder.time));
+  }
+
+  /**
+   * Get habit statistics and reminder days for a given habit.
+   */
+  public getHabitStatsWithRemindersQuery() {
+    return (
+      this.db
+        .select({
+          habit_id: habit.id,
+          last_completed_at: max(habitCompletion.completedAt),
+          day_frequency: sql`json_group_array(DISTINCT ${reminder.day} ORDER BY ${reminder.day} ASC)`,
+
+          // here for testing for now
+          week_streak: habitMilestone.week_streak,
+
+          streak_started_at: habitMilestone.streak_started_at,
+          best_day_streak: habitMilestone.best_day_streak,
+        })
+        .from(habit)
+        .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
+        .innerJoin(reminder, eq(habit.id, reminder.habit_id))
+
+        // here for testing for now
+        .leftJoin(habitCompletion, eq(habit.id, habitCompletion.habit_id))
+
+        .groupBy(habit.id)
+    );
   }
 }

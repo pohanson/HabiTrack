@@ -1,1 +1,0 @@
-ALTER TABLE `habit_milestone` ADD `prev_best_day_streak` integer DEFAULT -1;

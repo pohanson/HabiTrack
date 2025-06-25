@@ -1,12 +1,14 @@
 export {
   Habit,
-  Reminder,
   HabitCompletion,
-  User,
+  HabitMilestone,
   InsertHabit,
-  InsertReminder,
   InsertHabitCompletion,
+  InsertHabitMilestone,
+  InsertReminder,
   InsertUser,
+  Reminder,
+  User,
 } from './localSchema';
 
-export { habit, reminder, habitCompletion, user } from './localSchema';
+export { habit, habitCompletion, habitMilestone, reminder, user } from './localSchema';

@@ -33,14 +33,22 @@ export class HabitService extends BaseSyncableRepoService {
 
   /**
    * Creates a new habit with reminders.
+   * @returns The ID of the created habit.
    */
-  public createHabitWithReminders(habit: HabitInsertionData) {
+  public async createHabitWithReminders(habit: HabitInsertionData): Promise<string> {
     const userId = habit.user_id || this.dbService.userId;
-    this._habitRepository.create({ ...habit, user_id: userId }).then(({ id: habitId }) => {
-      if (habit.frequency && habit.frequency.length > 0) {
-        this.dbService.reminder.createRemindersForHabit(habitId, habit.frequency, habit.time);
-      }
-    });
+    const { id: habitId } = await this._habitRepository.create({ ...habit, user_id: userId });
+    if (habit.frequency && habit.frequency.length > 0) {
+      this.dbService.reminder.createRemindersForHabit(habitId, habit.frequency, habit.time);
+    }
+    return habitId;
+  }
+
+  /**
+   * Retrieves a habit by its ID as a query.
+   */
+  public getHabitByIdQuery(habitId: string) {
+    return this._habitRepository.getByIdQuery(habitId);
   }
 
   /**
@@ -82,10 +90,14 @@ export class HabitService extends BaseSyncableRepoService {
   }
 
   /**
-   * Retrieves all habits with today's completions for the given user.
+   * Retrieves all habits with today's completions, reminder, milestone for the given user.
    */
-  public getAllHabitsWithTodayCompletionsQuery(userId: string | null = this.dbService.userId) {
-    return this._habitRepository.getAllHabitsWithTodayCompletionsQuery(userId);
+  public getAllHabitsTodayQuery(userId: string | null = this.dbService.userId) {
+    return this._habitRepository.getAllHabitsTodayQuery(userId);
+  }
+
+  public getHabitStatsWithRemindersQuery() {
+    return this._habitRepository.getHabitStatsWithRemindersQuery();
   }
 
   /**

@@ -1,32 +1,29 @@
-import { ThemedView } from '@/components/ThemedView';
-import React, { useEffect } from 'react';
-import { ScrollView, useColorScheme } from 'react-native';
-import * as schema from '@/db/schema';
-import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { eq, sql } from 'drizzle-orm';
-import { useSQLiteContext } from 'expo-sqlite';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { Toast } from 'toastify-react-native';
-
-import { calculateDaysBetweenDates, getExpectedDates } from '@/utils/dateUtils';
-import { StatsDayStreakView } from '@/components/StatsDayStreakView';
 import { StatsCalendarView } from '@/components/StatsCalendarView';
 import { StatsCompletionRateView } from '@/components/StatsCompletionRateView';
-import { Colors } from '@/constants/Colors';
+import { StatsDayStreakView } from '@/components/StatsDayStreakView';
 import { StatsHeader } from '@/components/StatsHeader';
+import { ThemedView } from '@/components/ThemedView';
+import { Colors } from '@/constants/Colors';
+import { DatabaseService } from '@/services';
+import { getExpectedDates } from '@/utils/dateUtils';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, useColorScheme } from 'react-native';
+import { Toast } from 'toastify-react-native';
 
 export default function StatisticsScreen() {
-  const { id, name } = useLocalSearchParams();
+  const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const navigation = useNavigation();
-
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
+  const [streakData, setStreakData] = useState<{
+    badgesEarned: number;
+    bestStreak: number;
+    activeStreak: number;
+  } | null>(null);
 
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
-
-  const today = new Date();
+  const databaseService = DatabaseService.instance;
 
   // set header title
   useEffect(() => {
@@ -34,217 +31,46 @@ export default function StatisticsScreen() {
     navigation.setOptions({ headerTitle: 'Statistics' });
   }, [id, name, navigation]);
 
-  // helper functions
-  function getHabitFrequencyArray(habitId: number) {
-    try {
-      const result = drizzleDb
-        .select({
-          day_frequency: sql`json_group_array(DISTINCT ${reminder.day})`,
-        })
-        .from(reminder)
-        .where(eq(reminder.habit_id, habitId))
-        .get();
-      if (!result || !result.day_frequency) {
-        return [];
-      } else {
-        const freq = JSON.parse(result.day_frequency as string);
-        return freq.sort((e: number, f: number) => e - f);
-      }
-    } catch (error) {
-      console.error('Error in getHabitFrequencyArray:', error);
-      return [];
-    }
-  }
-
-  function calculateExpectedDays(startDate: string, freq: number[]): number {
-    if (startDate < createdAtDate) {
-      startDate = createdAtDate;
-    }
-    const startDay = new Date(startDate).getDay();
-    const today = new Date();
-    const todayDay = today.getDay();
-
-    // edge case: startDate and todayDate fall within the same calendar week
-    // find the following sunday after startDate date
-    const startOfWeeksBetweenDate = new Date(startDate);
-    const daysUntilFollowingSunday = startDay === 0 ? 7 : 7 - startDay;
-    startOfWeeksBetweenDate.setDate(startOfWeeksBetweenDate.getDate() + daysUntilFollowingSunday);
-    // if today's date < startOfWeeksBetweenDate, then startDate and todayDate fall within the same calendar week
-    const sameCalendarWeek =
-      today?.toJSON()?.split('T')[0] < startOfWeeksBetweenDate?.toJSON()?.split('T')[0];
-    if (sameCalendarWeek) {
-      let expectedNoOfDays = 0;
-      // if in same calendar week, only count days b/w createdAt and today
-      for (let i = 0; i < freq.length; i++) {
-        if (freq[i] >= startDay && freq[i] <= todayDay) {
-          expectedNoOfDays++;
-        }
-      }
-      return expectedNoOfDays;
-    }
-
-    // 1. Calculate expectedDays (startWeekExpectedDays + thisWeekExpectedDays + weeksBetweenExpectedDays)
-
-    // 1.1 startWeekExpectedDays calculation
-    let startWeekExpectedDays = 0;
-    for (let i = 0; i < freq.length; i++) {
-      if (freq[i] >= startDay) {
-        startWeekExpectedDays++;
-      }
-    }
-
-    // 1.2 thisWeekExpectedDays calculation
-    let thisWeekExpectedDays = 0;
-    for (let i = 0; i < freq.length; i++) {
-      if (freq[i] <= todayDay) {
-        thisWeekExpectedDays++;
-      }
-    }
-
-    // 1.3 weeksBetweenExpectedDays calculation
-    // find the saturday preceding today's date
-    const endOfWeeksBetweenDate = new Date(today);
-    const daysSincePreviousSaturday = todayDay === 6 ? 7 : todayDay + 1;
-    endOfWeeksBetweenDate.setDate(endOfWeeksBetweenDate.getDate() - daysSincePreviousSaturday);
-    // calculate no. of weeks b/w these 2 dates
-    const weeksBetween = Math.ceil(
-      calculateDaysBetweenDates(
-        startOfWeeksBetweenDate?.toJSON()?.split('T')[0],
-        endOfWeeksBetweenDate?.toJSON()?.split('T')[0],
-      ) / 7,
-    );
-
-    // 1.4 calculate expectedDays
-    const expectedNoOfDays =
-      startWeekExpectedDays + weeksBetween * freq.length + thisWeekExpectedDays;
-    return expectedNoOfDays;
-  }
-
-  // COMPLETION RATE VIEW CALCULATIONS
-
-  // get created_at data
   const { data: createdAtData, error: createdAtError } = useLiveQuery(
-    drizzleDb
-      .select({
-        created_at: habit.createdAt,
-      })
-      .from(habit)
-      .where(eq(habit.id, Number(id))),
+    databaseService.habit.getHabitByIdQuery(id),
   );
   if (createdAtError) {
     console.error('Error fetching created_at', createdAtError);
     Toast.error('Error fetching created_at data.');
   }
+  const createdAtDate = createdAtData[0]?.createdAt || new Date().toISOString().split('T')[0];
 
-  // get completed_at data
   const { data: completedAtData, error: completedAtError } = useLiveQuery(
-    drizzleDb
-      .select({
-        completed_at: habitCompletion.completedAt,
-      })
-      .from(habitCompletion)
-      .where(eq(habitCompletion.habit_id, Number(id))),
+    databaseService.habitCompletion.getCompletionsForHabitQuery(id),
   );
   if (completedAtError) {
     console.error('Error fetching created_at', completedAtError);
     Toast.error('Error fetching created_at data.');
   }
 
-  // get created at date as a string
-  const createdAtDate = createdAtData?.[0]?.created_at || '';
-
   // get frequency array for this habit
-  const freq = getHabitFrequencyArray(Number(id));
-
-  // get expectedNoOfDays for this habit (calculated since createdAtDate) (All Time)
-  const expectedNoOfDays = calculateExpectedDays(createdAtDate, freq);
-  console.log(completedAtData);
-  const actualNoOfDays = completedAtData.filter(
-    (entry) => String(entry.completed_at) >= createdAtDate,
-  ).length;
-
-  // get monthExpectedNoOfDays for this habit (calculated since 1st of this month) (This Month)
-  const firstOfThisMonthDate = `${createdAtDate.substring(0, 4)}-${createdAtDate.substring(5, 7)}-01`;
-  const monthExpectedNoOfDays = calculateExpectedDays(firstOfThisMonthDate, freq);
-  const monthActualNoOfDays = completedAtData.filter(
-    (entry) => String(entry.completed_at) >= firstOfThisMonthDate,
-  ).length;
-
-  // get weekExpectedNoOfDays for this habit (calculated since Sunday of this week) (This Week)
-  const daysSinceSunday = today.getDay();
-  const startOfThisWeek = new Date();
-  startOfThisWeek.setDate(startOfThisWeek.getDate() - daysSinceSunday);
-  const startOfThisWeekDate = startOfThisWeek.toJSON().split('T')[0];
-  const weekExpectedNoOfDays = calculateExpectedDays(startOfThisWeekDate, freq);
-  const weekActualNoOfDays = completedAtData.filter(
-    (entry) => String(entry.completed_at) >= startOfThisWeekDate,
-  ).length;
+  const freq = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id))
+    .data.map((r) => r.day)
+    .sort();
 
   // DAY STREAK VIEW CALCULATIONS
-
-  // get streak_started_at & best_day_streak data (& badges_earned for StatsHeader)
-  const { data, error } = useLiveQuery(
-    drizzleDb
-      .select({
-        badges_earned: habitMilestone.badges_earned,
-        streak_started_at: habitMilestone.streak_started_at,
-        best_day_streak: habitMilestone.best_day_streak,
-      })
-      .from(habitMilestone)
-      .where(eq(habitMilestone.habit_id, Number(id))),
-  );
-  if (error) {
-    console.error('Error fetching created_at', error);
-    Toast.error('Error fetching created_at data.');
-  }
-
-  // get streak_started_at as a string
-  const streakStartedAt = data?.[0]?.streak_started_at || '';
-
-  // get best_day_streak as a number
-  const bestStreak = Number(data?.[0]?.best_day_streak);
-
-  // get badges_earned as a number
-  const badgesEarned = Number(data?.[0]?.badges_earned);
-
-  // Calculate active streak
-  const todayStr = today.toJSON()?.split('T')[0];
-  const todayDOW = today.getDay();
-  // check if today is an expected day
-  const todayIsAnExpectedDay = freq.includes(todayDOW);
-  // check if today was completed for this habit
-  const todayHasCompletedAt = completedAtData.some(
-    (entry) => String(entry.completed_at) === todayStr,
-  );
-  let activeStreak = 0;
-  if (streakStartedAt === 'inactive') {
-    activeStreak = 0;
-  } else {
-    const daysBetween = calculateDaysBetweenDates(streakStartedAt, todayStr);
-    if (todayIsAnExpectedDay) {
-      if (todayHasCompletedAt) {
-        activeStreak = daysBetween + 1;
-      } else {
-        activeStreak = daysBetween;
-      }
-    } else {
-      activeStreak = daysBetween + 1;
-    }
-  }
-
+  databaseService.habitMilestone
+    .calculateHabitStreak(id as string, freq, completedAtData)
+    .then(setStreakData);
   // CALENDAR VIEW CALCULATIONS
 
-  const yesterdayDate = new Date(todayStr);
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterdayStr = yesterdayDate?.toJSON()?.split('T')[0];
+  const todayStr = new Date().toISOString().split('T')[0];
 
-  // Initialise completed dates object for calendar props:
+  const yesterdayDate = new Date(new Date().getSeconds() - 24 * 60 * 60 * 1000); // yesterday's date
+  const yesterdayStr = yesterdayDate.toJSON().split('T')[0];
+
   const markedDatesObj: { [key: string]: any } = {};
 
   // Obtain completed dates:
   const completedAtDatesSinceModified = completedAtData
-    .filter((entry) => String(entry.completed_at) >= createdAtDate)
-    .map((entry) => String(entry.completed_at));
+    .filter(({ completedAt }) => completedAt >= createdAtDate)
+    .map(({ completedAt }) => completedAt);
+
   // mark completed dates in green
   completedAtDatesSinceModified.forEach((dateStr) => {
     markedDatesObj[dateStr] = {
@@ -253,11 +79,12 @@ export default function StatisticsScreen() {
     };
   });
 
-  // Obtaining missed dates: (initialise array of expected dates b/w lastModified & today, filter out completed dates)
-
+  // Get expected dates
   const expectedDates = getExpectedDates(createdAtDate, yesterdayStr, freq);
+
   // for O(1) completedAt lookup:
   const completedDatesSet = new Set(completedAtDatesSinceModified);
+
   // marked missed dates in red
   expectedDates.forEach((dateStr) => {
     if (!completedDatesSet.has(dateStr)) {
@@ -268,6 +95,12 @@ export default function StatisticsScreen() {
     }
   });
 
+  const calcHabitStats = databaseService.statistic.calcHabitStatistics(
+    createdAtDate,
+    freq,
+    completedAtData,
+  );
+
   return (
     <ScrollView>
       <ThemedView style={{ gap: 10, padding: 10 }}>
@@ -275,7 +108,7 @@ export default function StatisticsScreen() {
           habitName={String(name)}
           todayDate={todayStr}
           createdAt={createdAtDate}
-          badgesEarned={badgesEarned}
+          badgesEarned={streakData?.badgesEarned || 0}
           reminderTime="hello"
           lastModifiedAt="placeholder"
         />
@@ -284,19 +117,11 @@ export default function StatisticsScreen() {
           createdAt={createdAtDate}
           completedAtDates={markedDatesObj}
         />
-        <StatsCompletionRateView
-          createdAt={createdAtDate}
-          actualNoOfDays={actualNoOfDays}
-          expectedNoOfDays={expectedNoOfDays}
-          firstOfThisMonthDate={firstOfThisMonthDate}
-          monthExpectedNoOfDays={monthExpectedNoOfDays}
-          monthActualNoOfDays={monthActualNoOfDays}
-          startOfThisWeekDate={startOfThisWeekDate}
-          weekExpectedNoOfDays={weekExpectedNoOfDays}
-          weekActualNoOfDays={weekActualNoOfDays}
-          pieChartSize={85}
+        <StatsCompletionRateView calcHabitStatsisticsByMode={calcHabitStats} pieChartSize={85} />
+        <StatsDayStreakView
+          activeStreak={streakData?.activeStreak || 0}
+          bestStreak={streakData?.bestStreak || 0}
         />
-        <StatsDayStreakView activeStreak={activeStreak} bestStreak={bestStreak} />
       </ThemedView>
     </ScrollView>
   );

@@ -1,9 +1,9 @@
-import { useColorScheme, View, Text, Image } from 'react-native';
+import { getProgressBarColorForPercentage } from '@/utils/colorUtils';
+import { Image, Text, useColorScheme, View } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { Shadows } from '../constants/Shadows';
-import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
-import { getProgressBarColorForPercentage } from '@/utils/colorUtils';
+import { ThemedView } from './ThemedView';
 
 export function HabitMilestoneCard({
   habitName,
@@ -59,10 +59,7 @@ function getBadgeImage(badgeType: number, completed: boolean) {
   }
 }
 
-const Badge = (props: BadgeProps) => {
-  // const colorScheme = useColorScheme() ?? 'light';
-  // const theme = Colors[colorScheme];
-
+function Badge(props: BadgeProps) {
   const opacity = props.completed ? 1 : 0.5; // set incomplete badge opacity here
 
   const badgeImage = getBadgeImage(props.badgeType, props.completed);
@@ -87,15 +84,9 @@ const Badge = (props: BadgeProps) => {
       </View>
     </View>
   );
-};
+}
 
-const RowOfBadges = ({
-  weekStreak,
-  badgesEarned,
-}: {
-  weekStreak: number;
-  badgesEarned: number;
-}) => {
+function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesEarned: number }) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
@@ -145,9 +136,9 @@ const RowOfBadges = ({
       />
     </ThemedView>
   );
-};
+}
 
-const ProgressBar = ({
+function ProgressBar({
   weekStreak,
   weeksRequired,
   completed,
@@ -155,7 +146,7 @@ const ProgressBar = ({
   weekStreak: number;
   weeksRequired: number;
   completed: boolean;
-}) => {
+}) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
@@ -207,4 +198,4 @@ const ProgressBar = ({
       </Text>
     </View>
   );
-};
+}

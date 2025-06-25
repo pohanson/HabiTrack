@@ -1,8 +1,8 @@
 import { Reminder, reminder } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
 import { SQLiteRunResult } from 'expo-sqlite';
+import { SyncableRepository } from './SyncRepository';
 
 export class ReminderRepository extends SyncableRepository<Reminder> {
   constructor(db: ReturnType<typeof drizzle>) {
@@ -10,12 +10,9 @@ export class ReminderRepository extends SyncableRepository<Reminder> {
   }
 
   /**
-   * Get all reminders for a habit.
+   * Get all reminders for a habit as query.
    */
-  public async getRemindersForHabit(
-    habitId: string,
-    includeDeleted: boolean = false,
-  ): Promise<Reminder[]> {
+  public getRemindersForHabitQuery(habitId: string, includeDeleted: boolean = false) {
     return this.db
       .select()
       .from(reminder)
@@ -25,6 +22,16 @@ export class ReminderRepository extends SyncableRepository<Reminder> {
           includeDeleted ? undefined : eq(reminder.isDeleted, false),
         ),
       );
+  }
+
+  /**
+   * Get all reminders for a habit.
+   */
+  public async getRemindersForHabit(
+    habitId: string,
+    includeDeleted: boolean = false,
+  ): Promise<Reminder[]> {
+    return this.getRemindersForHabitQuery(habitId, includeDeleted);
   }
 
   /**

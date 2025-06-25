@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "9e588f1b-35dd-4536-a32c-4841d6295e6e",
+  "id": "7b55b438-1ad6-4c19-844d-1fee38064764",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "habit": {
@@ -127,6 +127,102 @@
         "habit_completion_habit_id_habit_id_fk": {
           "name": "habit_completion_habit_id_habit_id_fk",
           "tableFrom": "habit_completion",
+          "tableTo": "habit",
+          "columnsFrom": ["habit_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "habit_milestone": {
+      "name": "habit_milestone",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "habit_id": {
+          "name": "habit_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "week_streak": {
+          "name": "week_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "badges_earned": {
+          "name": "badges_earned",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "streak_started_at": {
+          "name": "streak_started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'inactive'"
+        },
+        "best_day_streak": {
+          "name": "best_day_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "prev_best_day_streak": {
+          "name": "prev_best_day_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": -1
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "modifiedAt": {
+          "name": "modifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "isDeleted": {
+          "name": "isDeleted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "habit_milestone_habit_id_habit_id_fk": {
+          "name": "habit_milestone_habit_id_habit_id_fk",
+          "tableFrom": "habit_milestone",
           "tableTo": "habit",
           "columnsFrom": ["habit_id"],
           "columnsTo": ["id"],

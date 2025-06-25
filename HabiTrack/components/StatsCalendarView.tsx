@@ -6,7 +6,7 @@ import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { Circle } from '@/components/Circle';
 
-export const StatsCalendarView = ({
+export function StatsCalendarView({
   today,
   createdAt,
   completedAtDates,
@@ -14,7 +14,7 @@ export const StatsCalendarView = ({
   today: string;
   createdAt: string;
   completedAtDates: any;
-}) => {
+}) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
@@ -112,4 +112,4 @@ export const StatsCalendarView = ({
       </ThemedView>
     </ThemedView>
   );
-};
+}

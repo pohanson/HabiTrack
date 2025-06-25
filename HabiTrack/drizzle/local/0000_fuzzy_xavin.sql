@@ -30,6 +30,20 @@ CREATE TABLE `habit_completion` (
 	FOREIGN KEY (`habit_id`) REFERENCES `habit`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `habit_milestone` (
+	`id` text PRIMARY KEY NOT NULL,
+	`habit_id` text NOT NULL,
+	`week_streak` integer DEFAULT 0 NOT NULL,
+	`badges_earned` integer DEFAULT 0 NOT NULL,
+	`streak_started_at` text DEFAULT 'inactive',
+	`best_day_streak` integer DEFAULT 0,
+	`prev_best_day_streak` integer DEFAULT -1,
+	`createdAt` text NOT NULL,
+	`modifiedAt` text NOT NULL,
+	`isDeleted` integer DEFAULT false NOT NULL,
+	FOREIGN KEY (`habit_id`) REFERENCES `habit`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `reminder` (
 	`id` text PRIMARY KEY NOT NULL,
 	`day` integer NOT NULL,

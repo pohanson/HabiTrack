@@ -2,9 +2,7 @@ import { HabitCard } from '@/components/HabitCard';
 import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
 import { DatabaseService } from '@/services';
-import { and, asc, eq } from 'drizzle-orm';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -15,29 +13,8 @@ export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
 
   const databaseService = DatabaseService.instance;
-  const drizzleDb = databaseService.db;
 
-  const today = new Date().toISOString().split('T')[0];
-  const { data, error } = useLiveQuery(
-    drizzleDb
-      .select({
-        habit: habit,
-        habit_completion: habitCompletion,
-        reminder: reminder,
-        habit_milestone: habitMilestone,
-      })
-      .from(reminder)
-      .where(eq(reminder.day, new Date().getDay()))
-      .innerJoin(habit, eq(reminder.habit_id, habit.id))
-      .leftJoin(
-        habitCompletion,
-        and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
-      )
-      // added for habitMilestone
-      .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
-      .orderBy(asc(habitCompletion.completedAt), asc(reminder.time)),
-    [refresh],
-  );
+  const { data, error } = useLiveQuery(databaseService.habit.getAllHabitsTodayQuery(), [refresh]);
   if (error) {
     console.error('Error fetching habits:', error);
     Toast.error('Error fetching habits.');
@@ -75,6 +52,8 @@ export default function HomeScreen() {
               habit={habit}
               habit_completion={habit_completion}
               habit_milestone={habit_milestone}
+              today={new Date().toISOString().split('T')[0]}
+              isCompletable={true}
               setRefresh={setRefresh}
             />
           ))}

@@ -1,61 +1,34 @@
-import { useColorScheme } from 'react-native';
-import React, { useState } from 'react';
 import { Colors } from '@/constants/Colors';
-import { ThemedView } from './ThemedView';
 import { Shadows } from '@/constants/Shadows';
-import { ThemedText } from './ThemedText';
 import { Picker } from '@react-native-picker/picker';
+import React, { useMemo, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import PieChart from './PieChart';
+import { ThemedText } from './ThemedText';
+import { ThemedView } from './ThemedView';
 import { reorderDateString } from '@/utils/dateUtils';
 import { getColorForPercentage } from '@/utils/colorUtils';
 
-export const StatsCompletionRateView = ({
-  createdAt,
-  actualNoOfDays,
-  expectedNoOfDays,
-
-  firstOfThisMonthDate,
-  monthExpectedNoOfDays,
-  monthActualNoOfDays,
-
-  startOfThisWeekDate,
-  weekExpectedNoOfDays,
-  weekActualNoOfDays,
-
+export function StatsCompletionRateView({
+  calcHabitStatsisticsByMode,
   pieChartSize = 75,
 }: {
-  createdAt: string;
-  actualNoOfDays: number;
-  expectedNoOfDays: number;
-
-  firstOfThisMonthDate: string;
-  monthExpectedNoOfDays: number;
-  monthActualNoOfDays: number;
-
-  startOfThisWeekDate: string;
-  weekExpectedNoOfDays: number;
-  weekActualNoOfDays: number;
-
+  calcHabitStatsisticsByMode: (mode: 'week' | 'month' | 'all') => {
+    startDate: string;
+    expectedNoOfDays: number;
+    actualNoOfDays: number;
+  };
   pieChartSize?: number;
-}) => {
+}) {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
-  const [timeframe, setTimeframe] = useState('all');
+  const [timeframe, setTimeframe] = useState<'all' | 'week' | 'month'>('all');
 
-  let startDate = reorderDateString(createdAt);
-  let expected = expectedNoOfDays;
-  let actual = actualNoOfDays;
-
-  if (timeframe === 'month') {
-    startDate = firstOfThisMonthDate;
-    expected = monthExpectedNoOfDays;
-    actual = monthActualNoOfDays;
-  } else if (timeframe === 'week') {
-    startDate = startOfThisWeekDate;
-    expected = weekExpectedNoOfDays;
-    actual = weekActualNoOfDays;
-  } else {
-  }
+  const {
+    startDate,
+    expectedNoOfDays: expected,
+    actualNoOfDays: actual,
+  } = useMemo(() => calcHabitStatsisticsByMode(timeframe), [calcHabitStatsisticsByMode, timeframe]);
 
   const percentage = expected === 0 ? 0 : Math.round((actual / expected) * 1000) / 10;
   const adjustedPercentage = Math.min(100, Math.max(0, percentage));
@@ -118,7 +91,7 @@ export const StatsCompletionRateView = ({
       </ThemedText>
     </ThemedView>
   );
-};
+}
 
 function getProgressMessage(adjustedPercentage: number, timeframe: string) {
   // base messages for all time (and fallback)
