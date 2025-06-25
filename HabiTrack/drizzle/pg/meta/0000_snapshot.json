@@ -1,5 +1,5 @@
 {
-  "id": "a3138459-4c9e-4da9-b3d0-0247109e1881",
+  "id": "931e5d54-3a37-49c5-9291-69ff2ec4d121",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -139,10 +139,16 @@
       "name": "habit_milestone",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
         "habit_id": {
           "name": "habit_id",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "week_streak": {
@@ -179,12 +185,6 @@
           "primaryKey": false,
           "notNull": false,
           "default": -1
-        },
-        "completedAt": {
-          "name": "completedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
         },
         "createdAt": {
           "name": "createdAt",

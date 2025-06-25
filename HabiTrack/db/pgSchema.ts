@@ -47,8 +47,8 @@ export const habitCompletion = pgTable('habit_completion', {
 });
 
 export const habit_milestone = pgTable('habit_milestone', {
+  id: text('id').primaryKey(),
   habit_id: text('habit_id')
-    .primaryKey()
     .notNull()
     .references(() => habit.id),
   week_streak: integer('week_streak').notNull().default(0),
@@ -56,7 +56,6 @@ export const habit_milestone = pgTable('habit_milestone', {
   streak_started_at: text('streak_started_at').default('inactive'), // date: yyyy-mm-dd
   best_day_streak: integer('best_day_streak').default(0),
   prev_best_day_streak: integer('prev_best_day_streak').default(-1),
-  completedAt: timestamp('completedAt', { withTimezone: true }).notNull(), // date and time of completion
   createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
   modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
   isDeleted: boolean('isDeleted').notNull().default(false),
