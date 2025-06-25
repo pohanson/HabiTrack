@@ -182,10 +182,11 @@ export default function StatisticsScreen() {
 
   // DAY STREAK VIEW CALCULATIONS
 
-  // get streak_started_at & best_day_streak data
+  // get streak_started_at & best_day_streak data (& badges_earned for StatsHeader)
   const { data, error } = useLiveQuery(
     drizzleDb
       .select({
+        badges_earned: habitMilestone.badges_earned,
         streak_started_at: habitMilestone.streak_started_at,
         best_day_streak: habitMilestone.best_day_streak,
       })
@@ -202,6 +203,9 @@ export default function StatisticsScreen() {
 
   // get best_day_streak as a number
   const bestStreak = Number(data?.[0]?.best_day_streak);
+
+  // get badges_earned as a number
+  const badgesEarned = Number(data?.[0]?.badges_earned);
 
   // Calculate active streak
   const todayStr = today.toJSON()?.split('T')[0];
@@ -271,6 +275,7 @@ export default function StatisticsScreen() {
           habitName={String(name)}
           todayDate={todayStr}
           createdAt={createdAtDate}
+          badgesEarned={badgesEarned}
           reminderTime="hello"
           lastModifiedAt="placeholder"
         />

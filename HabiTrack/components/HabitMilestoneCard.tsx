@@ -1,16 +1,17 @@
-import { useColorScheme, View, Text, DimensionValue } from 'react-native';
+import { useColorScheme, View, Text, Image } from 'react-native';
 import { Colors } from '../constants/Colors';
 import { Shadows } from '../constants/Shadows';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
+import { getProgressBarColorForPercentage } from '@/utils/colorUtils';
 
 export function HabitMilestoneCard({
   habitName,
-  badgeCompletions,
+  weekStreak,
   badgesEarned,
 }: {
   habitName: string;
-  badgeCompletions: DimensionValue[];
+  weekStreak: number;
   badgesEarned: number;
 }) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -23,110 +24,123 @@ export function HabitMilestoneCard({
           alignItems: 'center',
           backgroundColor: theme.card,
           borderRadius: 20,
-          padding: 12,
+          padding: 5,
           overflow: 'hidden',
         },
         Shadows.large,
       ]}>
       <ThemedText style={{ fontSize: 22, fontWeight: 'bold', padding: 10 }}>{habitName}</ThemedText>
-      <RowOfBadges badgeCompletions={badgeCompletions} badgesEarned={badgesEarned} />
+      <RowOfBadges weekStreak={weekStreak} badgesEarned={badgesEarned} />
     </ThemedView>
   );
 }
 
 type BadgeProps = {
-  title: string;
+  badgeType: number;
   color: string;
   completed: boolean;
-  completion: DimensionValue | undefined; // percentage as string e.g. "80%"
+  weekStreak: number;
+  weeksRequired: number;
 };
 
+function getBadgeImage(badgeType: number, completed: boolean) {
+  if (completed) {
+    if (badgeType === 1) return require('../assets/images/badges/colored/msb1.png');
+    if (badgeType === 2) return require('../assets/images/badges/colored/msb2.png');
+    if (badgeType === 3) return require('../assets/images/badges/colored/msb3.png');
+    if (badgeType === 4) return require('../assets/images/badges/colored/msb4.png');
+    if (badgeType === 5) return require('../assets/images/badges/colored/msb5.png');
+  } else {
+    if (badgeType === 1) return require('../assets/images/badges/greyscale/gmsb1.png');
+    if (badgeType === 2) return require('../assets/images/badges/greyscale/gmsb2.png');
+    if (badgeType === 3) return require('../assets/images/badges/greyscale/gmsb3.png');
+    if (badgeType === 4) return require('../assets/images/badges/greyscale/gmsb4.png');
+    if (badgeType === 5) return require('../assets/images/badges/greyscale/gmsb5.png');
+  }
+}
+
 const Badge = (props: BadgeProps) => {
-  const colorScheme = useColorScheme() ?? 'light';
-  const theme = Colors[colorScheme];
+  // const colorScheme = useColorScheme() ?? 'light';
+  // const theme = Colors[colorScheme];
+
+  const opacity = props.completed ? 1 : 0.5; // set incomplete badge opacity here
+
+  const badgeImage = getBadgeImage(props.badgeType, props.completed);
 
   return (
-    <View style={{ rowGap: 5 }}>
-      <View
+    <View style={{ rowGap: 5, alignItems: 'center' }}>
+      <Image
+        source={badgeImage}
         style={{
-          width: 50,
-          height: 50,
-          backgroundColor: props.color,
-          borderRadius: 100,
-          justifyContent: 'center',
-          opacity: (props.completed ?? false) ? 1 : 0.5, // set opacity for incomplete badges here
-        }}>
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            color: colorScheme === 'light' ? 'white' : theme.card,
-            padding: 5,
-          }}>
-          {props.title}
-        </Text>
-      </View>
+          width: 70,
+          height: 70,
+          resizeMode: 'contain',
+          opacity: opacity,
+        }}
+      />
       <View>
-        <ProgressBar completion={props.completion} completed={props.completed} />
+        <ProgressBar
+          weekStreak={props.weekStreak}
+          weeksRequired={props.weeksRequired}
+          completed={props.completed}
+        />
       </View>
     </View>
   );
 };
 
 const RowOfBadges = ({
-  badgeCompletions,
+  weekStreak,
   badgesEarned,
 }: {
-  badgeCompletions: DimensionValue[];
+  weekStreak: number;
   badgesEarned: number;
 }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
-  const firstBadgeCompletion = badgeCompletions[0];
-  const secondBadgeCompletion = badgeCompletions[1];
-  const thirdBadgeCompletion = badgeCompletions[2];
-  const fourthBadgeCompletion = badgeCompletions[3];
-  const fifthBadgeCompletion = badgeCompletions[4];
 
   return (
     <ThemedView
       style={{
         backgroundColor: theme.card,
-        padding: 10,
         flexDirection: 'row',
         alignItems: 'center',
         width: '95%',
         justifyContent: 'space-between',
       }}>
       <Badge
-        title={'1\nweek'}
+        badgeType={1}
         color={theme.tint}
-        completion={firstBadgeCompletion}
+        weekStreak={weekStreak}
+        weeksRequired={1}
         completed={badgesEarned >= 1}
       />
       <Badge
-        title={'3\nweeks'}
+        badgeType={2}
         color={theme.tint}
-        completion={secondBadgeCompletion}
+        weekStreak={weekStreak}
+        weeksRequired={3}
         completed={badgesEarned >= 2}
       />
       <Badge
-        title={'12\nweeks'}
+        badgeType={3}
         color={theme.tint}
-        completion={thirdBadgeCompletion}
+        weekStreak={weekStreak}
+        weeksRequired={12}
         completed={badgesEarned >= 3}
       />
       <Badge
-        title={'26\nweeks'}
+        badgeType={4}
         color={theme.tint}
-        completion={fourthBadgeCompletion}
+        weekStreak={weekStreak}
+        weeksRequired={26}
         completed={badgesEarned >= 4}
       />
       <Badge
-        title={'52\nweeks'}
+        badgeType={5}
         color={theme.tint}
-        completion={fifthBadgeCompletion}
+        weekStreak={weekStreak}
+        weeksRequired={52}
         completed={badgesEarned >= 5}
       />
     </ThemedView>
@@ -134,49 +148,62 @@ const RowOfBadges = ({
 };
 
 const ProgressBar = ({
-  completion,
+  weekStreak,
+  weeksRequired,
   completed,
 }: {
-  completion: DimensionValue | undefined;
+  weekStreak: number;
+  weeksRequired: number;
   completed: boolean;
 }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
 
-  const progressBarWidth = 52;
-  const progressBarHeight = 12;
+  const progressBarWidth = 64;
+  const progressBarHeight = 6;
 
-  return !completed ? (
-    // incomplete progress bar
-    <View
-      style={{
-        position: 'relative',
-        width: progressBarWidth,
-        height: progressBarHeight,
-        borderRadius: 10,
-        backgroundColor: colorScheme === 'light' ? '#e0e0e0' : '#3d3d3d',
-        overflow: 'hidden',
-      }}>
+  const completion = weekStreak / weeksRequired;
+  const completionWidth = completion * progressBarWidth;
+
+  const progressBarColor = getProgressBarColorForPercentage(completion * 100);
+
+  const message = completed
+    ? 'Completed!'
+    : weeksRequired <= 1
+      ? `${weekStreak}/${weeksRequired} Week`
+      : `${weekStreak}/${weeksRequired} Weeks`;
+
+  return (
+    <View>
       <View
         style={{
-          position: 'absolute',
-          width: completion,
+          position: 'relative',
+          width: progressBarWidth,
           height: progressBarHeight,
           borderRadius: 10,
-          backgroundColor: theme.tint,
-        }}
-      />
-    </View>
-  ) : (
-    // complete progress bar
-    <View style={{ width: progressBarWidth, height: progressBarHeight, alignItems: 'center' }}>
+          backgroundColor: theme.lightGray,
+          overflow: 'hidden',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            width: completionWidth,
+            height: progressBarHeight,
+            backgroundColor: progressBarColor,
+            alignSelf: 'flex-start',
+          }}
+        />
+      </View>
+
       <Text
         style={{
-          fontSize: 9,
           fontWeight: 'bold',
-          color: colorScheme === 'light' ? 'black' : 'white',
+          fontSize: 10,
+          color: theme.text,
+          textAlign: 'left',
         }}>
-        Completed!
+        {message}
       </Text>
     </View>
   );
