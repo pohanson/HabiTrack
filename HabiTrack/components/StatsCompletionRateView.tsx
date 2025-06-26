@@ -6,7 +6,6 @@ import { useColorScheme } from 'react-native';
 import PieChart from './PieChart';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { reorderDateString } from '@/utils/dateUtils';
 import { getColorForPercentage } from '@/utils/colorUtils';
 
 export function StatsCompletionRateView({

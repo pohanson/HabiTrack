@@ -11,6 +11,7 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import ToastManager, { Toast } from 'toastify-react-native';
+import { NotificationManager } from '@/services/NotificationManager';
 
 export default function EditHabitScreen() {
   const { id }: { id: string } = useLocalSearchParams();
@@ -63,6 +64,7 @@ export default function EditHabitScreen() {
       try {
         databaseService.habit.updateHabitWithReminders({ ...(data as HabitInsertionData), id: id });
         Toast.success('Habit Updated');
+        NotificationManager.upsertPushNotificationForHabit(Number(id));
         navigation.goBack();
       } catch (error) {
         console.error('Error updating habit:', error);

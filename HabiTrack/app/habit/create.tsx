@@ -4,6 +4,7 @@ import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { NotificationManager } from '@/services/NotificationManager';
 import { DatabaseService } from '@/services';
 import { HabitInsertionData } from '@/services/HabitService';
 import { useNavigation } from 'expo-router';
@@ -30,16 +31,19 @@ export default function CreateHabitScreen() {
     async (data) => {
       console.log('Submitting Form:\n', data);
       try {
-        databaseService.habit.createHabitWithReminders(data as HabitInsertionData).then((habitId) =>
-          databaseService.habitMilestone.createMilestone({
-            habit_id: habitId,
-            week_streak: 0,
-            badges_earned: 0,
-            streak_started_at: 'inactive',
-            best_day_streak: 0,
-            prev_best_day_streak: -1,
-          }),
-        );
+        databaseService.habit
+          .createHabitWithReminders(data as HabitInsertionData)
+          .then((habitId) => {
+            databaseService.habitMilestone.createMilestone({
+              habit_id: habitId,
+              week_streak: 0,
+              badges_earned: 0,
+              streak_started_at: 'inactive',
+              best_day_streak: 0,
+              prev_best_day_streak: -1,
+            });
+            NotificationManager.upsertPushNotificationForHabit(habitId);
+          });
 
         Toast.success('Habit Created');
         useFormReturn.reset();
