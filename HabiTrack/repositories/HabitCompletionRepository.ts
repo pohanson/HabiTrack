@@ -51,4 +51,10 @@ export class HabitCompletionRepository extends SyncableRepository<HabitCompletio
       .where(eq(habitCompletion.habit_id, habitId))
       .execute();
   }
+
+  public async updateModifiedItems(items: HabitCompletion[]) {
+    super.updateModifiedItems(
+      items.map((item) => ({ ...item, completedAt: item.completedAt.split('T')[0] })),
+    ); // ensure completedAt is just the date, if it is just the date, it will return the date.
+  }
 }

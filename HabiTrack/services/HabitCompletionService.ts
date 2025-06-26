@@ -97,7 +97,10 @@ export class HabitCompletionService extends BaseSyncableRepoService {
     }
   }
 
-  // get the completedAt dates for a habit since Sunday as an array of date strings
+  //
+  /**
+   * Get the completedAt dates for a habit since Sunday as an array of date strings yyyy-mm-dd
+   */
   public async getCompletionsThisWeek(habitId: string): Promise<string[]> {
     try {
       const todayDate = new Date();

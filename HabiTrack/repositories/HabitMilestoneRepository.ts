@@ -1,4 +1,4 @@
-import { HabitMilestone, habitMilestone } from '@/db/localSchema';
+import { habit, HabitMilestone, habitMilestone } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SyncableRepository } from './SyncableRepository';
@@ -6,6 +6,23 @@ import { SyncableRepository } from './SyncableRepository';
 export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone> {
   constructor(db: ReturnType<typeof drizzle>) {
     super(db, habitMilestone);
+  }
+
+  /**
+   * Get all habit milestones as a query.
+   * @returns obj with the following properties:
+   * habit_id, habit_name, week_streak, badges_earned,
+   */
+  getAllMilestoneQuery() {
+    return this.db
+      .select({
+        habit_id: habit.id,
+        habit_name: habit.name,
+        week_streak: habitMilestone.week_streak,
+        badges_earned: habitMilestone.badges_earned,
+      })
+      .from(habitMilestone)
+      .innerJoin(habit, eq(habit.id, habitMilestone.habit_id));
   }
 
   /**

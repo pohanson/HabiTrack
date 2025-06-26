@@ -100,6 +100,7 @@ export class ReminderService extends BaseSyncableRepoService {
         });
       }
     });
+    this.dbService.habitMilestone.resetWeekStreakByHabitId(habitId);
   }
 
   /**
