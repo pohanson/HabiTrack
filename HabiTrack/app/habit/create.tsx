@@ -3,58 +3,48 @@ import { RHFTextInput } from '@/components/RHFInputs/RHFTextInput';
 import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
-import * as schema from '@/db/schema';
-import { habit, reminder } from '@/db/schema';
+import { ThemedView } from '@/components/ThemedView';
 import { NotificationManager } from '@/services/NotificationManager';
-import { zeroPad } from '@/utils/zeroPad';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { DatabaseService } from '@/services';
+import { HabitInsertionData } from '@/services/HabitService';
 import { useNavigation } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { View } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
   useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
-  // ^ Not sure if need useEffect here, can move navigation.setOptions outside maybe?
+  const databaseService = DatabaseService.instance;
 
   const useFormReturn = useForm<FieldValues>({
     values: {
-      habit: '',
+      name: '',
       description: '',
-      frequency: new Set<number>(),
+      frequency: [],
       time: null,
     },
   });
   const { handleSubmit } = useFormReturn;
 
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
-
   const onSubmit = handleSubmit(
     async (data) => {
+      console.log('Submitting Form:\n', data);
       try {
-        const habitResult = await drizzleDb.insert(habit).values({
-          name: data.habit,
-          description: data.description || '',
-        });
-        (data.frequency as Set<number>).forEach((day) =>
-          drizzleDb
-            .insert(reminder)
-            .values({
-              day: day,
-              time:
-                data.time != null
-                  ? `${zeroPad(data.time.getHours())}${zeroPad(data.time.getMinutes())}`
-                  : null,
-              habit_id: habitResult.lastInsertRowId,
-            })
-            .execute(),
-        );
+        databaseService.habit
+          .createHabitWithReminders(data as HabitInsertionData)
+          .then((habitId) => {
+            databaseService.habitMilestone.createMilestone({
+              habit_id: habitId,
+              week_streak: 0,
+              badges_earned: 0,
+              streak_started_at: 'inactive',
+              best_day_streak: 0,
+              prev_best_day_streak: -1,
+            });
+            NotificationManager.upsertPushNotificationForHabit(habitId);
+          });
 
-        NotificationManager.upsertPushNotificationForHabit(habitResult.lastInsertRowId);
         Toast.success('Habit Created');
         useFormReturn.reset();
       } catch (error) {
@@ -69,20 +59,24 @@ export default function CreateHabitScreen() {
   );
 
   return (
-    <View style={{ padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText type="title">Create Habit</ThemedText>
       <RHFTextInput
-        name="habit"
+        name="name"
         isRequired={true}
         label="Habit Name"
         useFormReturn={useFormReturn}
       />
       <RHFTextInput name="description" label="Description" useFormReturn={useFormReturn} />
 
-      <RHFFrequencyInput control={useFormReturn.control} name="frequency" />
+      <RHFFrequencyInput
+        control={useFormReturn.control}
+        name="frequency"
+        errorState={useFormReturn.formState.errors}
+      />
       <RHFTimeInput control={useFormReturn.control} />
       <TextButton label="Submit" onPress={onSubmit} style={{ marginTop: 30, width: '100%' }} />
       <ToastManager />
-    </View>
+    </ThemedView>
   );
 }

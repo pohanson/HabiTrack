@@ -1,23 +1,24 @@
+import { DATABASE_NAME } from '@/constants';
+import migrations from '@/drizzle/local/migrations';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { DatabaseService } from '@/services';
+import { NotificationManager } from '@/services/NotificationManager';
+import { SyncService } from '@/services/SyncService';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { DATABASE_NAME } from '@/constants';
-import migrations from '@/drizzle/migrations';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
+import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
+import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NotificationManager } from '@/services/NotificationManager';
 
-const expoDb = openDatabaseSync(DATABASE_NAME);
-const db = drizzle(expoDb);
-NotificationManager.init(db);
+const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
+const databaseService = DatabaseService.init(expoDb);
+const db = databaseService.db;
+NotificationManager.init(db as any);
 export default function RootLayout() {
   useEffect(() => {
     NotificationManager.registerForPushNotificationsAsync().catch(console.error);
@@ -39,6 +40,8 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
+  SyncService.init();
+  SyncService.instance.syncAll();
 
   return (
     <SafeAreaProvider>

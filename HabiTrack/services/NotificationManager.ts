@@ -66,7 +66,7 @@ export namespace NotificationManager {
     );
   }
 
-  export async function upsertPushNotificationForHabit(habitId: number) {
+  export async function upsertPushNotificationForHabit(habitId: string) {
     const notifications = await Notifications.getAllScheduledNotificationsAsync();
     const existingNotifications = notifications.filter((n) => n.content.data?.habitId === habitId);
     // Cancel all existing notification for that habit

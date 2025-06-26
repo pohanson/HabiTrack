@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { zeroPad } from '@/utils/zeroPad';
+import { paddedTimeFromDate } from '@/utils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
@@ -8,6 +8,7 @@ import { Pressable, View } from 'react-native';
 import { IconButton } from '../IconButton';
 import { STYLES } from '../Styles';
 import { ThemedText } from '../ThemedText';
+import { Shadows } from '@/constants/Shadows';
 
 export function RHFTimeInput({
   control,
@@ -18,7 +19,8 @@ export function RHFTimeInput({
 }) {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
-  const borderColor = useThemeColor({}, 'border');
+  const cardColor = useThemeColor({}, 'card');
+  const textColor = useThemeColor({}, 'text');
   return (
     <Controller
       name="time"
@@ -35,22 +37,21 @@ export function RHFTimeInput({
               width: '100%',
             }}>
             <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flex: 1,
-                borderWidth: 1,
-                borderColor: borderColor,
-                borderRadius: 10,
-                backgroundColor: 'dimgray',
-                paddingHorizontal: 16,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
+              style={[
+                {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flex: 1,
+                  borderRadius: 10,
+                  backgroundColor: cardColor,
+                  paddingHorizontal: 16,
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                },
+                Shadows.medium,
+              ]}>
               <ThemedText>
-                {reminderTime == null
-                  ? 'No Reminder'
-                  : `${zeroPad(reminderTime.getHours())}:${zeroPad(reminderTime.getMinutes())}`}
+                {reminderTime == null ? 'No Reminder' : paddedTimeFromDate(reminderTime)}
               </ThemedText>
               <IconButton iconName="xmark" onPress={() => onChange(null)} />
             </View>
@@ -60,7 +61,7 @@ export function RHFTimeInput({
               style={[STYLES.button]}
               pressRetentionOffset={60}
               hitSlop={5}>
-              <ThemedText style={{ color: 'white', fontWeight: 'bold' }}>Select Time</ThemedText>
+              <ThemedText style={{ color: textColor, fontWeight: 'bold' }}>Select Time</ThemedText>
             </Pressable>
           </View>
           {showTimePicker && (
