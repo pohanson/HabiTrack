@@ -33,4 +33,15 @@ export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone>
       .where(eq(habitMilestone.habit_id, habitId))
       .execute();
   }
+
+  /**
+   * Delete all milestones for a habit by habit Id.
+   */
+  public deleteByHabitId(habitId: string) {
+    return this.db
+      .update(habitMilestone)
+      .set({ isDeleted: true, modifiedAt: new Date().toISOString() })
+      .where(eq(habitMilestone.habit_id, habitId))
+      .execute();
+  }
 }

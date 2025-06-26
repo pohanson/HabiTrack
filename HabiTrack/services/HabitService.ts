@@ -118,6 +118,7 @@ export class HabitService extends BaseSyncableRepoService {
   public async deleteHabit(habitId: string) {
     this.dbService.habitCompletion.deleteCompletionsForHabit(habitId);
     this.dbService.reminder.deleteRemindersForHabit(habitId);
+    this.dbService.habitMilestone.deleteMilestoneByHabitId(habitId);
     await this._habitRepository.delete(habitId);
   }
 }

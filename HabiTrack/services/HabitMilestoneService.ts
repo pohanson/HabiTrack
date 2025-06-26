@@ -65,6 +65,10 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
     });
   }
 
+  public async deleteMilestoneByHabitId(habitId: string) {
+    return this._habitMilestoneRepository.deleteByHabitId(habitId);
+  }
+
   /**
    * Calculate the habit streak for a given habit Id.
    * @param habitId - The ID of the habit to calculate the streak for.
