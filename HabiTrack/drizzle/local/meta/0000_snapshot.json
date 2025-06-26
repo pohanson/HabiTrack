@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7b55b438-1ad6-4c19-844d-1fee38064764",
+  "id": "5d0a9e5a-63d9-4aa6-b3e6-40e34c55865d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "habit": {
@@ -323,6 +323,13 @@
         },
         "name": {
           "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "password": {
+          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

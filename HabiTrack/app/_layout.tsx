@@ -12,8 +12,43 @@ import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
-import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast, {
+  BaseToastProps,
+  ErrorToast,
+  InfoToast,
+  SuccessToast,
+} from 'react-native-toast-message';
+
+const toastConfig = {
+  success: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
+    <SuccessToast
+      {...props}
+      text1Style={{ fontSize: 16 }}
+      text2Style={{ fontSize: 14 }}
+      text1NumberOfLines={2}
+      text2NumberOfLines={4}
+    />
+  ),
+  error: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
+    <ErrorToast
+      {...props}
+      text1Style={{ fontSize: 16 }}
+      text2Style={{ fontSize: 14 }}
+      text1NumberOfLines={2}
+      text2NumberOfLines={4}
+    />
+  ),
+  info: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
+    <InfoToast
+      {...props}
+      text1Style={{ fontSize: 16 }}
+      text2Style={{ fontSize: 14 }}
+      text1NumberOfLines={2}
+      text2NumberOfLines={4}
+    />
+  ),
+};
 
 const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 const databaseService = DatabaseService.init(expoDb);
@@ -40,6 +75,7 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
+  // databaseService;
   SyncService.init();
   SyncService.instance.syncAll();
 
@@ -51,14 +87,30 @@ export default function RootLayout() {
             databaseName={DATABASE_NAME}
             options={{ enableChangeListener: true }}
             useSuspense>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
+            <RootNavigator />
             <StatusBar style="auto" />
+            <Toast config={toastConfig} />
           </SQLiteProvider>
         </Suspense>
       </ThemeProvider>
     </SafeAreaProvider>
+  );
+}
+
+function RootNavigator() {
+  const currentUser = DatabaseService.instance.userId;
+  return (
+    <Stack
+      initialRouteName={currentUser == null ? 'signup' : '(app)/(tabs)'}
+      screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={currentUser == null}>
+        <Stack.Screen name="signup" />
+        <Stack.Screen name="signin" />
+      </Stack.Protected>
+      <Stack.Protected guard={currentUser != null}>
+        <Stack.Screen name="(app)/(tabs)" />
+      </Stack.Protected>
+      <Stack.Screen name="+not-found" />
+    </Stack>
   );
 }

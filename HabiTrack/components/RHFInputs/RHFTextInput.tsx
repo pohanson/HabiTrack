@@ -1,18 +1,28 @@
 import { Colors } from '@/constants/Colors';
-import { Controller, UseFormReturn } from 'react-hook-form';
-import { TextInput, useColorScheme, View } from 'react-native';
+import { Controller, FieldValues, RegisterOptions, UseFormReturn } from 'react-hook-form';
+import { TextInput, TextInputProps, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 
+/**
+ * Default autoComplete and autoCorrect are set to false.
+ */
 export function RHFTextInput({
   name,
   label,
   useFormReturn,
   isRequired = false,
+  rules = {},
+  ...textInputProps
 }: {
   name: string;
   label: string;
   useFormReturn: UseFormReturn;
   isRequired?: boolean;
+  rules?: Omit<
+    RegisterOptions<FieldValues, string>,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled' | 'isRequired'
+  >;
+  textInputProps?: TextInputProps;
 }) {
   const colors = Colors[useColorScheme() || 'light'];
   const errorMessage = useFormReturn.formState.errors[name]?.message?.toString() || null;
@@ -27,9 +37,12 @@ export function RHFTextInput({
       <Controller
         control={useFormReturn.control}
         name={name}
-        rules={{ required: isRequired ? `${label} is required` : false }}
+        rules={{ required: isRequired ? `${label} is required` : false, ...rules }}
         render={({ field: { onChange, value } }) => (
           <TextInput
+            autoComplete="off"
+            autoCorrect={false}
+            {...textInputProps}
             onChangeText={onChange}
             value={value}
             style={{

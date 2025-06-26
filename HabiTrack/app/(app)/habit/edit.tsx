@@ -10,8 +10,9 @@ import { dateFromPaddedTime } from '@/utils';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import ToastManager, { Toast } from 'toastify-react-native';
+import { Toast } from 'toastify-react-native';
 import { NotificationManager } from '@/services/NotificationManager';
+import ToastManager from 'toastify-react-native/components/ToastManager';
 
 export default function EditHabitScreen() {
   const { id }: { id: string } = useLocalSearchParams();
@@ -122,7 +123,6 @@ export default function EditHabitScreen() {
           style={{ marginTop: 10, width: '100%' }}
         />
       </ThemedView>
-
       <ToastManager />
     </ThemedView>
   );
