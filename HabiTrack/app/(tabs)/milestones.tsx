@@ -1,34 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import { HabitMilestoneCard } from '@/components/HabitMilestoneCard';
-import { useSQLiteContext } from 'expo-sqlite';
-import { habit, habitMilestone } from '@/db/schema';
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { eq } from 'drizzle-orm';
-import * as schema from '@/db/schema';
-import { Toast } from 'toastify-react-native';
-import { useFocusEffect } from 'expo-router';
-import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { DatabaseService } from '@/services';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { Toast } from 'toastify-react-native';
 import { HabitMilestoneHeader } from '@/components/HabitMilestoneHeader';
 
 export default function Milestones() {
   const [refresh, setRefresh] = useState(0);
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
 
-  const { data, error } = useLiveQuery(
-    drizzleDb
-      .select({
-        habit_id: habitMilestone.habit_id,
-        habit_name: habit.name,
-        week_streak: habitMilestone.week_streak,
-        badges_earned: habitMilestone.badges_earned,
-      })
-      .from(habitMilestone)
-      .leftJoin(habit, eq(habit.id, habitMilestone.habit_id)),
-    [refresh],
-  );
+  const databaseService = DatabaseService.instance;
+  const { data, error } = useLiveQuery(databaseService.habitMilestone.getAllMilestonesQuery(), [
+    refresh,
+  ]);
 
   // extra calcs for active badges. Define complete habits as habits with all 5 milestone badges
   const totalMilestoneBadges =

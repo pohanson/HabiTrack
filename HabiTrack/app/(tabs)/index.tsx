@@ -1,47 +1,20 @@
-import { ScrollView } from 'react-native';
-
+import { HabitCard } from '@/components/HabitCard';
+import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { DatabaseService } from '@/services';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, useFocusEffect } from 'expo-router';
-
-import { IconButton } from '@/components/IconButton';
-import * as schema from '@/db/schema';
-import { habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
-import { and, asc, eq } from 'drizzle-orm';
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
-import { HabitCard } from '@/components/HabitCard';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
 
-  const today = new Date().toJSON().split('T')[0];
-  const dayOfWeek = new Date().getDay();
-  // const colors = Colors[useColorScheme() || 'light'];
-  const { data, error } = useLiveQuery(
-    drizzleDb
-      .select({
-        habit: habit,
-        habit_completion: habitCompletion,
-        reminder: reminder,
-        habit_milestone: habitMilestone,
-      })
-      .from(reminder)
-      .where(eq(reminder.day, dayOfWeek))
-      .innerJoin(habit, eq(reminder.habit_id, habit.id))
-      .leftJoin(
-        habitCompletion,
-        and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.completedAt, today)),
-      )
-      // added for habitMilestone
-      .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
-      .orderBy(asc(habitCompletion.completedAt), asc(reminder.time)),
-    [refresh],
-  );
+  const databaseService = DatabaseService.instance;
+
+  const { data, error } = useLiveQuery(databaseService.habit.getAllHabitsTodayQuery(), [refresh]);
   if (error) {
     console.error('Error fetching habits:', error);
     Toast.error('Error fetching habits.');
@@ -79,7 +52,8 @@ export default function HomeScreen() {
               habit={habit}
               habit_completion={habit_completion}
               habit_milestone={habit_milestone}
-              today={today}
+              today={new Date().toISOString().split('T')[0]}
+              isCompletable={true}
               setRefresh={setRefresh}
             />
           ))}
