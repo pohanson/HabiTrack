@@ -2,7 +2,7 @@ import { Reminder, reminder } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SQLiteRunResult } from 'expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
+import { SyncableRepository } from './SyncableRepository';
 
 export class ReminderRepository extends SyncableRepository<Reminder> {
   constructor(db: ReturnType<typeof drizzle>) {

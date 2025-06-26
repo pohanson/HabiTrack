@@ -1,4 +1,4 @@
-import { SyncableRepository } from '@/repositories/SyncRepository';
+import { SyncableRepository } from '@/repositories/SyncableRepository';
 import { SyncableModel } from '@/types/SyncableModel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

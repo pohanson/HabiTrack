@@ -1,7 +1,7 @@
 import { HabitMilestone, habitMilestone } from '@/db/localSchema';
 import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
+import { SyncableRepository } from './SyncableRepository';
 
 export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone> {
   constructor(db: ReturnType<typeof drizzle>) {

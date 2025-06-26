@@ -1,6 +1,6 @@
 import { HabitMilestone } from '@/db/schema';
 import { HabitMilestoneRepository } from '@/repositories/HabitMilestoneRepository';
-import { PartialSync } from '@/repositories/SyncRepository';
+import { PartialSync } from '@/repositories/SyncableRepository';
 import { calculateDaysBetweenDates } from '@/utils/dateUtils';
 import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 import { DatabaseService } from './DatabaseService';

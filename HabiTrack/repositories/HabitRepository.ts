@@ -1,7 +1,7 @@
 import { habit, Habit, habitCompletion, habitMilestone, reminder } from '@/db/schema';
 import { and, asc, eq, max, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
+import { SyncableRepository } from './SyncableRepository';
 
 export class HabitRepository extends SyncableRepository<Habit> {
   constructor(db: ReturnType<typeof drizzle>) {

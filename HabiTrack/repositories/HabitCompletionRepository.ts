@@ -1,7 +1,7 @@
 import { HabitCompletion, habitCompletion } from '@/db/schema';
 import { and, eq, gte, lte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
+import { SyncableRepository } from './SyncableRepository';
 
 export class HabitCompletionRepository extends SyncableRepository<HabitCompletion> {
   constructor(db: ReturnType<typeof drizzle>) {

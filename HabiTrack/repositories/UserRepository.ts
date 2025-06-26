@@ -1,7 +1,7 @@
 import { User, user } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { SyncableRepository } from './SyncRepository';
+import { SyncableRepository } from './SyncableRepository';
 
 export class UserRepository extends SyncableRepository<User> {
   constructor(db: ReturnType<typeof drizzle>) {
