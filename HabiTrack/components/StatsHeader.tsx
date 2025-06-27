@@ -44,7 +44,7 @@ export function StatsHeader({
         </ThemedView>
       )}
 
-      <ThemedView style={{ flex: 1 }}>
+      <ThemedView style={{ flex: 3 }}>
         <ThemedText
           style={{
             fontSize: 28,

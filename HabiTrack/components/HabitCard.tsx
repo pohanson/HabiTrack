@@ -76,11 +76,14 @@ export function HabitCard({
     const todayDOW = new Date(today).getDay();
     const todayDateStr = new Date().toJSON().split('T')[0];
 
-    databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
     if (habit_completion === null) {
-      // TICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling)
+      // TICKING HABIT (1. Completion data handling, 2. Milestone data handling, 3. Daily streaks data handling)
+      // THIS ORDER IS NECESSARY
 
-      // 1. Milestone data handling
+      // 1. Completion data handling
+      await databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
+
+      // 2. Milestone data handling
 
       // Then check if all habits for the week are completed
       const completionsThisWeek = await databaseService.habitCompletion.getCompletionsThisWeek(
@@ -92,6 +95,7 @@ export function HabitCard({
         const newWeekStreak = (habit_milestone?.week_streak || 0) + 1;
         const calculatedBadges = Number(getBadgesEarned(newWeekStreak));
         const newBadgesEarned = Math.max(calculatedBadges, habit_milestone?.badges_earned || 0);
+        console.log('Badges_earned for habit.id', habit.id, ':', newBadgesEarned);
 
         databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
           week_streak: newWeekStreak,
@@ -99,7 +103,7 @@ export function HabitCard({
         });
       }
 
-      // 2. Daily streaks data handling
+      // 3. Daily streaks data handling
 
       const updatedStreakStartedAt =
         String(habit_milestone?.streak_started_at) === 'inactive'
@@ -120,7 +124,8 @@ export function HabitCard({
         prev_best_day_streak: updatedPrevBestDayStreak,
       });
     } else {
-      // UNTICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling)
+      // UNTICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling, 3. Completion data handling)
+      // THIS ORDER IS NECESSARY
 
       // 1. Milestone data handling
 
@@ -131,6 +136,7 @@ export function HabitCard({
 
       // check if today's DOW is the habit frequency's last DOW && reached full week completion
       const lastDOW = frequencyArray[frequencyArray.length - 1];
+
       if (todayDOW === lastDOW && currentCompletions.length >= frequencyArray.length) {
         // decrement week_streak and update badges_earned (if necessary)
 
@@ -149,15 +155,17 @@ export function HabitCard({
         let updatedBadgesEarned = -1;
 
         if (isPotentialWeek) {
+          console.log('It is a potential week');
           // If it IS a potential week, check if current badges_earned > potential badges_earned
           if (currentBadgesEarned > oldBadgesEarned) {
-            // If current badges_earned > potential badges_earned, don't decrease badges_earned
+            // If current badges_earned >= potential badges_earned, don't decrease badges_earned
             updatedBadgesEarned = currentBadgesEarned;
           } else {
             // else current badges_earned < potential badges_earned, decrease badges_earned in this case
             updatedBadgesEarned = newBadgesEarned;
           }
         } else {
+          console.log('NOT a potential week');
           // If it is NOT a potential week, dont decrease badges_earned (new badges_earned === currentBadgesEarned)
           updatedBadgesEarned = currentBadgesEarned;
         }
@@ -188,6 +196,9 @@ export function HabitCard({
         best_day_streak: updatedBestDayStreak,
         prev_best_day_streak: -1,
       });
+
+      // 3. Completion data handling
+      await databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
     }
     // refresh UI
     setRefresh((prev) => prev + 1);

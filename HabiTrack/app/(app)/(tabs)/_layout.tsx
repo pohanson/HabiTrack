@@ -31,6 +31,7 @@ export default function TabLayout() {
     try {
       console.log('ALL WEEK STREAKS RECALCULATED');
       data.forEach(({ habit_id, last_completed_at, day_frequency }) => {
+        console.log(habit_id, last_completed_at);
         if (last_completed_at !== null) {
           // calculate the no. of days since last expected habit day
           const frequencyArray = JSON.parse(day_frequency as string);
@@ -123,7 +124,7 @@ export default function TabLayout() {
             if (todayStr > nextExpectedStr) {
               // streak broken case, set streak_started_at to 'inactive' and update best_day_streak if necessary
               // (outside of nextExpectedDate)
-
+              console.log(habit_id, 'streak BROKEN!!!');
               // find new best_day_streak
               const latestStreak =
                 String(streak_started_at) === 'inactive'
@@ -138,7 +139,7 @@ export default function TabLayout() {
               });
             } else if (todayStr < nextExpectedStr) {
               // within safeZone, don't change streak_started_at, just update best_day_streak if necessary
-
+              console.log(habit_id, 'in safeZONE!!!');
               const latestStreak =
                 String(streak_started_at) === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, todayStr) + 1
@@ -151,7 +152,7 @@ export default function TabLayout() {
             } else {
               // case where (todayStr === nextExpectedStr)
               // don't change streak_started_at, just update best_day_streak if necessary
-
+              console.log(habit_id, 'ON NEXT EXPECTED TODAY!!!');
               const latestStreak =
                 streak_started_at === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, safeZoneEndStr) + 1

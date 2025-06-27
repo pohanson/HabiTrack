@@ -38,8 +38,8 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
   /**
    * Get all habit milestones as a query.
    */
-  public getAllMilestonesQuery() {
-    return this._habitMilestoneRepository.getAllMilestoneQuery();
+  public getAllMilestonesQuery(includeDeleted: boolean = false) {
+    return this._habitMilestoneRepository.getAllMilestoneQuery(includeDeleted);
   }
 
   /**

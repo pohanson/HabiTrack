@@ -68,9 +68,14 @@ export class StatisticService {
     startDate: string,
     completedAtData: { completedAt: string }[],
   ): number {
-    return completedAtData.filter(({ completedAt }) => completedAt >= startDate).length;
+    // normalise startDate to yyyy-mm-dd
+    const normalizedStartDate = startDate.split('T')[0];
+    return completedAtData.filter(({ completedAt }) => {
+      // normalise completedAt to yyyy-mm-dd
+      const normalizedCompletedAt = completedAt.split('T')[0];
+      return normalizedCompletedAt >= normalizedStartDate;
+    }).length;
   }
-
   /**
    * Calculates habit statistics based on the creation date, frequency, and completed dates.
    * @param createdAtDate - The date when the habit was created in yyyy-mm-dd format

@@ -122,11 +122,18 @@ export class HabitRepository extends SyncableRepository<Habit> {
           best_day_streak: habitMilestone.best_day_streak,
         })
         .from(habit)
-        .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
+        .where(eq(habit.isDeleted, false))
+        .leftJoin(
+          habitMilestone,
+          and(eq(habit.id, habitMilestone.habit_id), eq(habitMilestone.isDeleted, false)),
+        )
         .innerJoin(reminder, eq(habit.id, reminder.habit_id))
 
         // here for testing for now
-        .leftJoin(habitCompletion, eq(habit.id, habitCompletion.habit_id))
+        .leftJoin(
+          habitCompletion,
+          and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.isDeleted, false)),
+        )
 
         .groupBy(habit.id)
     );
