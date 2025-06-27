@@ -1,22 +1,12 @@
-import { Habit, habit, Reminder, reminder } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import { Habit, Reminder } from '@/db/schema';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { SQLiteDatabase } from 'expo-sqlite';
 import { Platform } from 'react-native';
+import { DatabaseService } from './DatabaseService';
 
 export namespace NotificationManager {
-  let sqliteDb: ExpoSQLiteDatabase<Record<string, never>> & {
-    $client: SQLiteDatabase;
-  };
-
-  export function init(
-    db: ExpoSQLiteDatabase<Record<string, never>> & {
-      $client: SQLiteDatabase;
-    },
-    notificationHandler: Notifications.NotificationHandler | null = null,
-  ) {
+  const databaseService = DatabaseService.instance;
+  export function init(notificationHandler: Notifications.NotificationHandler | null = null) {
     Notifications.setNotificationHandler(
       notificationHandler || {
         handleNotification: async () => ({
@@ -27,7 +17,6 @@ export namespace NotificationManager {
         }),
       },
     );
-    sqliteDb = db;
     return;
   }
 
@@ -57,10 +46,7 @@ export namespace NotificationManager {
 
   export async function regeneratePushNotifications() {
     await Notifications.cancelAllScheduledNotificationsAsync();
-    const data = await sqliteDb
-      .select()
-      .from(habit)
-      .innerJoin(reminder, eq(habit.id, reminder.habit_id));
+    const data = await databaseService.habit.getAllHabitsWithReminder();
     await Promise.all(
       data.map(({ habit, reminder }) => scheduleWeeklyPushNotification(habit, reminder)),
     );
@@ -77,13 +63,13 @@ export namespace NotificationManager {
         ),
       );
     }
-    const data = await sqliteDb
-      .select()
-      .from(habit)
-      .innerJoin(reminder, eq(habit.id, reminder.habit_id))
-      .where(eq(habit.id, habitId));
+    const data = await databaseService.habit.getHabitWithReminders(habitId);
+    if (data == null) {
+      console.warn(`No habit found with id ${habitId}`);
+      return;
+    }
     await Promise.all(
-      data.map(({ habit, reminder }) => scheduleWeeklyPushNotification(habit, reminder)),
+      data.reminders.map((reminder) => scheduleWeeklyPushNotification(data.habit, reminder)),
     );
   }
 

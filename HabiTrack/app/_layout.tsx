@@ -53,7 +53,7 @@ const toastConfig = {
 const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 const databaseService = DatabaseService.init(expoDb);
 const db = databaseService.db;
-NotificationManager.init(db as any);
+NotificationManager.init();
 export default function RootLayout() {
   useEffect(() => {
     NotificationManager.registerForPushNotificationsAsync().catch(console.error);
