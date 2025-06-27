@@ -25,7 +25,9 @@ export function TextButton({
       pressRetentionOffset={50}
       style={[buttonStyle, style, Shadows.medium]}
       {...pressableProps}>
-      <ThemedText type="defaultSemiBold" style={[{ textAlign: 'center' }, textStyle]}>
+      <ThemedText
+        type="defaultSemiBold"
+        style={[{ textAlign: 'center', color: '#f2f2f2' }, textStyle]}>
         {label}
       </ThemedText>
     </Pressable>

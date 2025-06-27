@@ -109,20 +109,18 @@ export default function EditHabitScreen() {
       />
       <RHFTimeInput control={useFormReturn.control} label="Change Reminder Time" />
 
-      <ThemedView>
-        <TextButton
-          label="Save Changes"
-          onPress={onSaveChanges}
-          style={{ marginTop: 30, width: '100%' }}
-        />
+      <TextButton
+        label="Save Changes"
+        onPress={onSaveChanges}
+        style={{ marginTop: 30, width: '100%' }}
+      />
 
-        <TextButton
-          label="Delete Habit"
-          variant="delete"
-          onPress={onDelete}
-          style={{ marginTop: 10, width: '100%' }}
-        />
-      </ThemedView>
+      <TextButton
+        label="Delete Habit"
+        variant="delete"
+        onPress={onDelete}
+        style={{ marginTop: 10, width: '100%' }}
+      />
       <ToastManager />
     </ThemedView>
   );
