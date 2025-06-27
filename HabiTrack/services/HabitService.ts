@@ -37,6 +37,9 @@ export class HabitService extends BaseSyncableRepoService {
    */
   public async createHabitWithReminders(habit: HabitInsertionData): Promise<string> {
     const userId = habit.user_id || this.dbService.userId;
+    if (userId == null) {
+      throw new Error('User ID is required to create a habit');
+    }
     const { id: habitId } = await this._habitRepository.create({ ...habit, user_id: userId });
     if (habit.frequency && habit.frequency.length > 0) {
       this.dbService.reminder.createRemindersForHabit(habitId, habit.frequency, habit.time);
@@ -87,6 +90,13 @@ export class HabitService extends BaseSyncableRepoService {
       const reminders = values.map((value) => value.reminder as Reminder).filter((r) => r != null);
       return { habit, reminders };
     });
+  }
+
+  /**
+   * Retrieves all habits for the current user or all habits if userId is null. defaults to current user.
+   */
+  public async getAllHabitsWithReminder(userId: string | null = this.dbService.userId) {
+    return this._habitRepository.getAllHabitsWithRemindersQuery(userId).execute();
   }
 
   /**

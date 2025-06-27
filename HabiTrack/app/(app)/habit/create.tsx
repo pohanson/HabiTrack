@@ -4,13 +4,13 @@ import { RHFTimeInput } from '@/components/RHFInputs/RHFTimeInput';
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { NotificationManager } from '@/services/NotificationManager';
 import { DatabaseService } from '@/services';
 import { HabitInsertionData } from '@/services/HabitService';
+import { NotificationManager } from '@/services/NotificationManager';
 import { useNavigation } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import ToastManager, { Toast } from 'toastify-react-native';
+import Toast from 'react-native-toast-message';
 
 export default function CreateHabitScreen() {
   const navigation = useNavigation();
@@ -45,15 +45,24 @@ export default function CreateHabitScreen() {
             NotificationManager.upsertPushNotificationForHabit(habitId);
           });
 
-        Toast.success('Habit Created');
+        Toast.show({
+          text1: 'Habit Created',
+          type: 'success',
+        });
         useFormReturn.reset();
       } catch (error) {
         console.error('Error inserting habit:', error);
-        Toast.error('Failed to create habit');
+        Toast.show({
+          text1: 'Failed to create habit',
+          type: 'error',
+        });
       }
     },
     (errors) => {
-      Toast.error('Ensure required inputs are filled in');
+      Toast.show({
+        text1: 'Invalid/Missing Input',
+        type: 'error',
+      });
       console.log('Form submission errors:\n', errors);
     },
   );
@@ -76,7 +85,6 @@ export default function CreateHabitScreen() {
       />
       <RHFTimeInput control={useFormReturn.control} />
       <TextButton label="Submit" onPress={onSubmit} style={{ marginTop: 30, width: '100%' }} />
-      <ToastManager />
     </ThemedView>
   );
 }

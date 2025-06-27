@@ -10,8 +10,9 @@ import { dateFromPaddedTime } from '@/utils';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import ToastManager, { Toast } from 'toastify-react-native';
+import { Toast } from 'toastify-react-native';
 import { NotificationManager } from '@/services/NotificationManager';
+import ToastManager from 'toastify-react-native/components/ToastManager';
 
 export default function EditHabitScreen() {
   const { id }: { id: string } = useLocalSearchParams();
@@ -64,7 +65,7 @@ export default function EditHabitScreen() {
       try {
         databaseService.habit.updateHabitWithReminders({ ...(data as HabitInsertionData), id: id });
         Toast.success('Habit Updated');
-        NotificationManager.upsertPushNotificationForHabit(Number(id));
+        NotificationManager.upsertPushNotificationForHabit(id);
         navigation.goBack();
       } catch (error) {
         console.error('Error updating habit:', error);
@@ -91,7 +92,7 @@ export default function EditHabitScreen() {
   };
 
   return (
-    <ThemedView style={{ flex: 1, padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput
         name="name"
@@ -122,7 +123,6 @@ export default function EditHabitScreen() {
           style={{ marginTop: 10, width: '100%' }}
         />
       </ThemedView>
-
       <ToastManager />
     </ThemedView>
   );

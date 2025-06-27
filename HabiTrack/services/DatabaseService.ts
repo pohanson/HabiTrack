@@ -6,11 +6,12 @@ import { ReminderService } from './ReminderService';
 import { UserService } from './UserService';
 import { HabitMilestoneService } from './HabitMilestoneService';
 import { StatisticService } from './StatisticService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class DatabaseService {
   static #instance: DatabaseService;
   private _db: ReturnType<typeof drizzle>;
-  private _userId: string = 'CURRENT_USER';
+  private _userId: string | null = null;
 
   private _habitCompletionService: HabitCompletionService;
   private _habitService: HabitService;
@@ -33,10 +34,17 @@ export class DatabaseService {
     this._statisticService = StatisticService.init(this);
   }
 
-  public static init(db: SQLiteDatabase, userId: string = 'CURRENT_USER') {
+  public static init(db: SQLiteDatabase) {
     if (!DatabaseService.#instance) {
       DatabaseService.#instance = new DatabaseService(db);
     }
+
+    AsyncStorage.getItem('userId')
+      .then((userId) => {
+        DatabaseService.instance.userId = userId;
+      })
+      .catch(console.error);
+
     return DatabaseService.#instance;
   }
 
@@ -48,12 +56,13 @@ export class DatabaseService {
     return this._db;
   }
 
-  public get userId() {
+  public get userId(): string | null {
     return this._userId;
   }
 
-  public set userId(value: string) {
+  public set userId(value: string | null) {
     // TODO: Add validation for userid
+
     this._userId = value;
   }
 

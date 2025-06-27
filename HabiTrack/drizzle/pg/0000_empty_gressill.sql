@@ -44,6 +44,7 @@ CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"username" text NOT NULL,
 	"name" text NOT NULL,
+	"password" text NOT NULL,
 	"bio" text DEFAULT '',
 	"profilePicture" text DEFAULT '',
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,

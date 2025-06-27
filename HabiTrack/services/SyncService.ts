@@ -22,7 +22,7 @@ export class SyncService {
     return SyncService.#instance;
   }
 
-  async syncRepoService(repoService: BaseSyncableRepoService) {
+  static async syncRepoService(repoService: BaseSyncableRepoService) {
     if (repoService.tableName === undefined) {
       console.warn(
         `No upstream table defined for repository: ${repoService.tableName}\nABORTING PULLING`,
@@ -61,6 +61,6 @@ export class SyncService {
       });
   }
   async syncAll() {
-    BaseSyncableRepoService.syncRepoService.forEach(this.syncRepoService);
+    BaseSyncableRepoService.syncRepoService.forEach(SyncService.syncRepoService);
   }
 }

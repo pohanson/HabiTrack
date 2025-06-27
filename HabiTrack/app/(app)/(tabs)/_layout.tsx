@@ -60,8 +60,6 @@ export default function TabLayout() {
           if (weekStreakBroken) {
             try {
               databaseService.habitMilestone.resetWeekStreakByHabitId(habit_id);
-
-              console.log(`Reset week_streak for habit ${habit_id}`);
             } catch (error) {
               console.error(`Failed to reset streak for habit ${habit_id}:`, error);
             }
@@ -138,7 +136,6 @@ export default function TabLayout() {
                 streak_started_at: 'inactive',
                 best_day_streak: updatedBestDayStreak,
               });
-              console.log(`Reset streak_started_at for habit ${habit_id}`);
             } else if (todayStr < nextExpectedStr) {
               // within safeZone, don't change streak_started_at, just update best_day_streak if necessary
 

@@ -39,6 +39,28 @@ export class HabitRepository extends SyncableRepository<Habit> {
         ),
       );
   }
+  /**
+   * Get all habits with reminders for a user as a query. null user will return all habits with reminders
+   */
+  getAllHabitsWithRemindersQuery(userId: string | null, includeDeleted: boolean = false) {
+    return this.db
+      .select({ habit: habit, reminder: reminder })
+      .from(habit)
+      .innerJoin(
+        reminder,
+        and(
+          eq(habit.id, reminder.habit_id),
+          includeDeleted ? undefined : eq(reminder.isDeleted, false),
+        ),
+      )
+      .where(
+        and(
+          userId == null ? undefined : eq(habit.user_id, userId),
+          includeDeleted ? undefined : eq(habit.isDeleted, false),
+        ),
+      )
+      .orderBy(asc(reminder.day), asc(reminder.time));
+  }
 
   /**
    * Get all habits for a user with today's completions, reminder, milestone as a query.

@@ -8,6 +8,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
+import ToastManager from 'toastify-react-native/components/ToastManager';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
@@ -21,9 +22,10 @@ export default function HomeScreen() {
   }
 
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
+  Toast.success('Welcome to HabiTrack! Here are your habits for today.');
 
   return (
-    <ThemedView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedView
         style={{
           width: '100%',
@@ -59,6 +61,7 @@ export default function HomeScreen() {
           ))}
         </ThemedView>
       </ScrollView>
+      <ToastManager />
     </ThemedView>
   );
 }
