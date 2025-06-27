@@ -3,6 +3,7 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DatabaseService } from '@/services';
 import { calculateDaysBetweenDates, calculateDaysBetweenDOW } from '@/utils/dateUtils';
+import { getBadgesEarned } from '@/utils/milestoneUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Tabs } from 'expo-router';
 import React, { useEffect } from 'react';
@@ -13,8 +14,8 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
 
-  const dayOfWeek = new Date().getDay();
-  const yesterdayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  // const dayOfWeek = new Date().getDay();
+  // const yesterdayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
   const databaseService = DatabaseService.instance;
 
@@ -26,53 +27,53 @@ export default function TabLayout() {
     Toast.error('Error fetching habits.');
   }
 
-  // WEEK STREAK HANDLING
-  useEffect(() => {
-    try {
-      console.log('ALL WEEK STREAKS RECALCULATED');
-      data.forEach(({ habit_id, last_completed_at, day_frequency }) => {
-        console.log(habit_id, last_completed_at);
-        if (last_completed_at !== null) {
-          // calculate the no. of days since last expected habit day
-          const frequencyArray = JSON.parse(day_frequency as string);
-          let backTrackCount = 1;
-          for (let i = yesterdayOfWeek; ; i = i === 0 ? 6 : i - 1) {
-            if (frequencyArray.includes(i)) {
-              break;
-            }
-            backTrackCount++;
-            if ((i === 0 ? 6 : i - 1) === yesterdayOfWeek) {
-              break;
-            }
-          }
+  // // WEEK STREAK HANDLING
+  // useEffect(() => {
+  //   try {
+  //     console.log('ALL WEEK STREAKS RECALCULATED');
+  //     data.forEach(({ habit_id, last_completed_at, day_frequency }) => {
+  //       console.log(habit_id, last_completed_at);
+  //       if (last_completed_at !== null) {
+  //         // calculate the no. of days since last expected habit day
+  //         const frequencyArray = JSON.parse(day_frequency as string);
+  //         let backTrackCount = 1;
+  //         for (let i = yesterdayOfWeek; ; i = i === 0 ? 6 : i - 1) {
+  //           if (frequencyArray.includes(i)) {
+  //             break;
+  //           }
+  //           backTrackCount++;
+  //           if ((i === 0 ? 6 : i - 1) === yesterdayOfWeek) {
+  //             break;
+  //           }
+  //         }
 
-          // calculate the last expected date of completion
-          const daysBack = backTrackCount > 7 ? 1 : backTrackCount;
-          const todayDate = new Date();
-          const lastExpectedCompletedDate = new Date();
-          lastExpectedCompletedDate.setDate(todayDate.getDate() - daysBack);
+  //         // calculate the last expected date of completion
+  //         const daysBack = backTrackCount > 7 ? 1 : backTrackCount;
+  //         const todayDate = new Date();
+  //         const lastExpectedCompletedDate = new Date();
+  //         lastExpectedCompletedDate.setDate(todayDate.getDate() - daysBack);
 
-          // check if week Streak has been broken
-          const lastCompletedStr = last_completed_at.split('T')[0];
-          const lastExpectedStr = lastExpectedCompletedDate.toJSON().split('T')[0];
-          const weekStreakBroken = lastCompletedStr < lastExpectedStr;
+  //         // check if week Streak has been broken
+  //         const lastCompletedStr = last_completed_at.split('T')[0];
+  //         const lastExpectedStr = lastExpectedCompletedDate.toJSON().split('T')[0];
+  //         const weekStreakBroken = lastCompletedStr < lastExpectedStr;
 
-          // if week streak is broken, reset week_streak to 0
-          if (weekStreakBroken) {
-            try {
-              databaseService.habitMilestone.resetWeekStreakByHabitId(habit_id);
-            } catch (error) {
-              console.error(`Failed to reset streak for habit ${habit_id}:`, error);
-            }
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Error processing habit data:', error);
-    }
-    // might want to change the dependency array
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  //         // if week streak is broken, reset week_streak to 0
+  //         if (weekStreakBroken) {
+  //           try {
+  //             databaseService.habitMilestone.resetWeekStreakByHabitId(habit_id);
+  //           } catch (error) {
+  //             console.error(`Failed to reset streak for habit ${habit_id}:`, error);
+  //           }
+  //         }
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Error processing habit data:', error);
+  //   }
+  //   // might want to change the dependency array
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [data]);
 
   // DAY STREAK HANDLING
   useEffect(() => {
@@ -124,7 +125,7 @@ export default function TabLayout() {
             if (todayStr > nextExpectedStr) {
               // streak broken case, set streak_started_at to 'inactive' and update best_day_streak if necessary
               // (outside of nextExpectedDate)
-              console.log(habit_id, 'streak BROKEN!!!');
+              console.log(habit_id, 'Streak Broken');
               // find new best_day_streak
               const latestStreak =
                 String(streak_started_at) === 'inactive'
@@ -132,35 +133,60 @@ export default function TabLayout() {
                   : calculateDaysBetweenDates(String(streak_started_at), safeZoneEndStr) + 1;
               const updatedBestDayStreak = Math.max(Number(best_day_streak), latestStreak);
 
+              // update badges earned (based on best day streak)
+              const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+
               // update table row
               databaseService.habitMilestone.updateMilestoneByHabitId(habit_id, {
                 streak_started_at: 'inactive',
                 best_day_streak: updatedBestDayStreak,
+
+                // reset week_streak to 0 too
+                week_streak: 0,
+                badges_earned: updatedBadgesEarned,
               });
             } else if (todayStr < nextExpectedStr) {
               // within safeZone, don't change streak_started_at, just update best_day_streak if necessary
-              console.log(habit_id, 'in safeZONE!!!');
+              console.log(habit_id, 'In Safezone');
               const latestStreak =
                 String(streak_started_at) === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, todayStr) + 1
                   : calculateDaysBetweenDates(String(streak_started_at), todayStr) + 1;
               const updatedBestDayStreak = Math.max(Number(best_day_streak), latestStreak);
 
+              // handling week_streak (using current streak data)
+              const updatedWeekStreak = Math.floor(latestStreak / 7);
+
+              // update badges earned (based on best day streak)
+              const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+
               databaseService.habitMilestone.updateMilestoneByHabitId(habit_id, {
                 best_day_streak: updatedBestDayStreak,
+
+                week_streak: updatedWeekStreak,
+                badges_earned: updatedBadgesEarned,
               });
             } else {
               // case where (todayStr === nextExpectedStr)
               // don't change streak_started_at, just update best_day_streak if necessary
-              console.log(habit_id, 'ON NEXT EXPECTED TODAY!!!');
+              console.log(habit_id, 'is on next expected day (since last completedAt)');
               const latestStreak =
                 streak_started_at === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, safeZoneEndStr) + 1
                   : calculateDaysBetweenDates(String(streak_started_at), safeZoneEndStr) + 1;
               const updatedBestDayStreak = Math.max(Number(best_day_streak), latestStreak);
 
+              // handling week_streak (using current streak data)
+              const updatedWeekStreak = Math.floor(latestStreak / 7);
+
+              // update badges earned (based on best day streak)
+              const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+
               databaseService.habitMilestone.updateMilestoneByHabitId(habit_id, {
                 best_day_streak: updatedBestDayStreak,
+
+                week_streak: updatedWeekStreak,
+                badges_earned: updatedBadgesEarned,
               });
             }
           }

@@ -156,7 +156,8 @@ function ProgressBar({
   const completion = weekStreak / weeksRequired;
   const completionWidth = completion * progressBarWidth;
 
-  const progressBarColor = getProgressBarColorForPercentage(completion * 100);
+  const incompleteProgressBarColor = getProgressBarColorForPercentage(completion * 100);
+  const completeProgressBarColor = getProgressBarColorForPercentage(100);
 
   const message = completed
     ? 'Completed!'
@@ -164,7 +165,32 @@ function ProgressBar({
       ? `${weekStreak}/${weeksRequired} Week`
       : `${weekStreak}/${weeksRequired} Weeks`;
 
-  return (
+  return completed ? (
+    // completed progress bar + message
+    <View>
+      <View
+        style={{
+          position: 'relative',
+          width: progressBarWidth,
+          height: progressBarHeight,
+          borderRadius: 10,
+          backgroundColor: completeProgressBarColor,
+          overflow: 'hidden',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}></View>
+      <Text
+        style={{
+          fontWeight: 'bold',
+          fontSize: 10,
+          color: theme.text,
+          textAlign: 'left',
+        }}>
+        {message}
+      </Text>
+    </View>
+  ) : (
+    // incomplete progress bar + message
     <View>
       <View
         style={{
@@ -181,12 +207,11 @@ function ProgressBar({
           style={{
             width: completionWidth,
             height: progressBarHeight,
-            backgroundColor: progressBarColor,
+            backgroundColor: incompleteProgressBarColor,
             alignSelf: 'flex-start',
           }}
         />
       </View>
-
       <Text
         style={{
           fontWeight: 'bold',
