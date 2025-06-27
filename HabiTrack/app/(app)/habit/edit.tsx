@@ -65,7 +65,7 @@ export default function EditHabitScreen() {
       try {
         databaseService.habit.updateHabitWithReminders({ ...(data as HabitInsertionData), id: id });
         Toast.success('Habit Updated');
-        NotificationManager.upsertPushNotificationForHabit(Number(id));
+        NotificationManager.upsertPushNotificationForHabit(id);
         navigation.goBack();
       } catch (error) {
         console.error('Error updating habit:', error);
@@ -92,7 +92,7 @@ export default function EditHabitScreen() {
   };
 
   return (
-    <ThemedView style={{ flex: 1, padding: 8 }}>
+    <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput
         name="name"

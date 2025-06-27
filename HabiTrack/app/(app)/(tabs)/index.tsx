@@ -25,7 +25,7 @@ export default function HomeScreen() {
   Toast.success('Welcome to HabiTrack! Here are your habits for today.');
 
   return (
-    <ThemedView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedView
         style={{
           width: '100%',

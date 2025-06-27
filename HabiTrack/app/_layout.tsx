@@ -1,4 +1,5 @@
 import { DATABASE_NAME } from '@/constants';
+import { UserProvider, useUserContext } from '@/context/UserContext';
 import migrations from '@/drizzle/local/migrations';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DatabaseService } from '@/services';
@@ -75,40 +76,40 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
-  // databaseService;
+
   SyncService.init();
   SyncService.instance.syncAll();
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Suspense fallback={<ActivityIndicator size="large" />}>
-          <SQLiteProvider
-            databaseName={DATABASE_NAME}
-            options={{ enableChangeListener: true }}
-            useSuspense>
-            <RootNavigator />
-            <StatusBar style="auto" />
-            <Toast config={toastConfig} />
-          </SQLiteProvider>
-        </Suspense>
-      </ThemeProvider>
+      <UserProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Suspense fallback={<ActivityIndicator size="large" />}>
+            <SQLiteProvider
+              databaseName={DATABASE_NAME}
+              options={{ enableChangeListener: true }}
+              useSuspense>
+              <RootNavigator />
+              <StatusBar style="auto" hidden={true} />
+              <Toast config={toastConfig} />
+            </SQLiteProvider>
+          </Suspense>
+        </ThemeProvider>
+      </UserProvider>
     </SafeAreaProvider>
   );
 }
 
 function RootNavigator() {
-  const currentUser = DatabaseService.instance.userId;
+  console.log(useUserContext(), databaseService.userId);
   return (
-    <Stack
-      initialRouteName={currentUser == null ? 'signup' : '(app)/(tabs)'}
-      screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={currentUser == null}>
-        <Stack.Screen name="signup" />
-        <Stack.Screen name="signin" />
+    <Stack initialRouteName={useUserContext().currentUserId == null ? 'signup' : '(app)/(tabs)'}>
+      <Stack.Protected guard={useUserContext().currentUserId == null}>
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen name="signin" options={{ headerShown: false }} />
       </Stack.Protected>
-      <Stack.Protected guard={currentUser != null}>
-        <Stack.Screen name="(app)/(tabs)" />
+      <Stack.Protected guard={useUserContext().currentUserId != null}>
+        <Stack.Screen name="(app)/(tabs)" options={{ headerTransparent: true, headerTitle: '' }} />
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>

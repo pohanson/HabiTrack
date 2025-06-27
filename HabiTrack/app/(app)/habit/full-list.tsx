@@ -27,7 +27,7 @@ export default function FullHabitListScreen() {
   }, [navigation]);
 
   return data?.length === 0 ? (
-    <ThemedView>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText>No habits yet</ThemedText>
       <ThemedText>Create a habit to get started!</ThemedText>
     </ThemedView>

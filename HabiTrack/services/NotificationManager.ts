@@ -5,7 +5,6 @@ import { Platform } from 'react-native';
 import { DatabaseService } from './DatabaseService';
 
 export namespace NotificationManager {
-  const databaseService = DatabaseService.instance;
   export function init(notificationHandler: Notifications.NotificationHandler | null = null) {
     Notifications.setNotificationHandler(
       notificationHandler || {
@@ -46,6 +45,7 @@ export namespace NotificationManager {
 
   export async function regeneratePushNotifications() {
     await Notifications.cancelAllScheduledNotificationsAsync();
+    const databaseService = DatabaseService.instance;
     const data = await databaseService.habit.getAllHabitsWithReminder();
     await Promise.all(
       data.map(({ habit, reminder }) => scheduleWeeklyPushNotification(habit, reminder)),
@@ -53,6 +53,7 @@ export namespace NotificationManager {
   }
 
   export async function upsertPushNotificationForHabit(habitId: string) {
+    const databaseService = DatabaseService.instance;
     const notifications = await Notifications.getAllScheduledNotificationsAsync();
     const existingNotifications = notifications.filter((n) => n.content.data?.habitId === habitId);
     // Cancel all existing notification for that habit

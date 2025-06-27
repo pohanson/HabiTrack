@@ -1,9 +1,9 @@
-import { UserRepository } from '@/repositories/UserRepository';
-import { DatabaseService } from './DatabaseService';
 import { InsertUser, User } from '@/db/schema';
-import { BaseSyncableRepoService } from './BaseSyncableRepoService';
+import { UserRepository } from '@/repositories/UserRepository';
 import { supabase } from '@/utils/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BaseSyncableRepoService } from './BaseSyncableRepoService';
+import { DatabaseService } from './DatabaseService';
 
 import bcrypt from 'react-native-bcrypt';
 
@@ -97,7 +97,8 @@ export class UserService extends BaseSyncableRepoService {
     if (!isPasswordValid) {
       return null;
     }
-    AsyncStorage.setItem('userId', user.id).catch(console.error);
+    await AsyncStorage.setItem('userId', user.id).catch(console.error);
+    this.dbService.userId = user.id;
     return user;
   }
 }
