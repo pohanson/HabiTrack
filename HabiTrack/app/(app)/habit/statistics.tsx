@@ -29,6 +29,14 @@ export default function StatisticsScreen() {
   renderCount.current++;
   console.log('Stats page render count: ' + renderCount.current);
 
+  // FOR TESTING LATEST FREQ MODIFIED AT
+  useEffect(() => {
+    (async () => {
+      const latest = await databaseService.reminder.getLatestFrequencyModifiedAtForHabit(id);
+      console.log('Latest frequency modifiedAt:', latest);
+    })();
+  }, [id, databaseService.reminder]);
+
   // set header title
   useEffect(() => {
     if (!id) return;

@@ -109,4 +109,12 @@ export class ReminderService extends BaseSyncableRepoService {
   public deleteRemindersForHabit(habitId: string) {
     return this._reminderRepository.deleteRemindersForHabit(habitId);
   }
+
+  /**
+   * Get the latest modified at date out of all the reminders for a habit
+   * (Inclusive of deleted reminders)
+   */
+  public async getLatestFrequencyModifiedAtForHabit(habitId: string): Promise<string | null> {
+    return this._reminderRepository.getLatestFrequencyModifiedAtForHabit(habitId);
+  }
 }
