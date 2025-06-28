@@ -21,6 +21,9 @@ export const habit = pgTable('habit', {
     .references(() => user.id),
   createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
   modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
+  frequencyModifiedAt: timestamp('frequencyModifiedAt', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 

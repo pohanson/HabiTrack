@@ -40,7 +40,12 @@ export class HabitService extends BaseSyncableRepoService {
     if (userId == null) {
       throw new Error('User ID is required to create a habit');
     }
-    const { id: habitId } = await this._habitRepository.create({ ...habit, user_id: userId });
+    const today = new Date().toISOString();
+    const { id: habitId } = await this._habitRepository.create({
+      ...habit,
+      user_id: userId,
+      frequencyModifiedAt: today,
+    });
     if (habit.frequency && habit.frequency.length > 0) {
       this.dbService.reminder.createRemindersForHabit(habitId, habit.frequency, habit.time);
     }
@@ -118,7 +123,29 @@ export class HabitService extends BaseSyncableRepoService {
     if (!habit.id) {
       throw new Error('Habit ID is required for update');
     }
-    this._habitRepository.update(habit);
+
+    // Fetch the old frequency and new frequency
+    const oldReminders = await this.dbService.reminder.getRemindersForHabit(habit.id, false);
+    const oldFrequency = oldReminders.map((r) => r.day).sort();
+    const newFrequency = habit.frequency.sort();
+
+    // Check if the frequency has been edited by comparing old vs new freq
+    let freqHasBeenEdited = false;
+    if (oldFrequency.length !== newFrequency.length) {
+      freqHasBeenEdited = true;
+    } else {
+      for (let i = 0; i < oldFrequency.length; i++) {
+        freqHasBeenEdited = freqHasBeenEdited && oldFrequency[i] === newFrequency[i];
+      }
+    }
+    console.log('frequency was edited for habit:', habit.name);
+
+    const updatedData: any = { ...habit };
+    if (freqHasBeenEdited) {
+      updatedData.frequencyModifiedAt = new Date().toISOString();
+    }
+
+    await this._habitRepository.update(updatedData);
     this.dbService.reminder.updateRemindersForHabit(habit.id, habit.frequency, habit.time);
   }
 

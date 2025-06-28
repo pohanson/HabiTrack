@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5d0a9e5a-63d9-4aa6-b3e6-40e34c55865d",
+  "id": "a0ef74bc-0a0e-458b-97af-0fd0a5215682",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "habit": {
@@ -45,6 +45,13 @@
         },
         "modifiedAt": {
           "name": "modifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "frequencyModifiedAt": {
+          "name": "frequencyModifiedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

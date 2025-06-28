@@ -1,0 +1,1 @@
+ALTER TABLE "habit" DROP COLUMN "dummyField";
