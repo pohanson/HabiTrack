@@ -90,7 +90,7 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
 
     // get streak_started_at as a string
     const streakStartedAt = data?.[0]?.streak_started_at || '';
-
+    console.log(streakStartedAt);
     // get best_day_streak as a number
     const bestStreak = Number(data?.[0]?.best_day_streak);
 
@@ -99,8 +99,6 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
     const todayDOW = today.getDay();
     // check if today is an expected day
     const todayIsAnExpectedDay = freq.includes(todayDOW);
-
-    console.log('streak_started_at:', streakStartedAt);
 
     // check if today was completed for this habit
     const todayHasCompletedAt = completedAtData.some(({ completedAt }) => completedAt === todayStr);
@@ -119,6 +117,7 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
         activeStreak = daysBetween + 1;
       }
     }
+
     return {
       badgesEarned: data[0].badges_earned || 0,
       bestStreak,

@@ -147,12 +147,27 @@ export class HabitService extends BaseSyncableRepoService {
     console.log('old freq:', oldFrequency);
     console.log('new freq:', newFrequency);
 
+    // check if there are any (undeleted) completions today
+    const todayDate = new Date().toISOString().split('T')[0];
+    const completionsToday = await this.dbService.habitCompletion.getCompletionsForHabit(habit.id, {
+      completedAt: todayDate,
+    });
+
     const updatedData: any = { ...habit };
     if (!freqHasNotBeenEdited) {
       updatedData.frequencyModifiedAt = new Date().toISOString();
+      // RESET MILESTONE DATA FOR THIS HABIT
+      await this.dbService.habitMilestone.updateMilestoneByHabitId(habit.id, {
+        week_streak: 0,
+        badges_earned: 0,
+        streak_started_at: completionsToday.length > 0 ? todayDate : 'inactive', // this should be set to 'inactive' UNLESS there is an undeleted completion today
+        best_day_streak: 0,
+        prev_best_day_streak: -1,
+        modifiedAt: new Date().toISOString(),
+      });
     }
 
-    console.log(updatedData.frequencyModifiedAt);
+    console.log('frequencyModifiedAt:', updatedData.frequencyModifiedAt);
 
     await this._habitRepository.update(updatedData);
     this.dbService.reminder.updateRemindersForHabit(habit.id, habit.frequency, habit.time);

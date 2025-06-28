@@ -112,7 +112,12 @@ export class HabitRepository extends SyncableRepository<Habit> {
       this.db
         .select({
           habit_id: habit.id,
-          last_completed_at: max(habitCompletion.completedAt),
+
+          // FILTER OUT ANY COMPLETIONS BEFORE STATS RESET DATE (frequencyModifiedAt's date converted to yyyy-mm-dd)
+          last_completed_at: max(
+            sql`CASE WHEN ${habitCompletion.completedAt} >= substr(${habit.frequencyModifiedAt}, 1, 10) THEN ${habitCompletion.completedAt} ELSE NULL END`,
+          ),
+          frequency_modified_at: habit.frequencyModifiedAt,
           day_frequency: sql`json_group_array(DISTINCT ${reminder.day} ORDER BY ${reminder.day} ASC)`,
 
           // here for testing for now

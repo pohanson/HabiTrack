@@ -67,12 +67,18 @@ export class StatisticService {
   public calcActualDaysCompleted(
     startDate: string,
     completedAtData: { completedAt: string }[],
+    freq: number[],
   ): number {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayDOW = new Date(todayStr).getDay();
     // normalise startDate to yyyy-mm-dd
     const normalizedStartDate = startDate.split('T')[0];
     return completedAtData.filter(({ completedAt }) => {
-      // normalise completedAt to yyyy-mm-dd
       const normalizedCompletedAt = completedAt.split('T')[0];
+      // Exclude today's completion if today is not in freq
+      if (normalizedCompletedAt === todayStr && !freq.includes(todayDOW)) {
+        return false;
+      }
       return normalizedCompletedAt >= normalizedStartDate;
     }).length;
   }
@@ -122,7 +128,7 @@ export class StatisticService {
       return {
         startDate: startDateStr,
         expectedNoOfDays: this.calculateExpectedDays(startDateStr, freq),
-        actualNoOfDays: this.calcActualDaysCompleted(startDateStr, completedAtData),
+        actualNoOfDays: this.calcActualDaysCompleted(startDateStr, completedAtData, freq),
       };
     };
   }

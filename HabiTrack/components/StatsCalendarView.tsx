@@ -8,11 +8,11 @@ import { Circle } from '@/components/Circle';
 
 export function StatsCalendarView({
   today,
-  createdAt,
+  startDate,
   completedAtDates,
 }: {
   today: string;
-  createdAt: string;
+  startDate: string;
   completedAtDates: any;
 }) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -48,7 +48,7 @@ export function StatsCalendarView({
           textDisabledColor: theme.lightGray,
           arrowColor: theme.header,
         }}
-        minDate={createdAt}
+        minDate={startDate}
         maxDate={today}
         disableAllTouchEventsForDisabledDays={true}
         disableAllTouchEventsForInactiveDays={true}

@@ -25,6 +25,7 @@ export default function StatisticsScreen() {
   const theme = Colors[colorScheme];
   const databaseService = DatabaseService.instance;
 
+  // refresh counter
   let renderCount = useRef(0);
   renderCount.current++;
   console.log('Stats page render count: ' + renderCount.current);
@@ -40,10 +41,20 @@ export default function StatisticsScreen() {
     databaseService.habit.getHabitByIdQuery(id),
   );
 
+  // get created at date for this habit
   const createdAtDate = useMemo(
     () => createdAtData[0]?.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
     [createdAtData],
   );
+  // get frequency modified at date for this habit
+  const frequencyModifiedAtDate = useMemo(
+    () => createdAtData[0]?.frequencyModifiedAt?.split('T')[0],
+    [createdAtData],
+  );
+  // get the start date to use for stats (frequencyModifiedAtDate if possible, if not fallback to createdAtDate)
+  const statsStartDate = useMemo(() => {
+    return frequencyModifiedAtDate || createdAtDate || new Date().toISOString().split('T')[0];
+  }, [frequencyModifiedAtDate, createdAtDate]);
 
   // get completedAt data for this habit
   const { data: completedAtData, error: completedAtError } = useLiveQuery(
@@ -87,11 +98,18 @@ export default function StatisticsScreen() {
   const { markedDatesObj } = useMemo(() => {
     const markedDates: { [key: string]: any } = {};
 
+    const todayDOW = new Date(todayStr).getDay();
+
     // Obtain completed dates:
     const completedDates = completedAtData
       .map((completion) => completion.completedAt.split('T')[0])
-      .filter((completedAt) => completedAt >= createdAtDate);
-
+      .filter((completedAt) => {
+        // don't include today's completedAt if today is not in freq
+        if (completedAt === todayStr && !freq.includes(todayDOW)) {
+          return false;
+        }
+        return completedAt >= statsStartDate;
+      });
     // mark completed dates in green
     completedDates.forEach((dateStr) => {
       markedDates[dateStr] = {
@@ -101,7 +119,7 @@ export default function StatisticsScreen() {
     });
 
     // Get expected dates
-    const expectedDates = getExpectedDates(createdAtDate, yesterdayStr, freq);
+    const expectedDates = getExpectedDates(frequencyModifiedAtDate, yesterdayStr, freq);
 
     // marked missed dates in red
     // but make completedDates a set for O(1) completedAt lookup:
@@ -125,8 +143,8 @@ export default function StatisticsScreen() {
 
   // COMPLETION RATE CALCULATIONS
   const calcHabitStats = useMemo(
-    () => databaseService.statistic.calcHabitStatistics(createdAtDate, freq, completedAtData),
-    [createdAtDate, freq, completedAtData, databaseService.statistic],
+    () => databaseService.statistic.calcHabitStatistics(statsStartDate, freq, completedAtData),
+    [statsStartDate, freq, completedAtData, databaseService.statistic],
   );
 
   return (
@@ -135,14 +153,13 @@ export default function StatisticsScreen() {
         <StatsHeader
           habitName={String(name)}
           todayDate={todayStr}
-          createdAt={createdAtDate}
+          createdAt={String(createdAtDate)}
           badgesEarned={streakData?.badgesEarned || 0}
-          reminderTime="hello"
-          lastModifiedAt="placeholder"
+          startDate={String(statsStartDate)}
         />
         <StatsCalendarView
           today={todayStr}
-          createdAt={createdAtDate}
+          startDate={String(statsStartDate)}
           completedAtDates={markedDatesObj}
         />
         <StatsCompletionRateView calcHabitStatsisticsByMode={calcHabitStats} pieChartSize={85} />
