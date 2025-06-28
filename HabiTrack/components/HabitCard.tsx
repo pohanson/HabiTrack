@@ -47,6 +47,12 @@ export function HabitCard({
       return;
     }
 
+    // REFETCH THE FRESHEST MILESTONE DATA WHEN HABIT TICK/UNTICK
+    const latestMilestone = await databaseService.habitMilestone.getMilestonesByHabitIdQuery(
+      habit.id,
+    );
+
+    // Use latestMilestone instead of habit_milestone prop
     // const frequencyArray = await databaseService.reminder
     //   .getRemindersForHabit(habit.id)
     //   .then((reminder) => reminder.map((r) => r.day).sort());
@@ -83,17 +89,18 @@ export function HabitCard({
       // 3. Daily streaks data handling
 
       const updatedStreakStartedAt =
-        String(habit_milestone?.streak_started_at) === 'inactive'
+        String(latestMilestone[0]?.streak_started_at) === 'inactive'
           ? todayDateStr
-          : String(habit_milestone?.streak_started_at);
+          : String(latestMilestone[0]?.streak_started_at);
       const currentStreak =
-        String(habit_milestone?.streak_started_at) === 'inactive'
+        String(latestMilestone[0]?.streak_started_at) === 'inactive'
           ? 1
-          : calculateDaysBetweenDates(String(habit_milestone?.streak_started_at), todayDateStr) + 1;
-      const updatedPrevBestDayStreak = Number(habit_milestone?.best_day_streak);
+          : calculateDaysBetweenDates(String(latestMilestone[0]?.streak_started_at), todayDateStr) +
+            1;
+      const updatedPrevBestDayStreak = Number(latestMilestone[0]?.best_day_streak);
       const updatedBestDayStreak = Math.max(
         currentStreak,
-        Number(habit_milestone?.best_day_streak),
+        Number(latestMilestone[0]?.best_day_streak),
       );
 
       // handling week_streak (using current streak data)
@@ -101,7 +108,10 @@ export function HabitCard({
 
       // handling badges_earned (using updated best_day_streak data)
       const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+
       console.log('badges_earned for', habit.name + ': ' + updatedBadgesEarned);
+      console.log('old streak started at:', habit_milestone?.streak_started_at);
+      console.log('updated streak started at:', updatedStreakStartedAt);
 
       databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
         streak_started_at: updatedStreakStartedAt,

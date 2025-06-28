@@ -6,6 +6,9 @@ import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 import { DatabaseService } from './DatabaseService';
 
 export class HabitMilestoneService extends BaseSyncableRepoService {
+  getMilestoneByHabitId(id: string) {
+    throw new Error('Method not implemented.');
+  }
   static #instance: HabitMilestoneService;
   private dbService: DatabaseService;
   private _habitMilestoneRepository: HabitMilestoneRepository;
@@ -96,6 +99,9 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
     const todayDOW = today.getDay();
     // check if today is an expected day
     const todayIsAnExpectedDay = freq.includes(todayDOW);
+
+    console.log('streak_started_at:', streakStartedAt);
+
     // check if today was completed for this habit
     const todayHasCompletedAt = completedAtData.some(({ completedAt }) => completedAt === todayStr);
     let activeStreak = 0;

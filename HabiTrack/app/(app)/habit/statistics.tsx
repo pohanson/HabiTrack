@@ -7,8 +7,8 @@ import { Colors } from '@/constants/Colors';
 import { DatabaseService } from '@/services';
 import { getExpectedDates } from '@/utils/dateUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, useColorScheme } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
@@ -21,6 +21,8 @@ export default function StatisticsScreen() {
     activeStreak: number;
   } | null>(null);
 
+  const [refresh, setRefresh] = useState(0);
+
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   const databaseService = DatabaseService.instance;
@@ -29,19 +31,19 @@ export default function StatisticsScreen() {
   renderCount.current++;
   console.log('Stats page render count: ' + renderCount.current);
 
-  // FOR TESTING LATEST FREQ MODIFIED AT
-  useEffect(() => {
-    (async () => {
-      const latest = await databaseService.reminder.getLatestFrequencyModifiedAtForHabit(id);
-      console.log('Latest frequency modifiedAt:', latest);
-    })();
-  }, [id, databaseService.reminder]);
+  // force stats page to refresh upon navigation to it
+  useFocusEffect(
+    useCallback(() => {
+      console.log('milestones page refeshed');
+      setRefresh((prev) => prev + 1);
+    }, []),
+  );
 
   // set header title
   useEffect(() => {
     if (!id) return;
     navigation.setOptions({ headerTitle: 'Statistics' });
-  }, [id, name, navigation]);
+  }, [id, name, navigation, refresh]);
 
   // get createdAt data for this habit
   const { data: createdAtData, error: createdAtError } = useLiveQuery(
@@ -56,10 +58,13 @@ export default function StatisticsScreen() {
   // get completedAt data for this habit
   const { data: completedAtData, error: completedAtError } = useLiveQuery(
     databaseService.habitCompletion.getCompletionsForHabitQuery(id, {}, false),
+    [refresh],
   );
 
   // get frequency array for this habit
-  const { data: freqData } = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id));
+  const { data: freqData } = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id), [
+    refresh,
+  ]);
   const freq = useMemo(() => (freqData || []).map((r) => r.day).sort(), [freqData]);
 
   // handle errors
@@ -73,7 +78,7 @@ export default function StatisticsScreen() {
       console.error('Error fetching completions', completedAtError);
       Toast.error('Error fetching completion data.');
     }
-  }, [createdAtError, completedAtError]);
+  }, [createdAtError, completedAtError, refresh]);
 
   // DAY STREAK VIEW CALCULATIONS
   useEffect(() => {
@@ -81,7 +86,7 @@ export default function StatisticsScreen() {
       .calculateHabitStreak(id as string, freq, completedAtData)
       .then(setStreakData)
       .catch((error) => console.error('Error calculating streak:', error));
-  }, [id, freq, completedAtData, databaseService.habitMilestone]);
+  }, [id, freq, completedAtData, databaseService.habitMilestone, refresh]);
 
   // CALENDAR VIEW CALCULATIONS
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);

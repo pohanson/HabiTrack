@@ -130,20 +130,29 @@ export class HabitService extends BaseSyncableRepoService {
     const newFrequency = habit.frequency.sort();
 
     // Check if the frequency has been edited by comparing old vs new freq
-    let freqHasBeenEdited = false;
+    let freqHasNotBeenEdited = true;
     if (oldFrequency.length !== newFrequency.length) {
-      freqHasBeenEdited = true;
+      freqHasNotBeenEdited = false;
     } else {
       for (let i = 0; i < oldFrequency.length; i++) {
-        freqHasBeenEdited = freqHasBeenEdited && oldFrequency[i] === newFrequency[i];
+        freqHasNotBeenEdited = freqHasNotBeenEdited && oldFrequency[i] === newFrequency[i];
       }
     }
-    console.log('frequency was edited for habit:', habit.name);
+
+    console.log(
+      freqHasNotBeenEdited
+        ? 'Frequency was not edited for habit: ' + habit.name
+        : 'Frequency was edited for habit: ' + habit.name,
+    );
+    console.log('old freq:', oldFrequency);
+    console.log('new freq:', newFrequency);
 
     const updatedData: any = { ...habit };
-    if (freqHasBeenEdited) {
+    if (!freqHasNotBeenEdited) {
       updatedData.frequencyModifiedAt = new Date().toISOString();
     }
+
+    console.log(updatedData.frequencyModifiedAt);
 
     await this._habitRepository.update(updatedData);
     this.dbService.reminder.updateRemindersForHabit(habit.id, habit.frequency, habit.time);
