@@ -3,19 +3,47 @@ import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
+import { addNetworkStateListener, getNetworkStateAsync, useNetworkState } from 'expo-network';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
 export default function SignupPage() {
   const useFormReturn = useForm();
   const databaseService = DatabaseService.instance;
+  const [isLoading, setIsLoading] = useState(false);
+  const [networkState, setNetworkState] = useState(useNetworkState());
+  getNetworkStateAsync().then((state) => setNetworkState(state));
+
+  addNetworkStateListener((networkState) => {
+    setNetworkState(networkState);
+  });
+  if (!networkState.isInternetReachable) {
+    return (
+      <ThemedView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}>
+        <ThemedText style={{ textAlign: 'center' }}>
+          Please connect to internet for the signin and signup. The rest of the app could be used
+          without wifi
+        </ThemedText>
+      </ThemedView>
+    );
+  }
 
   const onSubmit = useFormReturn.handleSubmit(
-    (data: any) => {
-      console.log('Form submitted:', data);
-      databaseService.user.checkValidUsername(data.username).then((isValid) => {
+    async (data: any) => {
+      setIsLoading(true);
+      try {
+        console.log('Form submitted:', data);
+        const isValid = await databaseService.user.checkValidUsername(data.username);
         console.log('Username validity:', isValid);
+
         if (!isValid) {
           Toast.show({
             text1: 'Error',
@@ -24,30 +52,30 @@ export default function SignupPage() {
           });
           return;
         }
-        databaseService.user
-          .signupUser({
-            username: data.username,
-            name: data.name,
-            password: data.password,
-          })
-          .then(() => {
-            Toast.show({
-              text1: 'Account Created',
-              text2: `Please sign in with your new account.`,
-              type: 'success',
-            });
-            router.replace('/signin');
-            useFormReturn.reset();
-          })
-          .catch((error) => {
-            console.error('Error creating user:', error);
-            Toast.show({
-              text1: 'Failed to create account',
-              text2: 'Please try again.',
-              type: 'error',
-            });
-          });
-      });
+
+        await databaseService.user.signupUser({
+          username: data.username,
+          name: data.name,
+          password: data.password,
+        });
+
+        Toast.show({
+          text1: 'Account Created',
+          text2: `Please sign in with your new account.`,
+          type: 'success',
+        });
+        router.replace('/signin');
+        useFormReturn.reset();
+      } catch (error) {
+        console.error('Error creating user:', error);
+        Toast.show({
+          text1: 'Failed to create account',
+          text2: 'Please try again.',
+          type: 'error',
+        });
+      } finally {
+        setIsLoading(false);
+      }
     },
     () => {
       console.log('Form submission failed');
@@ -66,7 +94,7 @@ export default function SignupPage() {
       </ThemedText>
       <RHFTextInput
         useFormReturn={useFormReturn}
-        label="Username"
+        label="Username (Case Sensitive)"
         name="username"
         isRequired={true}
         textInputProps={{ spellCheck: false }}
@@ -89,12 +117,26 @@ export default function SignupPage() {
         }}
         textInputProps={{ spellCheck: false }}
       />
-      <TextButton label="Sign Up" onPress={onSubmit} style={{ marginTop: 20 }} />
-      <TextButton
-        label="Go to Sign In"
-        onPress={() => router.replace('/signin')}
-        style={{ marginTop: 10 }}
-      />
+      {isLoading ? (
+        <ThemedText type="subtitle" style={{ textAlign: 'center', marginTop: 20 }}>
+          Creating account...
+        </ThemedText>
+      ) : (
+        <ThemedView>
+          <TextButton
+            label="Sign Up"
+            onPress={onSubmit}
+            style={{ marginTop: 20 }}
+            disabled={isLoading}
+          />
+          <TextButton
+            label="Go to Sign In"
+            onPress={() => router.replace('/signin')}
+            style={{ marginTop: 10 }}
+            disabled={isLoading}
+          />
+        </ThemedView>
+      )}
     </ThemedView>
   );
 }

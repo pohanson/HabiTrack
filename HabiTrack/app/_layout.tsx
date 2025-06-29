@@ -20,6 +20,7 @@ import Toast, {
   InfoToast,
   SuccessToast,
 } from 'react-native-toast-message';
+import { addNetworkStateListener, useNetworkState } from 'expo-network';
 
 const toastConfig = {
   success: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
@@ -56,6 +57,7 @@ const databaseService = DatabaseService.init(expoDb);
 const db = databaseService.db;
 NotificationManager.init();
 export default function RootLayout() {
+  const networkState = useNetworkState();
   useEffect(() => {
     NotificationManager.registerForPushNotificationsAsync().catch(console.error);
     NotificationManager.regeneratePushNotifications().catch(console.error);
@@ -76,9 +78,23 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
+  addNetworkStateListener((networkState) => {
+    if (networkState.isInternetReachable) {
+      SyncService.init().syncAll();
+    }
+  });
 
-  SyncService.init();
-  SyncService.instance.syncAll();
+  console.log('networkstate', networkState);
+  if (networkState.isInternetReachable) {
+    SyncService.init();
+    SyncService.instance.syncAll();
+  } else {
+    Toast.show({
+      text1: 'No Internet Connection',
+      text2: 'No syncing done',
+      type: 'info',
+    });
+  }
 
   return (
     <SafeAreaProvider>
