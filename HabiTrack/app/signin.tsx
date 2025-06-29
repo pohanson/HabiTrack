@@ -4,7 +4,9 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useUserContext } from '@/context/UserContext';
 import { DatabaseService } from '@/services';
+import { addNetworkStateListener, getNetworkStateAsync, useNetworkState } from 'expo-network';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
@@ -12,21 +14,56 @@ export default function SigninPage() {
   const useFormReturn = useForm();
   const databaseService = DatabaseService.instance;
   const setCurrentUser = useUserContext().setCurrentUser;
-  const isLoading = useFormReturn.formState.isSubmitting;
+  const [isLoading, setIsLoading] = useState(false);
+  const [networkState, setNetworkState] = useState(useNetworkState());
+  getNetworkStateAsync().then((state) => setNetworkState(state));
+
+  addNetworkStateListener((networkState) => {
+    setNetworkState(networkState);
+  });
+  if (!networkState.isInternetReachable) {
+    return (
+      <ThemedView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}>
+        <ThemedText style={{ textAlign: 'center' }}>
+          Please connect to internet for the signin and signup. The rest of the app could be used
+          without wifi
+        </ThemedText>
+      </ThemedView>
+    );
+  }
+
   const onSubmit = useFormReturn.handleSubmit(
     async (data: any) => {
-      const user = await databaseService.user.signinUser(data.username, data.password);
-      if (user) {
-        Toast.show({ text1: `Welcome ${user.name}!`, type: 'success' });
-        setCurrentUser(user.id);
-        router.replace('/'); // Redirect to home page after successful login
-        useFormReturn.reset();
-      } else {
+      setIsLoading(true);
+      try {
+        const user = await databaseService.user.signinUser(data.username, data.password);
+        if (user) {
+          Toast.show({ text1: `Welcome ${user.name}!`, type: 'success' });
+          setCurrentUser(user.id);
+          router.replace('/'); // Redirect to home page after successful login
+          useFormReturn.reset();
+        } else {
+          Toast.show({
+            text1: 'Login Failed',
+            text2: 'Invalid username or password.',
+            type: 'error',
+          });
+        }
+      } catch (error) {
+        console.error('Login error:', error);
         Toast.show({
           text1: 'Login Failed',
-          text2: 'Invalid username or password.',
+          text2: 'An error occurred during login.',
           type: 'error',
         });
+      } finally {
+        setIsLoading(false);
       }
     },
     () => {
@@ -46,7 +83,7 @@ export default function SigninPage() {
       </ThemedText>
       <RHFTextInput
         useFormReturn={useFormReturn}
-        label="Username"
+        label="Username (Case Sensitive)"
         name="username"
         isRequired={true}
         textInputProps={{ spellCheck: false }}
@@ -60,7 +97,7 @@ export default function SigninPage() {
       />
       {isLoading ? (
         <ThemedText type="subtitle" style={{ textAlign: 'center' }}>
-          Loading...
+          Signing in...
         </ThemedText>
       ) : (
         <ThemedView>
