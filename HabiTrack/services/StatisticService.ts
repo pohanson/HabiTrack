@@ -71,12 +71,18 @@ export class StatisticService {
   ): number {
     const todayStr = new Date().toISOString().split('T')[0];
     const todayDOW = new Date(todayStr).getDay();
+    // get freq as a set for O(1) lookups
+    const freqSet = new Set(freq);
     // normalise startDate to yyyy-mm-dd
     const normalizedStartDate = startDate.split('T')[0];
     return completedAtData.filter(({ completedAt }) => {
       const normalizedCompletedAt = completedAt.split('T')[0];
       // Exclude today's completion if today is not in freq
-      if (normalizedCompletedAt === todayStr && !freq.includes(todayDOW)) {
+      if (normalizedCompletedAt === todayStr && !freqSet.has(todayDOW)) {
+        return false;
+      }
+      // Exclude completions on days not in freq (phantom completions)
+      if (!freqSet.has(new Date(completedAt).getDay())) {
         return false;
       }
       return normalizedCompletedAt >= normalizedStartDate;

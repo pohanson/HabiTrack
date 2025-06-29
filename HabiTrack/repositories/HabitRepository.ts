@@ -118,6 +118,7 @@ export class HabitRepository extends SyncableRepository<Habit> {
             sql`CASE WHEN ${habitCompletion.completedAt} >= substr(${habit.frequencyModifiedAt}, 1, 10) THEN ${habitCompletion.completedAt} ELSE NULL END`,
           ),
           frequency_modified_at: habit.frequencyModifiedAt,
+          // gets frequency array (filters out deleted reminders)
           day_frequency: sql`json_group_array(DISTINCT ${reminder.day} ORDER BY ${reminder.day} ASC)`,
 
           // here for testing for now
@@ -132,7 +133,7 @@ export class HabitRepository extends SyncableRepository<Habit> {
           habitMilestone,
           and(eq(habit.id, habitMilestone.habit_id), eq(habitMilestone.isDeleted, false)),
         )
-        .innerJoin(reminder, eq(habit.id, reminder.habit_id))
+        .innerJoin(reminder, and(eq(habit.id, reminder.habit_id), eq(reminder.isDeleted, false)))
 
         // here for testing for now
         .leftJoin(

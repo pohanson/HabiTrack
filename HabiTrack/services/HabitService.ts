@@ -149,6 +149,7 @@ export class HabitService extends BaseSyncableRepoService {
 
     // check if there are any (undeleted) completions today
     const todayDate = new Date().toISOString().split('T')[0];
+    const todayDOW = new Date(todayDate).getDay();
     const completionsToday = await this.dbService.habitCompletion.getCompletionsForHabit(habit.id, {
       completedAt: todayDate,
     });
@@ -160,7 +161,9 @@ export class HabitService extends BaseSyncableRepoService {
       await this.dbService.habitMilestone.updateMilestoneByHabitId(habit.id, {
         week_streak: 0,
         badges_earned: 0,
-        streak_started_at: completionsToday.length > 0 ? todayDate : 'inactive', // this should be set to 'inactive' UNLESS there is an undeleted completion today
+        // streak_started_at should be set to 'inactive' UNLESS (there is an undeleted completion today && todayDOW is in newFreq)
+        streak_started_at:
+          completionsToday.length > 0 && newFrequency.includes(todayDOW) ? todayDate : 'inactive',
         best_day_streak: 0,
         prev_best_day_streak: -1,
         modifiedAt: new Date().toISOString(),

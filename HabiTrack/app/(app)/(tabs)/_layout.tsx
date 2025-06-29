@@ -29,17 +29,36 @@ export default function TabLayout() {
     try {
       console.log('ALL DAY STREAKS RECALCULATED');
       data.forEach(
-        ({ habit_id, last_completed_at, day_frequency, streak_started_at, best_day_streak }) => {
-          if (last_completed_at !== null) {
+        async ({
+          habit_id,
+          last_completed_at,
+          day_frequency,
+          streak_started_at,
+          best_day_streak,
+          frequency_modified_at,
+        }) => {
+          const frequencyArray = JSON.parse(day_frequency as string);
+          let lastCompletedAt = last_completed_at;
+          const frequencyModifiedAt = frequency_modified_at.split('T')[0];
+
+          // filter out the 'phantom completed at' (where last_completed_at is today but frequency does not include today)
+          if (
+            String(last_completed_at) === String(frequencyModifiedAt) &&
+            !frequencyArray.includes(new Date(String(last_completed_at)).getDay())
+          ) {
+            lastCompletedAt = null;
+            console.log('Filtered out phantom completedAt');
+          }
+
+          if (lastCompletedAt !== null) {
             // define 'safe-zone' as the days after a habit is marked completed
             // up until (but not including) the next expected date. Let this next expected date be nextExpectedDate.
             // day streak is broken on the DAY FOLLOWING nextExpectedDate (if the habit wasn't marked as complete on nextExpectedDate).
 
-            const lastCompletedStr = last_completed_at.split('T')[0];
+            const lastCompletedStr = lastCompletedAt.split('T')[0];
             const lastCompletedAtDOW = new Date(lastCompletedStr).getDay();
 
             // find DOW of nextExpectedDate
-            const frequencyArray = JSON.parse(day_frequency as string);
             let lastCompletedAtIndex = -1;
             for (let i = 0; i < frequencyArray.length; i++) {
               if (frequencyArray[i] === lastCompletedAtDOW) {
@@ -61,6 +80,8 @@ export default function TabLayout() {
             const nextExpectedDate = new Date(lastCompletedStr);
             nextExpectedDate.setDate(nextExpectedDate.getDate() + noOfDaysTillNextExpectedDate);
 
+            console.log('nextExpectedDate calculated as', nextExpectedDate);
+
             // define safeZoneEndDate as the day before nextExpectedDate
             const safeZoneEndDate = new Date(nextExpectedDate);
             safeZoneEndDate.setDate(nextExpectedDate.getDate() - 1);
@@ -80,6 +101,7 @@ export default function TabLayout() {
                 String(streak_started_at) === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, safeZoneEndStr) + 1
                   : calculateDaysBetweenDates(String(streak_started_at), safeZoneEndStr) + 1;
+
               const updatedBestDayStreak = Math.max(Number(best_day_streak), latestStreak);
 
               // update badges earned (based on best day streak)

@@ -90,7 +90,7 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
 
     // get streak_started_at as a string
     const streakStartedAt = data?.[0]?.streak_started_at || '';
-    console.log(streakStartedAt);
+
     // get best_day_streak as a number
     const bestStreak = Number(data?.[0]?.best_day_streak);
 
@@ -117,6 +117,10 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
         activeStreak = daysBetween + 1;
       }
     }
+    console.log('/////////////////////////////////////');
+    console.log('Streak started at:', streakStartedAt);
+    console.log('Best streak:', bestStreak);
+    console.log('Active streak:', activeStreak);
 
     return {
       badgesEarned: data[0].badges_earned || 0,

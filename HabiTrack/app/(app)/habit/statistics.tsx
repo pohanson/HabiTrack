@@ -100,12 +100,19 @@ export default function StatisticsScreen() {
 
     const todayDOW = new Date(todayStr).getDay();
 
+    const freqSet = new Set(freq); // for O(1) lookups
+
     // Obtain completed dates:
     const completedDates = completedAtData
       .map((completion) => completion.completedAt.split('T')[0])
       .filter((completedAt) => {
         // don't include today's completedAt if today is not in freq
         if (completedAt === todayStr && !freq.includes(todayDOW)) {
+          return false;
+        }
+        // don't include completions on days not in freq (phantom completions)
+        const dow = new Date(completedAt).getDay();
+        if (!freqSet.has(dow)) {
           return false;
         }
         return completedAt >= statsStartDate;
