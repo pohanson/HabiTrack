@@ -13,6 +13,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { Toast } from 'toastify-react-native';
 import { NotificationManager } from '@/services/NotificationManager';
 import ToastManager from 'toastify-react-native/components/ToastManager';
+import { Alert } from 'react-native';
 
 export default function EditHabitScreen() {
   const { id }: { id: string } = useLocalSearchParams();
@@ -62,11 +63,52 @@ export default function EditHabitScreen() {
 
   const onSaveChanges = handleSubmit(
     async (data) => {
+      console.log('Form data submitted:', data);
       try {
-        databaseService.habit.updateHabitWithReminders({ ...(data as HabitInsertionData), id: id });
-        Toast.success('Habit Updated');
-        NotificationManager.upsertPushNotificationForHabit(id);
-        navigation.goBack();
+        databaseService.reminder.getRemindersForHabit(id).then((reminders) => {
+          // checking if there is a change in date for frequency
+          const oldFrequency = reminders.map((r) => r.day).sort();
+          const newFrequency = data.frequency.sort();
+          let freqHasNotBeenEdited = true;
+          if (oldFrequency.length !== newFrequency.length) {
+            freqHasNotBeenEdited = false;
+          } else {
+            for (let i = 0; i < oldFrequency.length; i++) {
+              freqHasNotBeenEdited = freqHasNotBeenEdited && oldFrequency[i] === newFrequency[i];
+            }
+          }
+
+          const executeUpdate = () => {
+            // Proceed with updating the habit
+            databaseService.habit.updateHabitWithReminders({
+              ...(data as HabitInsertionData),
+              id: id,
+            });
+            Toast.success('Habit Updated');
+            NotificationManager.upsertPushNotificationForHabit(id);
+            navigation.goBack();
+          };
+
+          if (!freqHasNotBeenEdited) {
+            Alert.alert(
+              'Past Data Deletion',
+              "Your Habit's Statistics and Milestones will reset when you change the frequency days.\n\nAre you sure you want to proceed?",
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => Toast.error('Habit not updated'),
+                },
+                {
+                  text: 'OK',
+                  onPress: executeUpdate,
+                },
+              ],
+              { cancelable: true, onDismiss: () => {} },
+            );
+          } else {
+            executeUpdate();
+          }
+        });
       } catch (error) {
         console.error('Error updating habit:', error);
         Toast.error('Failed to update habit');
@@ -92,7 +134,7 @@ export default function EditHabitScreen() {
   };
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
+    <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText type="title">Edit Habit</ThemedText>
       <RHFTextInput
         name="name"
