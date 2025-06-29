@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import { HabitMilestoneHeader } from '@/components/HabitMilestoneHeader';
@@ -17,10 +17,20 @@ export default function Milestones() {
     refresh,
   ]);
 
+  let renderCount = useRef(0);
+  renderCount.current++;
+  console.log('milestone page render count:', renderCount.current);
+
   // extra calcs for active badges. Define complete habits as habits with all 5 milestone badges
-  const totalMilestoneBadges =
-    data?.reduce((acc: number, item: any) => Number(acc) + Number(item.badges_earned), 0) || 0;
-  const totalCompleteHabits = data?.filter((item) => Number(item.badges_earned) >= 5).length;
+  const totalMilestoneBadges = useMemo(
+    () =>
+      data?.reduce((acc: number, item: any) => Number(acc) + Number(item.badges_earned), 0) || 0,
+    [data],
+  );
+  const totalCompleteHabits = useMemo(
+    () => data?.filter((item) => Number(item.badges_earned) >= 5).length,
+    [data],
+  );
 
   if (error) {
     console.error('Error fetching milestones:', error);
@@ -33,13 +43,6 @@ export default function Milestones() {
       setRefresh((prev) => prev + 1);
     }, []),
   );
-
-  // for console log testing
-  useEffect(() => {
-    if (data) {
-      console.log('milestone data loaded:', data);
-    }
-  }, [data]);
 
   return (
     <ThemedView style={{ flex: 1 }}>

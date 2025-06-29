@@ -7,6 +7,7 @@ import PieChart from './PieChart';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
 import { getColorForPercentage } from '@/utils/colorUtils';
+import { reorderDateString } from '@/utils/dateUtils';
 
 export function StatsCompletionRateView({
   calcHabitStatsisticsByMode,
@@ -67,7 +68,9 @@ export function StatsCompletionRateView({
         {timeframe === 'month' && ' [Month]'}
         {timeframe === 'week' && ' [Week]'}
       </ThemedText>
-      <ThemedText style={{ fontSize: 15, padding: 0 }}>Evaluated since: {startDate}</ThemedText>
+      <ThemedText style={{ fontSize: 15, padding: 0 }}>
+        Evaluated since: {reorderDateString(startDate)}
+      </ThemedText>
       <PieChart
         actualNoOfDays={actual}
         expectedNoOfDays={expected}

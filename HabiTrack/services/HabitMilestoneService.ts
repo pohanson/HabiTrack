@@ -6,6 +6,9 @@ import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 import { DatabaseService } from './DatabaseService';
 
 export class HabitMilestoneService extends BaseSyncableRepoService {
+  getMilestoneByHabitId(id: string) {
+    throw new Error('Method not implemented.');
+  }
   static #instance: HabitMilestoneService;
   private dbService: DatabaseService;
   private _habitMilestoneRepository: HabitMilestoneRepository;
@@ -38,8 +41,11 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
   /**
    * Get all habit milestones as a query.
    */
-  public getAllMilestonesQuery() {
-    return this._habitMilestoneRepository.getAllMilestoneQuery();
+  public getAllMilestonesQuery(
+    userId: string | null = this.dbService.userId,
+    includeDeleted: boolean = false,
+  ) {
+    return this._habitMilestoneRepository.getAllMilestoneQuery(userId, includeDeleted);
   }
 
   /**
@@ -96,6 +102,7 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
     const todayDOW = today.getDay();
     // check if today is an expected day
     const todayIsAnExpectedDay = freq.includes(todayDOW);
+
     // check if today was completed for this habit
     const todayHasCompletedAt = completedAtData.some(({ completedAt }) => completedAt === todayStr);
     let activeStreak = 0;
@@ -113,6 +120,11 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
         activeStreak = daysBetween + 1;
       }
     }
+    console.log('/////////////////////////////////////');
+    console.log('Streak started at:', streakStartedAt);
+    console.log('Best streak:', bestStreak);
+    console.log('Active streak:', activeStreak);
+
     return {
       badgesEarned: data[0].badges_earned || 0,
       bestStreak,

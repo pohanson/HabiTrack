@@ -5,6 +5,7 @@ CREATE TABLE `habit` (
 	`user_id` text NOT NULL,
 	`createdAt` text NOT NULL,
 	`modifiedAt` text NOT NULL,
+	`frequencyModifiedAt` text NOT NULL,
 	`isDeleted` integer DEFAULT false NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );

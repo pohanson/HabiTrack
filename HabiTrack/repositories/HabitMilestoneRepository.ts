@@ -13,7 +13,7 @@ export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone>
    * @returns obj with the following properties:
    * habit_id, habit_name, week_streak, badges_earned,
    */
-  getAllMilestoneQuery() {
+  getAllMilestoneQuery(userId: string | null, includeDeleted: boolean = false) {
     return this.db
       .select({
         habit_id: habit.id,
@@ -22,7 +22,11 @@ export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone>
         badges_earned: habitMilestone.badges_earned,
       })
       .from(habitMilestone)
-      .innerJoin(habit, eq(habit.id, habitMilestone.habit_id));
+      .where(includeDeleted ? undefined : eq(habitMilestone.isDeleted, includeDeleted))
+      .innerJoin(
+        habit,
+        and(eq(habit.id, habitMilestone.habit_id), userId ? eq(habit.user_id, userId) : undefined),
+      );
   }
 
   /**

@@ -40,7 +40,12 @@ export class HabitService extends BaseSyncableRepoService {
     if (userId == null) {
       throw new Error('User ID is required to create a habit');
     }
-    const { id: habitId } = await this._habitRepository.create({ ...habit, user_id: userId });
+    const today = new Date().toISOString();
+    const { id: habitId } = await this._habitRepository.create({
+      ...habit,
+      user_id: userId,
+      frequencyModifiedAt: today,
+    });
     if (habit.frequency && habit.frequency.length > 0) {
       this.dbService.reminder.createRemindersForHabit(habitId, habit.frequency, habit.time);
     }
@@ -118,7 +123,56 @@ export class HabitService extends BaseSyncableRepoService {
     if (!habit.id) {
       throw new Error('Habit ID is required for update');
     }
-    this._habitRepository.update(habit);
+
+    // Fetch the old frequency and new frequency
+    const oldReminders = await this.dbService.reminder.getRemindersForHabit(habit.id, false);
+    const oldFrequency = oldReminders.map((r) => r.day).sort();
+    const newFrequency = habit.frequency.sort();
+
+    // Check if the frequency has been edited by comparing old vs new freq
+    let freqHasNotBeenEdited = true;
+    if (oldFrequency.length !== newFrequency.length) {
+      freqHasNotBeenEdited = false;
+    } else {
+      for (let i = 0; i < oldFrequency.length; i++) {
+        freqHasNotBeenEdited = freqHasNotBeenEdited && oldFrequency[i] === newFrequency[i];
+      }
+    }
+
+    console.log(
+      freqHasNotBeenEdited
+        ? 'Frequency was not edited for habit: ' + habit.name
+        : 'Frequency was edited for habit: ' + habit.name,
+    );
+    console.log('old freq:', oldFrequency);
+    console.log('new freq:', newFrequency);
+
+    // check if there are any (undeleted) completions today
+    const todayDate = new Date().toISOString().split('T')[0];
+    const todayDOW = new Date(todayDate).getDay();
+    const completionsToday = await this.dbService.habitCompletion.getCompletionsForHabit(habit.id, {
+      completedAt: todayDate,
+    });
+
+    const updatedData: any = { ...habit };
+    if (!freqHasNotBeenEdited) {
+      updatedData.frequencyModifiedAt = new Date().toISOString();
+      // RESET MILESTONE DATA FOR THIS HABIT
+      await this.dbService.habitMilestone.updateMilestoneByHabitId(habit.id, {
+        week_streak: 0,
+        badges_earned: 0,
+        // streak_started_at should be set to 'inactive' UNLESS (there is an undeleted completion today && todayDOW is in newFreq)
+        streak_started_at:
+          completionsToday.length > 0 && newFrequency.includes(todayDOW) ? todayDate : 'inactive',
+        best_day_streak: 0,
+        prev_best_day_streak: -1,
+        modifiedAt: new Date().toISOString(),
+      });
+    }
+
+    console.log('frequencyModifiedAt:', updatedData.frequencyModifiedAt);
+
+    await this._habitRepository.update(updatedData);
     this.dbService.reminder.updateRemindersForHabit(habit.id, habit.frequency, habit.time);
   }
 

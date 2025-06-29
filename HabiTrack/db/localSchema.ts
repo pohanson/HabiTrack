@@ -30,6 +30,9 @@ export const habit = sqliteTable('habit', {
   modifiedAt: text('modifiedAt')
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
+  frequencyModifiedAt: text('frequencyModifiedAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 

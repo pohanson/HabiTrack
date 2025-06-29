@@ -8,7 +8,7 @@ import { DatabaseService } from '@/services';
 import { getExpectedDates } from '@/utils/dateUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, useColorScheme } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
@@ -25,80 +25,133 @@ export default function StatisticsScreen() {
   const theme = Colors[colorScheme];
   const databaseService = DatabaseService.instance;
 
+  // refresh counter
+  let renderCount = useRef(0);
+  renderCount.current++;
+  console.log('Stats page render count: ' + renderCount.current);
+
   // set header title
   useEffect(() => {
     if (!id) return;
     navigation.setOptions({ headerTitle: 'Statistics' });
   }, [id, name, navigation]);
 
+  // get createdAt data for this habit
   const { data: createdAtData, error: createdAtError } = useLiveQuery(
     databaseService.habit.getHabitByIdQuery(id),
   );
-  if (createdAtError) {
-    console.error('Error fetching created_at', createdAtError);
-    Toast.error('Error fetching created_at data.');
-  }
-  const createdAtDate = createdAtData[0]?.createdAt || new Date().toISOString().split('T')[0];
 
-  const { data: completedAtData, error: completedAtError } = useLiveQuery(
-    databaseService.habitCompletion.getCompletionsForHabitQuery(id),
+  // get created at date for this habit
+  const createdAtDate = useMemo(
+    () => createdAtData[0]?.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+    [createdAtData],
   );
-  if (completedAtError) {
-    console.error('Error fetching created_at', completedAtError);
-    Toast.error('Error fetching created_at data.');
-  }
+  // get frequency modified at date for this habit
+  const frequencyModifiedAtDate = useMemo(
+    () => createdAtData[0]?.frequencyModifiedAt?.split('T')[0],
+    [createdAtData],
+  );
+  // get the start date to use for stats (frequencyModifiedAtDate if possible, if not fallback to createdAtDate)
+  const statsStartDate = useMemo(() => {
+    return frequencyModifiedAtDate || createdAtDate || new Date().toISOString().split('T')[0];
+  }, [frequencyModifiedAtDate, createdAtDate]);
+
+  // get completedAt data for this habit
+  const { data: completedAtData, error: completedAtError } = useLiveQuery(
+    databaseService.habitCompletion.getCompletionsForHabitQuery(id, {}, false),
+  );
 
   // get frequency array for this habit
-  const freq = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id))
-    .data.map((r) => r.day)
-    .sort();
+  const { data: freqData } = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id));
+  const freq = useMemo(() => (freqData || []).map((r) => r.day).sort(), [freqData]);
+
+  // handle errors
+  useEffect(() => {
+    if (createdAtError) {
+      console.error('Error fetching created_at', createdAtError);
+      Toast.error('Error fetching created_at data.');
+    }
+
+    if (completedAtError) {
+      console.error('Error fetching completions', completedAtError);
+      Toast.error('Error fetching completion data.');
+    }
+  }, [createdAtError, completedAtError]);
 
   // DAY STREAK VIEW CALCULATIONS
-  databaseService.habitMilestone
-    .calculateHabitStreak(id as string, freq, completedAtData)
-    .then(setStreakData);
+  useEffect(() => {
+    databaseService.habitMilestone
+      .calculateHabitStreak(id as string, freq, completedAtData)
+      .then(setStreakData)
+      .catch((error) => console.error('Error calculating streak:', error));
+  }, [id, freq, completedAtData, databaseService.habitMilestone]);
+
   // CALENDAR VIEW CALCULATIONS
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const yesterdayStr = useMemo(() => {
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    return yesterdayDate.toJSON().split('T')[0];
+  }, []);
 
-  const yesterdayDate = new Date(new Date().getSeconds() - 24 * 60 * 60 * 1000); // yesterday's date
-  const yesterdayStr = yesterdayDate.toJSON().split('T')[0];
+  const { markedDatesObj } = useMemo(() => {
+    const markedDates: { [key: string]: any } = {};
 
-  const markedDatesObj: { [key: string]: any } = {};
+    const todayDOW = new Date(todayStr).getDay();
 
-  // Obtain completed dates:
-  const completedAtDatesSinceModified = completedAtData
-    .filter(({ completedAt }) => completedAt >= createdAtDate)
-    .map(({ completedAt }) => completedAt);
+    const freqSet = new Set(freq); // for O(1) lookups
 
-  // mark completed dates in green
-  completedAtDatesSinceModified.forEach((dateStr) => {
-    markedDatesObj[dateStr] = {
-      marked: true,
-      dotColor: theme.green,
-    };
-  });
-
-  // Get expected dates
-  const expectedDates = getExpectedDates(createdAtDate, yesterdayStr, freq);
-
-  // for O(1) completedAt lookup:
-  const completedDatesSet = new Set(completedAtDatesSinceModified);
-
-  // marked missed dates in red
-  expectedDates.forEach((dateStr) => {
-    if (!completedDatesSet.has(dateStr)) {
-      markedDatesObj[dateStr] = {
+    // Obtain completed dates:
+    const completedDates = completedAtData
+      .map((completion) => completion.completedAt.split('T')[0])
+      .filter((completedAt) => {
+        // don't include today's completedAt if today is not in freq
+        if (completedAt === todayStr && !freq.includes(todayDOW)) {
+          return false;
+        }
+        // don't include completions on days not in freq (phantom completions)
+        const dow = new Date(completedAt).getDay();
+        if (!freqSet.has(dow)) {
+          return false;
+        }
+        return completedAt >= statsStartDate;
+      });
+    // mark completed dates in green
+    completedDates.forEach((dateStr) => {
+      markedDates[dateStr] = {
         marked: true,
-        dotColor: theme.red,
+        dotColor: theme.green,
       };
-    }
-  });
+    });
 
-  const calcHabitStats = databaseService.statistic.calcHabitStatistics(
-    createdAtDate,
-    freq,
-    completedAtData,
+    // Get expected dates
+    const expectedDates = getExpectedDates(frequencyModifiedAtDate, yesterdayStr, freq);
+
+    // marked missed dates in red
+    // but make completedDates a set for O(1) completedAt lookup:
+    const completedDatesSet = new Set(completedDates);
+    expectedDates.forEach((dateStr) => {
+      if (!completedDatesSet.has(dateStr)) {
+        markedDates[dateStr] = {
+          marked: true,
+          dotColor: theme.red,
+        };
+      }
+    });
+
+    return {
+      completedAtDatesSinceModified: completedDates,
+      markedDatesObj: markedDates,
+      expectedDatesSinceModified: expectedDates,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedAtData, createdAtDate, yesterdayStr, freq]);
+
+  // COMPLETION RATE CALCULATIONS
+  const calcHabitStats = useMemo(
+    () => databaseService.statistic.calcHabitStatistics(statsStartDate, freq, completedAtData),
+    [statsStartDate, freq, completedAtData, databaseService.statistic],
   );
 
   return (
@@ -107,14 +160,13 @@ export default function StatisticsScreen() {
         <StatsHeader
           habitName={String(name)}
           todayDate={todayStr}
-          createdAt={createdAtDate}
+          createdAt={String(createdAtDate)}
           badgesEarned={streakData?.badgesEarned || 0}
-          reminderTime="hello"
-          lastModifiedAt="placeholder"
+          startDate={String(statsStartDate)}
         />
         <StatsCalendarView
           today={todayStr}
-          createdAt={createdAtDate}
+          startDate={String(statsStartDate)}
           completedAtDates={markedDatesObj}
         />
         <StatsCompletionRateView calcHabitStatsisticsByMode={calcHabitStats} pieChartSize={85} />

@@ -8,15 +8,13 @@ export function StatsHeader({
   todayDate,
   createdAt,
   badgesEarned,
-  lastModifiedAt,
-  reminderTime,
+  startDate,
 }: {
   habitName: string;
   todayDate: string;
   createdAt: string;
   badgesEarned: number;
-  lastModifiedAt: string;
-  reminderTime: string;
+  startDate: string;
 }) {
   function getBadgeImageFromBadgesEarned(badgesEarned: number) {
     if (badgesEarned === 1) return require('../assets/images/badges/colored/msb1.png');
@@ -44,7 +42,7 @@ export function StatsHeader({
         </ThemedView>
       )}
 
-      <ThemedView style={{ flex: 1 }}>
+      <ThemedView style={{ flex: 3 }}>
         <ThemedText
           style={{
             fontSize: 28,
@@ -101,7 +99,7 @@ export function StatsHeader({
             textAlignVertical: 'center',
             fontSize: 11,
           }}>
-          {reorderDateString(createdAt)}
+          {reorderDateString(startDate)}
         </ThemedText>
       </ThemedView>
     </ThemedView>

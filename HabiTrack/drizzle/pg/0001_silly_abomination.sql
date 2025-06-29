@@ -1,0 +1,1 @@
+ALTER TABLE "habit" ADD COLUMN "dummyField" text DEFAULT '';

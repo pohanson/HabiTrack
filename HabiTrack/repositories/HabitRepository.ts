@@ -112,7 +112,13 @@ export class HabitRepository extends SyncableRepository<Habit> {
       this.db
         .select({
           habit_id: habit.id,
-          last_completed_at: max(habitCompletion.completedAt),
+
+          // FILTER OUT ANY COMPLETIONS BEFORE STATS RESET DATE (frequencyModifiedAt's date converted to yyyy-mm-dd)
+          last_completed_at: max(
+            sql`CASE WHEN ${habitCompletion.completedAt} >= substr(${habit.frequencyModifiedAt}, 1, 10) THEN ${habitCompletion.completedAt} ELSE NULL END`,
+          ),
+          frequency_modified_at: habit.frequencyModifiedAt,
+          // gets frequency array (filters out deleted reminders)
           day_frequency: sql`json_group_array(DISTINCT ${reminder.day} ORDER BY ${reminder.day} ASC)`,
 
           // here for testing for now
@@ -122,11 +128,18 @@ export class HabitRepository extends SyncableRepository<Habit> {
           best_day_streak: habitMilestone.best_day_streak,
         })
         .from(habit)
-        .leftJoin(habitMilestone, eq(habit.id, habitMilestone.habit_id))
-        .innerJoin(reminder, eq(habit.id, reminder.habit_id))
+        .where(eq(habit.isDeleted, false))
+        .leftJoin(
+          habitMilestone,
+          and(eq(habit.id, habitMilestone.habit_id), eq(habitMilestone.isDeleted, false)),
+        )
+        .innerJoin(reminder, and(eq(habit.id, reminder.habit_id), eq(reminder.isDeleted, false)))
 
         // here for testing for now
-        .leftJoin(habitCompletion, eq(habit.id, habitCompletion.habit_id))
+        .leftJoin(
+          habitCompletion,
+          and(eq(habit.id, habitCompletion.habit_id), eq(habitCompletion.isDeleted, false)),
+        )
 
         .groupBy(habit.id)
     );

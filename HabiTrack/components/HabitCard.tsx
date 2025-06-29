@@ -9,6 +9,7 @@ import { Shadows } from '../constants/Shadows';
 import { IconButton } from './IconButton';
 import { ThemedText } from './ThemedText';
 import { ToggleInput } from './ToggleInput';
+import { getBadgesEarned } from '@/utils/milestoneUtils';
 
 export function HabitCard({
   habit,
@@ -41,136 +42,67 @@ export function HabitCard({
     });
   };
 
-  // calculate the badges_earned for a given week_streak
-  function getBadgesEarned(weekStreak: number) {
-    try {
-      if (weekStreak >= 0 && weekStreak < 1) {
-        return 0;
-      } else if (weekStreak >= 1 && weekStreak < 3) {
-        return 1;
-      } else if (weekStreak >= 3 && weekStreak < 12) {
-        return 2;
-      } else if (weekStreak >= 12 && weekStreak < 26) {
-        return 3;
-      } else if (weekStreak >= 26 && weekStreak < 52) {
-        return 4;
-      } else if (weekStreak >= 52) {
-        return 5;
-      } else {
-        return -1;
-      }
-    } catch (error) {
-      console.error('Error in getBadgesEarned:', error);
-      return -1;
-    }
-  }
-
   const toggleHabitCompletion = async () => {
     if (today == null) {
       return;
     }
 
-    const frequencyArray = await databaseService.reminder
-      .getRemindersForHabit(habit.id)
-      .then((reminder) => reminder.map((r) => r.day).sort());
-    const todayDOW = new Date(today).getDay();
+    // REFETCH THE FRESHEST MILESTONE DATA WHEN HABIT TICK/UNTICK
+    const latestMilestone = await databaseService.habitMilestone.getMilestonesByHabitIdQuery(
+      habit.id,
+    );
+
+    // Use latestMilestone instead of habit_milestone prop
+    // const frequencyArray = await databaseService.reminder
+    //   .getRemindersForHabit(habit.id)
+    //   .then((reminder) => reminder.map((r) => r.day).sort());
+    // const todayDOW = new Date(today).getDay();
     const todayDateStr = new Date().toJSON().split('T')[0];
 
-    databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
     if (habit_completion === null) {
-      // TICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling)
+      // TICKING HABIT (1. Completion data handling, 2. Daily streaks data handling)
+      // THIS ORDER IS NECESSARY
 
-      // 1. Milestone data handling
-
-      // Then check if all habits for the week are completed
-      const completionsThisWeek = await databaseService.habitCompletion.getCompletionsThisWeek(
-        habit.id,
-      );
-      const noOfCompletionsThisWeek = completionsThisWeek.length;
-      // If so, increment week_streak and update badges_earned
-      if (noOfCompletionsThisWeek >= frequencyArray.length) {
-        const newWeekStreak = (habit_milestone?.week_streak || 0) + 1;
-        const calculatedBadges = Number(getBadgesEarned(newWeekStreak));
-        const newBadgesEarned = Math.max(calculatedBadges, habit_milestone?.badges_earned || 0);
-
-        databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
-          week_streak: newWeekStreak,
-          badges_earned: newBadgesEarned,
-        });
-      }
+      // 1. Completion data handling
+      await databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
 
       // 2. Daily streaks data handling
-
       const updatedStreakStartedAt =
-        String(habit_milestone?.streak_started_at) === 'inactive'
+        String(latestMilestone[0]?.streak_started_at) === 'inactive'
           ? todayDateStr
-          : String(habit_milestone?.streak_started_at);
+          : String(latestMilestone[0]?.streak_started_at);
       const currentStreak =
-        String(habit_milestone?.streak_started_at) === 'inactive'
+        String(latestMilestone[0]?.streak_started_at) === 'inactive'
           ? 1
-          : calculateDaysBetweenDates(String(habit_milestone?.streak_started_at), todayDateStr) + 1;
-      const updatedPrevBestDayStreak = Number(habit_milestone?.best_day_streak);
+          : calculateDaysBetweenDates(String(latestMilestone[0]?.streak_started_at), todayDateStr) +
+            1;
+      const updatedPrevBestDayStreak = Number(latestMilestone[0]?.best_day_streak);
       const updatedBestDayStreak = Math.max(
         currentStreak,
-        Number(habit_milestone?.best_day_streak),
+        Number(latestMilestone[0]?.best_day_streak),
       );
+
+      // handling week_streak (using current streak data)
+      const updatedWeekStreak = Math.floor(currentStreak / 7);
+
+      // handling badges_earned (using updated best_day_streak data)
+      const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+
+      console.log('badges_earned for', habit.name + ': ' + updatedBadgesEarned);
+
       databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
         streak_started_at: updatedStreakStartedAt,
         best_day_streak: updatedBestDayStreak,
         prev_best_day_streak: updatedPrevBestDayStreak,
+
+        week_streak: updatedWeekStreak,
+        badges_earned: updatedBadgesEarned,
       });
     } else {
-      // UNTICKING HABIT (1. Milestone data handling, 2. Daily streaks data handling)
+      // UNTICKING HABIT (1. Daily streaks data handling, 2. Completion data handling)
+      // THIS ORDER IS NECESSARY
 
-      // 1. Milestone data handling
-
-      // get current completions (all completions since Sunday)
-      const currentCompletions = await databaseService.habitCompletion.getCompletionsThisWeek(
-        habit.id,
-      );
-
-      // check if today's DOW is the habit frequency's last DOW && reached full week completion
-      const lastDOW = frequencyArray[frequencyArray.length - 1];
-      if (todayDOW === lastDOW && currentCompletions.length >= frequencyArray.length) {
-        // decrement week_streak and update badges_earned (if necessary)
-
-        // but first make sure badges_earned DOES decrement on days of potentially earning new badge when unticked,
-        // (i.e. when user accidentally ticks that habit then unticks it),
-        // but does not decrement on any other day
-
-        // Check if today is a potential week (i.e. week where ticking habit would trigger badges_earned increment)
-        const oldWeekStreak = habit_milestone?.week_streak || 0;
-        const newWeekStreak = Math.max(0, (habit_milestone?.week_streak || 0) - 1);
-        const oldBadgesEarned = getBadgesEarned(oldWeekStreak);
-        const newBadgesEarned = getBadgesEarned(newWeekStreak);
-        const currentBadgesEarned = habit_milestone?.badges_earned || 0;
-        const isPotentialWeek = oldBadgesEarned !== newBadgesEarned;
-
-        let updatedBadgesEarned = -1;
-
-        if (isPotentialWeek) {
-          // If it IS a potential week, check if current badges_earned > potential badges_earned
-          if (currentBadgesEarned > oldBadgesEarned) {
-            // If current badges_earned > potential badges_earned, don't decrease badges_earned
-            updatedBadgesEarned = currentBadgesEarned;
-          } else {
-            // else current badges_earned < potential badges_earned, decrease badges_earned in this case
-            updatedBadgesEarned = newBadgesEarned;
-          }
-        } else {
-          // If it is NOT a potential week, dont decrease badges_earned (new badges_earned === currentBadgesEarned)
-          updatedBadgesEarned = currentBadgesEarned;
-        }
-
-        databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
-          week_streak: newWeekStreak,
-          badges_earned: updatedBadgesEarned,
-        });
-        console.log('Badges_earned for habit.id', habit.id, ':', updatedBadgesEarned);
-      }
-
-      // 2. Daily streaks data handling
-
+      // 1. Daily streaks data handling
       const updatedStreakStartedAt =
         String(habit_milestone?.streak_started_at) === todayDateStr
           ? 'inactive'
@@ -183,11 +115,25 @@ export function HabitCard({
         currentStreak,
         Number(habit_milestone?.prev_best_day_streak),
       );
+
+      // handling week_streak (using current streak data)
+      const updatedWeekStreak = Math.floor(currentStreak / 7);
+
+      // handling badges_earned (using updated best_day_streak data)
+      const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
+      console.log('badges_earned for', habit.name + ': ' + updatedBadgesEarned);
+
       databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
         streak_started_at: updatedStreakStartedAt,
         best_day_streak: updatedBestDayStreak,
         prev_best_day_streak: -1,
+
+        week_streak: updatedWeekStreak,
+        badges_earned: updatedBadgesEarned,
       });
+
+      // 2. Completion data handling
+      await databaseService.habitCompletion.toggleTodayHabitCompletion(habit.id);
     }
     // refresh UI
     setRefresh((prev) => prev + 1);
