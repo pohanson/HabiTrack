@@ -207,6 +207,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="star" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="socials"
+        options={{
+          title: 'Socials',
+          headerTitle: 'Socials',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
