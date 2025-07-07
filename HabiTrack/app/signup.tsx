@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { addNetworkStateListener, getNetworkStateAsync, useNetworkState } from 'expo-network';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
@@ -14,11 +14,14 @@ export default function SignupPage() {
   const databaseService = DatabaseService.instance;
   const [isLoading, setIsLoading] = useState(false);
   const [networkState, setNetworkState] = useState(useNetworkState());
-  getNetworkStateAsync().then((state) => setNetworkState(state));
 
-  addNetworkStateListener((networkState) => {
-    setNetworkState(networkState);
-  });
+  useEffect(() => {
+    getNetworkStateAsync().then((state) => setNetworkState(state));
+
+    addNetworkStateListener((networkState) => {
+      setNetworkState(networkState);
+    });
+  }, []);
   if (!networkState.isInternetReachable) {
     return (
       <ThemedView
