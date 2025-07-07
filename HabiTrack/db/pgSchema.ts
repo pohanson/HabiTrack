@@ -44,7 +44,7 @@ export const habitCompletion = pgTable('habit_completion', {
   habit_id: text('habit_id')
     .notNull()
     .references(() => habit.id),
-  completedAt: timestamp('completedAt', { withTimezone: true }).notNull(), // date and time of completion
+  completedAt: text('completedAt').notNull(), // date: yyyy-mm-dd
   createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
   modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
   isDeleted: boolean('isDeleted').notNull().default(false),

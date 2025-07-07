@@ -1,0 +1,1 @@
+ALTER TABLE "habit_completion" ALTER COLUMN "completedAt" SET DATA TYPE text;
