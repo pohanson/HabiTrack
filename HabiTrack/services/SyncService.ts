@@ -44,7 +44,10 @@ export class SyncService {
       log(`Pushing ${deltas.length} deltas to remote for ${repoService.tableName}`);
       supabase
         .from(repoService.tableName)
-        .upsert(deltas, { count: 'exact' })
+        .upsert(
+          deltas.map((d) => ({ ...d, modifiedAt: syncStartTimestamp })),
+          { count: 'exact' },
+        )
         .then((res) => {
           log(`Successfully pushed deltas to remote for ${repoService.tableName}`, res);
         });
@@ -54,6 +57,7 @@ export class SyncService {
     await supabase
       .from(repoService.tableName)
       .select()
+      .gt('modifiedAt', lastSyncedTimestamp)
       .then((res) => {
         repoService
           .updateModifiedItems(res.data as SyncableModel[])
