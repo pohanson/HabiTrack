@@ -14,11 +14,11 @@ export default function SocialsPage() {
           width: '80%',
         }}>
         <TextButton
-          label="Friends"
+          label="Your Friends"
           style={buttonStyle}
           onPress={() => router.push('/friend/view')}
         />
-        <TextButton label="Friends Leaderboard" style={buttonStyle} />
+        <TextButton label="Habit Circles" style={buttonStyle} />
       </ThemedView>
     </ThemedView>
   );

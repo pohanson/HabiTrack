@@ -30,6 +30,19 @@ export class UserService extends BaseSyncableRepoService {
     return UserService.#instance;
   }
 
+  public searchUser(searchStr: string): Promise<User[]> {
+    const lowerCaseSearchStr = searchStr.toLowerCase();
+    return this._userRepository
+      .searchUser(lowerCaseSearchStr)
+      .then((users) => {
+        return users;
+      })
+      .catch((error) => {
+        console.error('Error searching for user:', error);
+        throw new Error(`Failed to search user: ${error.message}`);
+      });
+  }
+
   public async signupUser(user: Omit<InsertUser, 'id'> & Partial<Pick<User, 'id'>>): Promise<User> {
     // check to ensure required fields are present
     if (!user.username || !user.name || !user.password) {
@@ -72,6 +85,17 @@ export class UserService extends BaseSyncableRepoService {
     return this._userRepository.getUserByUsername(username);
   }
 
+  public getUserById(userId: string): Promise<User | null> {
+    return this._userRepository.getById(userId).then((user) => {
+      if (user) {
+        return user;
+      } else {
+        console.warn(`User with ID ${userId} not found.`);
+        return null;
+      }
+    });
+  }
+
   public async checkValidUsername(username: string): Promise<boolean> {
     if (username.length === 0) {
       return false;
@@ -80,7 +104,7 @@ export class UserService extends BaseSyncableRepoService {
     return supabase
       .from('user')
       .select('username', { count: 'exact' })
-      .eq('username', username)
+      .ilike('username', username)
       .then((res) => {
         console.log(res);
         return res.count === 0;

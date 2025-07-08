@@ -8,8 +8,9 @@ import { SyncService } from '@/services/SyncService';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useFonts } from 'expo-font';
-import { router, Stack } from 'expo-router';
-import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
+import { addNetworkStateListener, useNetworkState } from 'expo-network';
+import { Stack } from 'expo-router';
+import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
@@ -20,8 +21,6 @@ import Toast, {
   InfoToast,
   SuccessToast,
 } from 'react-native-toast-message';
-import { addNetworkStateListener, useNetworkState } from 'expo-network';
-import { IconButton } from '@/components/IconButton';
 
 const toastConfig = {
   success: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
@@ -131,9 +130,6 @@ function RootNavigator() {
           name="(app)/friend/view"
           options={{
             headerTitle: 'Friends',
-            headerRight: () => (
-              <IconButton iconName="bell" onPress={() => router.push('/friend/notification')} />
-            ),
           }}
         />
         <Stack.Screen

@@ -86,14 +86,34 @@ export const habitMilestone = sqliteTable('habit_milestone', {
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 
+export const friend = sqliteTable('friend', {
+  id: text('id').primaryKey(),
+  user_id: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  friend_id: text('friend_id')
+    .notNull()
+    .references(() => user.id),
+  status: text('status').notNull().default('PENDING'), // PENDING, ACCEPTED, REJECTED
+  createdAt: text('createdAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  modifiedAt: text('modifiedAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});
+
 export type Habit = typeof habit.$inferSelect;
 export type Reminder = typeof reminder.$inferSelect;
 export type HabitCompletion = typeof habitCompletion.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type HabitMilestone = typeof habitMilestone.$inferSelect;
+export type Friend = typeof friend.$inferSelect;
 
 export type InsertHabit = typeof habit.$inferInsert;
 export type InsertReminder = typeof reminder.$inferInsert;
 export type InsertHabitCompletion = typeof habitCompletion.$inferInsert;
 export type InsertUser = typeof user.$inferInsert;
 export type InsertHabitMilestone = typeof habitMilestone.$inferInsert;
+export type InsertFriend = typeof friend.$inferInsert;

@@ -4,14 +4,15 @@ import { ThemedView } from '../ThemedView';
 import { ThemedText } from '../ThemedText';
 import { IconButton } from '../IconButton';
 import { View } from 'react-native';
+import { User } from '@/db/schema';
 
 export function FriendCard({
-  //   friend,
+  friend,
   onReject = undefined,
   onAccept = undefined,
   onAdd = undefined,
 }: {
-  //   friend: Friend;
+  friend: User;
   onReject?: () => void;
   onAccept?: () => void;
   onAdd?: () => void;
@@ -40,7 +41,10 @@ export function FriendCard({
         },
         Shadows.large,
       ]}>
-      <ThemedText>Friend</ThemedText>
+      <View>
+        <ThemedText>{friend.name}</ThemedText>
+        <ThemedText>@{friend.username}</ThemedText>
+      </View>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         {onAccept && (
           <IconButton

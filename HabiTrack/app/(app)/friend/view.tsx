@@ -1,57 +1,60 @@
+import { AddFriendModal } from '@/components/friend/AddFriendModal';
+import { FriendCard } from '@/components/friend/FriendCard';
 import { IconButton } from '@/components/IconButton';
-import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { useState } from 'react';
-import { Modal, TextInput, View } from 'react-native';
+import { DatabaseService } from '@/services';
+import { SyncService } from '@/services/SyncService';
+import { useEffect, useState } from 'react';
+import { TextInput, View } from 'react-native';
 
 export default function FriendView() {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState<User[]>([]);
+  const [userFriends, setUserFriends] = useState<User[]>([]);
+  const [refresh, setRefresh] = useState(0);
+  const databaseService = DatabaseService.instance;
+
+  useEffect(() => {
+    SyncService.syncRepoService(databaseService.friend);
+    databaseService.friend
+      .getIncomingPendingRequests()
+      .then((result) => setPendingRequests(result || []));
+    databaseService.friend.getUserFriends().then((result) => setUserFriends(result || []));
+  }, [databaseService.friend, refresh]);
+
   return (
     <ThemedView style={{ flex: 1, alignItems: 'center' }}>
-      <Modal visible={isAddModalVisible} transparent={true} animationType="slide">
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'gray',
-            opacity: 0.8,
-          }}>
-          <View
-            style={{
-              alignItems: 'center',
-              width: '80%',
-              gap: 10,
-              padding: 30,
-              borderRadius: 20,
-              backgroundColor: useThemeColor({}, 'card'),
-            }}>
-            <ThemedText type="title">Add Friend</ThemedText>
-
-            <TextInput
-              style={{
-                width: '100%',
-                padding: 10,
-                margin: 4,
-                borderWidth: 1,
-                borderColor: useThemeColor({}, 'border'),
-                borderRadius: 5,
-              }}
-              placeholder="Enter friend's username"
+      {pendingRequests.length > 0 && (
+        <>
+          <ThemedText type="subtitle">Your Pending Request</ThemedText>
+          {pendingRequests.map((user) => (
+            <FriendCard
+              key={user.id}
+              friend={user}
+              onAccept={() =>
+                databaseService.friend
+                  .acceptFriendRequest(user.id)
+                  .then(() => setRefresh((prev) => prev + 1))
+              }
+              onReject={() =>
+                databaseService.friend
+                  .rejectFriendRequest(user.id)
+                  .then(() => setRefresh((prev) => prev + 1))
+              }
             />
-            <TextButton
-              label="Close"
-              onPress={() => setIsAddModalVisible(false)}
-              style={{
-                backgroundColor: useThemeColor({}, 'red'),
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
-      <ThemedView
+          ))}
+        </>
+      )}
+      <AddFriendModal
+        visible={isAddModalVisible}
+        setIsAddModalVisible={setIsAddModalVisible}
+        transparent={true}
+        animationType="slide"
+      />
+      <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -61,7 +64,8 @@ export default function FriendView() {
         }}>
         <ThemedText type="title">Your Friends</ThemedText>
         <IconButton iconName="plus" onPress={() => setIsAddModalVisible(true)} />
-      </ThemedView>
+      </View>
+      {/* // TODO: Implement search functionalit */}
       <TextInput
         style={{
           width: '80%',
@@ -72,6 +76,11 @@ export default function FriendView() {
         }}
         placeholder="Search for friends..."
       />
+      <View style={{ gap: 10, marginTop: 20 }}>
+        {userFriends.map((friend) => (
+          <FriendCard key={friend.id} friend={friend} />
+        ))}
+      </View>
     </ThemedView>
   );
 }

@@ -28,8 +28,7 @@ export function IconButton({
             borderRadius: '50%',
             padding: 10,
           },
-          transparentBackground ? {} : { backgroundColor: backgroundColor },
-          Shadows.medium,
+          transparentBackground ? {} : { backgroundColor: backgroundColor, ...Shadows.medium },
         ]}>
         <IconSymbol name={iconName} color={iconColor || defaultIconColor} size={iconSize} />
       </Pressable>
