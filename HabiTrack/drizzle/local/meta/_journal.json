@@ -8,6 +8,13 @@
       "when": 1751130631155,
       "tag": "0000_safe_gorgon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1751904665647,
+      "tag": "0001_puzzling_karnak",
+      "breakpoints": true
     }
   ]
 }

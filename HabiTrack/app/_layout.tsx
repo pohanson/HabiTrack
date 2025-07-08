@@ -8,8 +8,9 @@ import { SyncService } from '@/services/SyncService';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useFonts } from 'expo-font';
+import { addNetworkStateListener, useNetworkState } from 'expo-network';
 import { Stack } from 'expo-router';
-import { SQLiteProvider, openDatabaseSync } from 'expo-sqlite';
+import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
@@ -20,7 +21,6 @@ import Toast, {
   InfoToast,
   SuccessToast,
 } from 'react-native-toast-message';
-import { addNetworkStateListener, useNetworkState } from 'expo-network';
 
 const toastConfig = {
   success: (props: React.JSX.IntrinsicAttributes & BaseToastProps) => (
@@ -126,6 +126,18 @@ function RootNavigator() {
       </Stack.Protected>
       <Stack.Protected guard={useUserContext().currentUserId != null}>
         <Stack.Screen name="(app)/(tabs)" options={{ headerTransparent: true, headerTitle: '' }} />
+        <Stack.Screen
+          name="(app)/friend/view"
+          options={{
+            headerTitle: 'Friends',
+          }}
+        />
+        <Stack.Screen
+          name="(app)/friend/notification"
+          options={{
+            headerTitle: 'Friends Notifications',
+          }}
+        />
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>

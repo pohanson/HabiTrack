@@ -53,11 +53,12 @@ export class SyncService {
         });
     });
     // fetch and pull changes from remote
-    log(`Pulling changes for ${repoService.tableName} since ${syncStartTimestamp}`);
+    log(`Pulling changes for ${repoService.tableName} since ${lastSyncedTimestamp}`);
     await supabase
       .from(repoService.tableName)
       .select()
       .gt('modifiedAt', lastSyncedTimestamp)
+      .lt('modifiedAt', syncStartTimestamp) // prevent the item we just pushed to be synced back.
       .then((res) => {
         repoService
           .updateModifiedItems(res.data as SyncableModel[])

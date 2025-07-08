@@ -1,5 +1,5 @@
 import { SyncableModel } from '@/types/SyncableModel';
-import { eq, gte, lte } from 'drizzle-orm';
+import { eq, gt, lte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core';
 import { SQLiteRunResult } from 'expo-sqlite';
@@ -184,7 +184,7 @@ export abstract class SyncableRepository<TModel extends SyncableModel> {
       return (await this.db
         .select()
         .from(this.table)
-        .where(gte(this.table.modifiedAt, lastSyncTimestamp))) as TModel[];
+        .where(gt(this.table.modifiedAt, lastSyncTimestamp))) as TModel[];
     } catch (error) {
       console.error('Error fetching modified items:', error);
       throw new Error(

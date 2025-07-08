@@ -7,12 +7,17 @@ export function IconButton({
   onPress,
   iconName,
   iconSize = 24,
+  iconColor = null,
+  transparentBackground = false,
 }: {
   onPress: () => void;
   iconName: IconSymbolName;
   iconSize?: number;
+  iconColor?: string | null;
+  transparentBackground?: boolean;
 }) {
   const backgroundColor = useThemeColor({}, 'tint');
+  const defaultIconColor = useThemeColor({}, 'icon');
   return (
     <View>
       <Pressable
@@ -20,11 +25,12 @@ export function IconButton({
         style={(isPressed) => [
           {
             opacity: isPressed.pressed ? 0.7 : 1,
+            borderRadius: '50%',
+            padding: 10,
           },
-          { backgroundColor: backgroundColor, borderRadius: '50%', padding: 10 },
-          Shadows.medium,
+          transparentBackground ? {} : { backgroundColor: backgroundColor, ...Shadows.medium },
         ]}>
-        <IconSymbol name={iconName} color={useThemeColor({}, 'icon')} size={iconSize} />
+        <IconSymbol name={iconName} color={iconColor || defaultIconColor} size={iconSize} />
       </Pressable>
     </View>
   );

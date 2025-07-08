@@ -65,14 +65,16 @@ export const habit_milestone = pgTable('habit_milestone', {
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 
-export type Habit = typeof habit.$inferSelect;
-export type Reminder = typeof reminder.$inferSelect;
-export type HabitCompletion = typeof habitCompletion.$inferSelect;
-export type User = typeof user.$inferSelect;
-export type HabitMilestone = typeof habit_milestone.$inferSelect;
-
-export type InsertHabit = typeof habit.$inferInsert;
-export type InsertReminder = typeof reminder.$inferInsert;
-export type InsertHabitCompletion = typeof habitCompletion.$inferInsert;
-export type InsertUser = typeof user.$inferInsert;
-export type InsertHabitMilestone = typeof habit_milestone.$inferInsert;
+export const friend = pgTable('friend', {
+  id: text('id').primaryKey(),
+  user_id: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  friend_id: text('friend_id')
+    .notNull()
+    .references(() => user.id),
+  status: text('status').notNull().default('PENDING'), // PENDING, ACCEPTED, REJECTED
+  createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
+  modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});

@@ -26,6 +26,8 @@ const MAPPING = {
   xmark: 'close',
   star: 'star',
   'chart.bar': 'bar-chart',
+  person: 'person',
+  bell: 'notifications',
 } as IconMapping;
 
 /**

@@ -29,6 +29,20 @@
       "when": 1751888086577,
       "tag": "0003_regular_ultron",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751904669848,
+      "tag": "0004_bitter_namor",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1751962200628,
+      "tag": "0005_red_nuke",
+      "breakpoints": true
     }
   ]
 }
