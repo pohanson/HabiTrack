@@ -147,4 +147,17 @@ export class UserService extends BaseSyncableRepoService {
     const userId = this.dbService.userId;
     return userId ? this.getUserById(userId) : null;
   }
+  
+  /**
+   * Retrieves a username by their user ID.
+   * @returns string if found, otherwise null
+   */
+  public async getUsernameById(userId: string): Promise<string | null> {
+    const user = await this._userRepository.getById(userId);
+    if (user) {
+      return user.username;
+    }
+    console.warn(`User with ID ${userId} not found.`);
+    return null;
+  }
 }

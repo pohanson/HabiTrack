@@ -18,7 +18,11 @@ export default function SocialsPage() {
           style={buttonStyle}
           onPress={() => router.push('/friend/view')}
         />
-        <TextButton label="Habit Circles" style={buttonStyle} />
+        <TextButton
+          label="Habit Circles"
+          style={buttonStyle}
+          onPress={() => router.push('/habitCircles/view')}
+        />
       </ThemedView>
     </ThemedView>
   );
