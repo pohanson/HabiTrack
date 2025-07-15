@@ -22,8 +22,7 @@ export function RHFTextInput({
     RegisterOptions<FieldValues, string>,
     'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled' | 'isRequired'
   >;
-  textInputProps?: TextInputProps;
-}) {
+} & TextInputProps) {
   const colors = Colors[useColorScheme() || 'light'];
   const errorMessage = useFormReturn.formState.errors[name]?.message?.toString() || null;
   return (

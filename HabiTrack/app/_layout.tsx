@@ -138,6 +138,13 @@ function RootNavigator() {
             headerTitle: 'Friends Notifications',
           }}
         />
+        <Stack.Screen
+          name="(app)/account/edit/[id]"
+          options={{
+            headerTitle: 'Edit Account',
+            headerShown: true,
+          }}
+        />
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>
