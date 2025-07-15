@@ -64,20 +64,15 @@ export default function RootLayout() {
   }, []);
 
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
   const { error } = useMigrations(db, migrations);
 
   if (error) {
     console.log('Database migration failed:', error);
-    return null;
   }
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
   addNetworkStateListener((networkState) => {
     if (networkState.isInternetReachable) {
       SyncService.init().syncAll();
