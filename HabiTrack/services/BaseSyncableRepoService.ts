@@ -19,8 +19,7 @@ export abstract class BaseSyncableRepoService {
 
   async getLastSyncTimestamp(): Promise<string> {
     try {
-      const value = null;
-      await AsyncStorage.getItem(`lastSyncTimestamp_${this.tableName}`);
+      const value = await AsyncStorage.getItem(`lastSyncTimestamp_${this.tableName}`);
       if (!value) {
         return new Date(0).toISOString();
       }
