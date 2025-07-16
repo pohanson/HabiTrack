@@ -15,6 +15,7 @@ export default function FriendView() {
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
   const [userFriends, setUserFriends] = useState<User[]>([]);
   const [refresh, setRefresh] = useState(0);
+  const [searchStr, setSearchStr] = useState('');
   const databaseService = DatabaseService.instance;
 
   useEffect(() => {
@@ -65,21 +66,29 @@ export default function FriendView() {
         <ThemedText type="title">Your Friends</ThemedText>
         <IconButton iconName="plus" onPress={() => setIsAddModalVisible(true)} />
       </View>
-      {/* // TODO: Implement search functionalit */}
       <TextInput
         style={{
           width: '80%',
           padding: 10,
           borderWidth: 1,
+          color: useThemeColor({}, 'text'),
           borderColor: useThemeColor({}, 'border'),
           borderRadius: 5,
         }}
+        value={searchStr}
+        onChangeText={(text) => setSearchStr(text.toLowerCase())}
         placeholder="Search for friends..."
       />
       <View style={{ gap: 10, marginTop: 20 }}>
-        {userFriends.map((friend) => (
-          <FriendCard key={friend.id} friend={friend} />
-        ))}
+        {userFriends
+          .filter(
+            (friend) =>
+              friend.name.toLowerCase().includes(searchStr) ||
+              friend.username.toLowerCase().includes(searchStr),
+          )
+          .map((friend) => (
+            <FriendCard key={friend.id} friend={friend} />
+          ))}
       </View>
     </ThemedView>
   );
