@@ -1,13 +1,16 @@
 import { HabitList } from '@/components/HabitList';
+import { HabitMilestoneList } from '@/components/HabitMilestoneList';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { UserInformation } from '@/components/UserInformation';
 import { User } from '@/db/schema';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
 import { useLocalSearchParams } from 'expo-router';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Tabs } from 'react-native-collapsible-tab-view';
+import { MaterialTabBar, Tabs } from 'react-native-collapsible-tab-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const FriendContext = createContext<User | null>(null);
 
@@ -49,16 +52,34 @@ export default function FriendPage() {
 }
 
 function FriendTabs() {
+  const backgroundColor = useThemeColor({}, 'background');
+  const inactiveTextColor = useThemeColor({}, 'text');
+  const activeTextColor = useThemeColor({ dark: '#FFF', light: '#000' }, 'text');
+
   const friend = useContext(FriendContext);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const renderHeader = useCallback(() => {
     return (
-      <View style={{ padding: 4 }}>
+      <View
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+        style={{ padding: 4, backgroundColor: backgroundColor }}>
         <UserInformation user={friend} />
       </View>
     );
-  }, [friend]);
+  }, [backgroundColor, friend]);
   return (
-    <Tabs.Container renderHeader={renderHeader}>
+    <Tabs.Container
+      renderHeader={renderHeader}
+      containerStyle={{ backgroundColor: backgroundColor }}
+      minHeaderHeight={headerHeight}
+      renderTabBar={(props) => (
+        <MaterialTabBar
+          {...props}
+          tabStyle={{ backgroundColor: backgroundColor }}
+          inactiveColor={inactiveTextColor}
+          activeColor={activeTextColor}
+        />
+      )}>
       <Tabs.Tab name="FriendHabit" label="Habit">
         <Tabs.ScrollView>
           <FriendHabitScreen />
@@ -75,8 +96,9 @@ function FriendTabs() {
 
 function FriendHabitScreen() {
   const friend = useContext(FriendContext);
+  const { bottom: bottomInset } = useSafeAreaInsets();
   return (
-    <ThemedView style={{ height: '100%' }}>
+    <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
@@ -88,12 +110,13 @@ function FriendHabitScreen() {
 
 function FriendMilestoneScreen() {
   const friend = useContext(FriendContext);
+  const { bottom: bottomInset } = useSafeAreaInsets();
   return (
-    <ThemedView style={{ height: '100%' }}>
+    <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
-        <ThemedText>Friend Milestone for {friend.name}</ThemedText>
+        <HabitMilestoneList userId={friend.id} />
       )}
     </ThemedView>
   );

@@ -25,8 +25,7 @@ export function HabitList({
 
   return data?.length === 0 ? (
     <ThemedView style={{ flex: 1, padding: 8 }}>
-      <ThemedText>No habits yet</ThemedText>
-      <ThemedText>Create a habit to get started!</ThemedText>
+      <ThemedText>No habits</ThemedText>
     </ThemedView>
   ) : (
     <ScrollView>
