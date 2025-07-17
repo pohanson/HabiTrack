@@ -7,6 +7,7 @@ import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
 import { SyncService } from '@/services/SyncService';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
@@ -87,7 +88,11 @@ export default function FriendView() {
               friend.username.toLowerCase().includes(searchStr),
           )
           .map((friend) => (
-            <FriendCard key={friend.id} friend={friend} />
+            <FriendCard
+              key={friend.id}
+              friend={friend}
+              onPress={() => router.push(`/friend/${friend.id}`)}
+            />
           ))}
       </View>
     </ThemedView>
