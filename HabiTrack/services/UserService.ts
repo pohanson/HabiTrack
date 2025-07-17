@@ -6,6 +6,7 @@ import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 import { DatabaseService } from './DatabaseService';
 
 import bcrypt from 'react-native-bcrypt';
+import { SQLiteRunResult } from 'expo-sqlite';
 
 export class UserService extends BaseSyncableRepoService {
   static #instance: UserService;
@@ -96,6 +97,18 @@ export class UserService extends BaseSyncableRepoService {
     });
   }
 
+  public async updateUser(user: Partial<User>): Promise<SQLiteRunResult> {
+    if (!user.id) {
+      console.error('User ID is required for update.');
+      throw new Error('User ID is required for update.');
+    }
+    user.modifiedAt = new Date().toISOString();
+    return this._userRepository.update(user as User).catch((err) => {
+      console.error('Error updating user in local database:', err);
+      throw new Error(`Failed to update user: ${err.message}`);
+    });
+  }
+
   public async checkValidUsername(username: string): Promise<boolean> {
     if (username.length === 0) {
       return false;
@@ -124,5 +137,14 @@ export class UserService extends BaseSyncableRepoService {
     await AsyncStorage.setItem('userId', user.id).catch(console.error);
     this.dbService.userId = user.id;
     return user;
+  }
+
+  public async signoutUser() {
+    await AsyncStorage.removeItem('userId').catch(console.error);
+  }
+
+  public async getCurrentUser(): Promise<User | null> {
+    const userId = this.dbService.userId;
+    return userId ? this.getUserById(userId) : null;
   }
 }

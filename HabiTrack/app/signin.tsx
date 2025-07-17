@@ -89,14 +89,14 @@ export default function SigninPage() {
         label="Username (Case Sensitive)"
         name="username"
         isRequired={true}
-        textInputProps={{ spellCheck: false }}
+        spellCheck={false}
       />
       <RHFTextInput
         useFormReturn={useFormReturn}
         label="Password"
         name="password"
         isRequired={true}
-        textInputProps={{ spellCheck: false }}
+        spellCheck={false}
       />
       {isLoading ? (
         <ThemedText type="subtitle" style={{ textAlign: 'center' }}>

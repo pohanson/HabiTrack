@@ -28,6 +28,7 @@ const MAPPING = {
   'chart.bar': 'bar-chart',
   person: 'person',
   bell: 'notifications',
+  'person.crop.circle': 'account-circle',
 } as IconMapping;
 
 /**
