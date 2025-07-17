@@ -125,7 +125,9 @@ export function RHFMembersInput({
             {/* vertical scroll list of addable members (user's friends) */}
             <ThemedView style={{ backgroundColor: theme.card, flex: 1 }}>
               {friends && friends.length === 0 && (
-                <ThemedText>You need to add Friends before creating Groups</ThemedText>
+                <ThemedText>
+                  {'You have no friends to add.\nAdd friends to start creating groups!'}
+                </ThemedText>
               )}
               <ScrollView persistentScrollbar={true}>
                 <View style={{ gap: 10, padding: 10 }}>

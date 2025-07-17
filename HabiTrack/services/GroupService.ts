@@ -74,4 +74,30 @@ export class GroupService extends BaseSyncableRepoService {
     // return this group's Id
     return groupId;
   }
+
+  public getGroupsByUserIdQuery(
+    userId: string | null = this.dbService.userId,
+    includeDeleted: boolean = false,
+  ) {
+    if (userId == null) {
+      throw new Error('User ID is required to get groups');
+    }
+    return this._groupRepository.getGroupsByUserIdQuery(userId, includeDeleted);
+  }
+
+  public getGroupsByUserId(
+    userId: string | null = this.dbService.userId,
+    includeDeleted: boolean = false,
+  ) {
+    if (userId == null) {
+      throw new Error('User ID is required to get groups');
+    }
+    return this._groupRepository.getGroupsByUserIdQuery(userId, includeDeleted);
+  }
+
+  public getGroupNameById(groupId: string) {
+    return this._groupRepository
+      .getGroupNameByIdQuery(groupId)
+      .then((query) => (query.length > 0 ? query[0].name : null));
+  }
 }

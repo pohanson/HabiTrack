@@ -27,4 +27,12 @@ export class GroupMemberService extends BaseSyncableRepoService {
     }
     return GroupMemberService.#instance;
   }
+
+  public getMembersByGroupId(groupId: string, includeDeleted: boolean = false) {
+    return this._groupMemberRepository.getMembersByGroupIdQuery(groupId, includeDeleted);
+  }
+
+  public getNumberOfMembersByGroupId(groupId: string, includeDeleted: boolean = false) {
+    return this.getMembersByGroupId(groupId, includeDeleted).then((query) => query.length);
+  }
 }

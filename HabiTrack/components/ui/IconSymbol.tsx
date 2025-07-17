@@ -22,13 +22,14 @@ const MAPPING = {
   plus: 'add',
   checkmark: 'check',
   'list.bullet': 'list',
-  pencil: 'edit',
   xmark: 'close',
   star: 'star',
   'chart.bar': 'bar-chart',
   person: 'person',
   bell: 'notifications',
   'person.crop.circle': 'account-circle',
+  pencil: 'edit',
+  'person.2': 'group',
 } as IconMapping;
 
 /**
