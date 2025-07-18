@@ -16,6 +16,7 @@ export function HabitCard({
   habit_completion,
   habit_milestone,
   today = null,
+  isEditable = true,
   isCompletable = true,
   setRefresh = () => {},
 }: {
@@ -23,6 +24,7 @@ export function HabitCard({
   habit_completion: HabitCompletion | null;
   habit_milestone: HabitMilestone | null;
   today?: string | null;
+  isEditable?: boolean;
   isCompletable?: boolean;
   setRefresh?: Dispatch<SetStateAction<number>>;
 }) {
@@ -157,7 +159,10 @@ export function HabitCard({
       ]}>
       <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
+        {isEditable && (
+          <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
+        )}
+
         <IconButton
           iconName="chart.bar"
           onPress={() => onStatsButtonPressed(habit.id, habit.name)}

@@ -127,6 +127,12 @@ function RootNavigator() {
       <Stack.Protected guard={useUserContext().currentUserId != null}>
         <Stack.Screen name="(app)/(tabs)" options={{ headerTransparent: true, headerTitle: '' }} />
         <Stack.Screen
+          name="(app)/habit/full-list"
+          options={{
+            headerTitle: 'All Habits',
+          }}
+        />
+        <Stack.Screen
           name="(app)/friend/view"
           options={{
             headerTitle: 'Friends',
@@ -143,6 +149,12 @@ function RootNavigator() {
           options={{
             headerTitle: 'Edit Account',
             headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="(app)/friend/[id]"
+          options={{
+            headerTitle: 'Friend Profile',
           }}
         />
       </Stack.Protected>
