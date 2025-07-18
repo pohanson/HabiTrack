@@ -65,4 +65,16 @@ export class HabitMilestoneRepository extends SyncableRepository<HabitMilestone>
       .where(eq(habitMilestone.habit_id, habitId))
       .execute();
   }
+
+  public getBadgesEarnedByHabitIdQuery(habitId: string, includeDeleted: boolean = false) {
+    return this.db
+      .select({ badges_earned: habitMilestone.badges_earned })
+      .from(habitMilestone)
+      .where(
+        and(
+          eq(habitMilestone.habit_id, habitId),
+          includeDeleted ? undefined : eq(habitMilestone.isDeleted, false),
+        ),
+      );
+  }
 }

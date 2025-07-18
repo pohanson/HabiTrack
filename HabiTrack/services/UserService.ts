@@ -160,4 +160,31 @@ export class UserService extends BaseSyncableRepoService {
     console.warn(`User with ID ${userId} not found.`);
     return null;
   }
+
+  /**
+   * Retrieves total no. of badges earned of all habits of a user by user ID
+   * @param userId
+   */
+  public async getTotalBadgesEarnedByUserId(userId: string) {
+    // [habit, habit, habit...]
+    const habitArray = await this.dbService.habit.getAllHabits();
+    // converts array of habit rows into habit id strings [String, String, String...]
+    const habitIds = habitArray.map((habit) => String(habit.id));
+
+    // case where user has no habits, return 0
+    if (habitIds.length === 0) {
+      return 0;
+    }
+
+    // iterate through array and sum up the badges earned
+    let result = 0;
+    for (let i = 0; i < habitIds.length; i++) {
+      const badgesEarned = await this.dbService.habitMilestone.getBadgesEarnedByHabitId(
+        habitIds[i],
+      );
+      result += badgesEarned;
+    }
+
+    return result;
+  }
 }

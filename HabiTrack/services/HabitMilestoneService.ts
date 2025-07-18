@@ -131,4 +131,15 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
       activeStreak,
     };
   }
+
+  public async getBadgesEarnedByHabitId(
+    habitId: string,
+    includeDeleted: boolean = false,
+  ): Promise<number> {
+    const result = await this._habitMilestoneRepository.getBadgesEarnedByHabitIdQuery(
+      habitId,
+      includeDeleted,
+    );
+    return result.reduce((sum, unit) => sum + unit.badges_earned, 0);
+  }
 }

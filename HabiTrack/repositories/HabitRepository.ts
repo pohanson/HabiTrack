@@ -23,6 +23,23 @@ export class HabitRepository extends SyncableRepository<Habit> {
       );
   }
 
+  // /**
+  //  * Get all habit Ids for a user as a query
+  //  * @param userId
+  //  * @param includeDeleted
+  //  */
+  // public getHabitIdsByUserIdQuery(userId: string, includeDeleted: boolean = false) {
+  //   return this.db
+  //     .select({ habit_id: habit.id })
+  //     .from(habit)
+  //     .where(
+  //       and(
+  //         eq(habit.user_id, userId),
+  //         includeDeleted ? undefined : eq(habit.isDeleted, false)
+  //       )
+  //     );
+  // }
+
   /**
    * Get habit with reminder given a habitId as a query.
    */

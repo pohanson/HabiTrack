@@ -42,8 +42,8 @@ export function GroupCard({ group }: { group: Group }) {
 
   const press = (groupId: string, groupName: string) => {
     router.push({
-      pathname: '/habitCircles/group',
-      params: { id: group.id, name: group.name },
+      pathname: '../habitCircles/group',
+      params: { groupId: group.id, groupName: group.name },
     });
   };
 
