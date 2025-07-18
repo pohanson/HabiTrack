@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { addNetworkStateListener, getNetworkStateAsync, useNetworkState } from 'expo-network';
 import { router } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
@@ -100,14 +100,14 @@ export default function SignupPage() {
         label="Username (Case Sensitive)"
         name="username"
         isRequired={true}
-        textInputProps={{ spellCheck: false }}
+        spellCheck={false}
       />
       <RHFTextInput
         useFormReturn={useFormReturn}
         label="Name"
         name="name"
         isRequired={true}
-        textInputProps={{ spellCheck: false }}
+        spellCheck={false}
       />
       <RHFTextInput
         useFormReturn={useFormReturn}
@@ -118,7 +118,7 @@ export default function SignupPage() {
           minLength: { value: 6, message: 'Too Short! Password length must be between 6-18.' },
           maxLength: { value: 18, message: 'Too Long! Password length must be between 6-18.' },
         }}
-        textInputProps={{ spellCheck: false }}
+        spellCheck={false}
       />
       {isLoading ? (
         <ThemedText type="subtitle" style={{ textAlign: 'center', marginTop: 20 }}>
