@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { router, useNavigation } from 'expo-router';
 import { IconButton } from '@/components/IconButton';
 import { ScrollView, View } from 'react-native';
@@ -10,6 +10,8 @@ import { GroupCard } from '@/components/GroupCard';
 
 export default function HabitCirclesView() {
   const navigation = useNavigation();
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const databaseService = DatabaseService.instance;
 
@@ -24,6 +26,12 @@ export default function HabitCirclesView() {
   if (groupsError) {
     console.error('Error fetching groups:', groupsError);
   }
+
+  useEffect(() => {
+    if (groupsData !== undefined) {
+      setIsLoading(false);
+    }
+  }, [groupsData]);
 
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -40,19 +48,25 @@ export default function HabitCirclesView() {
         <IconButton iconName="plus" onPress={() => router.push('/habitCircles/create')} />
       </View>
 
-      <View style={{ width: '100%' }}>
-        <ThemedView style={{ gap: 10, padding: 10 }}>
-          {groupsData?.length === 0 ? (
-            <ThemedText>
-              {'You have no Habit Circles yet.\nCreate your first group to get started!'}
-            </ThemedText>
-          ) : (
-            groupsData?.map((groupRow) => (
-              <GroupCard key={groupRow.group.id} group={groupRow.group} />
-            ))
-          )}
-        </ThemedView>
-      </View>
+      {!isLoading ? (
+        <View style={{ width: '100%' }}>
+          <ThemedView style={{ gap: 10, padding: 10 }}>
+            {groupsData?.length === 0 ? (
+              <ThemedText>
+                {'You have no Habit Circles yet.\nCreate your first group to get started!'}
+              </ThemedText>
+            ) : (
+              groupsData?.map((groupRow) => (
+                <GroupCard key={groupRow.group.id} group={groupRow.group} />
+              ))
+            )}
+          </ThemedView>
+        </View>
+      ) : (
+        <View>
+          <ThemedText>Loading...</ThemedText>
+        </View>
+      )}
     </ScrollView>
   );
 }

@@ -33,4 +33,40 @@ export const Shadows = {
 
     elevation: 10,
   },
+
+  firstPlace: {
+    shadowColor: '#ff0000ff',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 6.25,
+
+    elevation: 20,
+  },
+
+  secondPlace: {
+    shadowColor: '#ff0000ff',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 6.25,
+
+    elevation: 20,
+  },
+
+  thirdPlace: {
+    shadowColor: '#ff0000ff',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 6.25,
+
+    elevation: 20,
+  },
 };

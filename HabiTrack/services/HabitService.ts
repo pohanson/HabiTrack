@@ -82,6 +82,15 @@ export class HabitService extends BaseSyncableRepoService {
   }
 
   /**
+   * Gets all habits for a user by user ID
+   * @param userId
+   * @param includeDeleted
+   */
+  public getHabitsByUserId(userId: string, includeDeleted: boolean = false) {
+    return this._habitRepository.getHabitsByUserIdQuery(userId, includeDeleted).execute();
+  }
+
+  /**
    * Retrieves a habit with its reminders by habit ID.
    */
   public async getHabitWithReminders(

@@ -11,7 +11,11 @@ export function LeaderboardHeader({
   onSelectionChange: (selection: string) => void;
 }) {
   const selectedColor = useThemeColor({}, 'blue');
-  const deselectedColor = 'dimgray';
+  const deselectedColor = 'gray';
+
+  const selectedTextColor = 'white';
+  const deselectedTextColor = 'black';
+
   return (
     <View
       style={{
@@ -27,14 +31,21 @@ export function LeaderboardHeader({
             height: '50%',
             backgroundColor: selectionType === 'Completion Rate' ? selectedColor : deselectedColor,
             width: '33%',
-            borderColor: useThemeColor({}, 'border'),
+            borderColor:
+              selectionType === 'Completion Rate' ? selectedTextColor : deselectedTextColor,
             borderWidth: 2,
+            borderTopLeftRadius: 15,
           },
           Shadows.large,
         ]}
         onPress={() => onSelectionChange('Completion Rate')}>
         <ThemedText
-          style={{ color: 'white', fontSize: 13, textAlign: 'center', fontWeight: 'bold' }}>
+          style={{
+            color: selectionType === 'Completion Rate' ? selectedTextColor : deselectedTextColor,
+            fontSize: 13,
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}>
           Completion Rate
         </ThemedText>
       </TouchableOpacity>
@@ -45,14 +56,20 @@ export function LeaderboardHeader({
             height: '50%',
             backgroundColor: selectionType === 'Badges Earned' ? selectedColor : deselectedColor,
             width: '33%',
-            borderColor: useThemeColor({}, 'border'),
+            borderColor:
+              selectionType === 'Badges Earned' ? selectedTextColor : deselectedTextColor,
             borderWidth: 2,
           },
           Shadows.large,
         ]}
         onPress={() => onSelectionChange('Badges Earned')}>
         <ThemedText
-          style={{ color: 'white', fontSize: 13, textAlign: 'center', fontWeight: 'bold' }}>
+          style={{
+            color: selectionType === 'Badges Earned' ? selectedTextColor : deselectedTextColor,
+            fontSize: 13,
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}>
           Badges Earned
         </ThemedText>
       </TouchableOpacity>
@@ -63,14 +80,21 @@ export function LeaderboardHeader({
             height: '50%',
             backgroundColor: selectionType === 'Active Streak' ? selectedColor : deselectedColor,
             width: '33%',
-            borderColor: useThemeColor({}, 'border'),
+            borderColor:
+              selectionType === 'Active Streak' ? selectedTextColor : deselectedTextColor,
             borderWidth: 2,
+            borderBottomRightRadius: 15,
           },
           Shadows.large,
         ]}
         onPress={() => onSelectionChange('Active Streak')}>
         <ThemedText
-          style={{ color: 'white', fontSize: 13, textAlign: 'center', fontWeight: 'bold' }}>
+          style={{
+            color: selectionType === 'Active Streak' ? selectedTextColor : deselectedTextColor,
+            fontSize: 13,
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}>
           Active Streak
         </ThemedText>
       </TouchableOpacity>

@@ -35,4 +35,36 @@ export class GroupMemberService extends BaseSyncableRepoService {
   public getNumberOfMembersByGroupId(groupId: string, includeDeleted: boolean = false) {
     return this.getMembersByGroupId(groupId, includeDeleted).then((query) => query.length);
   }
+
+  public async getMembersRankedByBadgesEarned(groupId: string, includeDeleted: boolean = false) {
+    const groupMembers = await this.getMembersByGroupId(groupId, includeDeleted);
+    const userIds = groupMembers.map((entry) => String(entry.groupMember.user_id));
+
+    const userArray = await Promise.all(
+      userIds.map((userId) => this.dbService.user.getUserById(userId)),
+    );
+    const totalBadgesEarnedArray = await Promise.all(
+      userIds.map(async (userId) => {
+        const result = await this.dbService.user.getTotalBadgesEarnedByUserId(userId);
+        return result;
+      }),
+    );
+
+    const membersWithTotalBadges = await Promise.all(
+      groupMembers.map(async (entry, idx) => ({
+        rank: 0,
+        user: userArray[idx],
+        totalBadgesEarned: totalBadgesEarnedArray[idx],
+      })),
+    );
+
+    const rankedMembers = membersWithTotalBadges
+      .sort((first, second) => second.totalBadgesEarned - first.totalBadgesEarned)
+      .map((entry, idx) => ({
+        ...entry,
+        rank: idx + 1,
+      }));
+
+    return rankedMembers;
+  }
 }

@@ -167,7 +167,7 @@ export class UserService extends BaseSyncableRepoService {
    */
   public async getTotalBadgesEarnedByUserId(userId: string) {
     // [habit, habit, habit...]
-    const habitArray = await this.dbService.habit.getAllHabits();
+    const habitArray = await this.dbService.habit.getHabitsByUserId(userId);
     // converts array of habit rows into habit id strings [String, String, String...]
     const habitIds = habitArray.map((habit) => String(habit.id));
 

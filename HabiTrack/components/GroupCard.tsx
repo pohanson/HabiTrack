@@ -90,7 +90,7 @@ export function GroupCard({ group }: { group: Group }) {
         </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <ThemedText
-            style={{ fontWeight: 'bold', fontSize: 16, color: useThemeColor({}, 'text') }}>
+            style={{ fontWeight: 'bold', fontSize: 16, color: useThemeColor({}, 'lightGray') }}>
             {noOfMembers}
           </ThemedText>
           <IconSymbol color={useThemeColor({}, 'tint')} name="person.2" size={22} />

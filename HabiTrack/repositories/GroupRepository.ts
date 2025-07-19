@@ -33,6 +33,11 @@ export class GroupRepository extends SyncableRepository<Group> {
       .orderBy(group.createdAt);
   }
 
+  /**
+   * Get name of group by groud ID as a query
+   * @param groupId
+   * @param includeDeleted
+   */
   public getGroupNameByIdQuery(groupId: string, includeDeleted: boolean = false) {
     return this.db
       .select({ name: group.name })
