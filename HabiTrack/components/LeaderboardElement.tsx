@@ -71,9 +71,10 @@ export function LeaderboardElement({
           width: '100%',
           justifyContent: 'space-between',
           borderRadius: 15,
-          padding: 10,
-          borderWidth: isUser ? 2 : 0,
-          borderColor: useThemeColor({}, 'blue'),
+          padding: 8,
+          borderWidth: isUser ? 3 : 0,
+          // set border color for the current user here
+          borderColor: 'white',
         },
         rankStyle.shadows,
       ]}>
@@ -85,6 +86,7 @@ export function LeaderboardElement({
         <ThemedText style={{ fontWeight: 'bold', color: useThemeColor({}, 'blue'), padding: 5 }}>
           {rank}
         </ThemedText>
+
         {/* name, username, profile pic */}
         <View style={{ marginLeft: 8 }}>
           <ThemedText
@@ -94,16 +96,19 @@ export function LeaderboardElement({
           <ThemedText style={{ color: '#888', fontSize: 12 }}>@{user.username}</ThemedText>
         </View>
       </View>
+
       {/* quantity based on selectionType */}
       <View
         style={[
           {
             borderRadius: 10,
             backgroundColor: useThemeColor({}, 'blue'),
-            padding: 10,
+            padding: 8,
             justifyContent: 'center',
+            borderWidth: 2,
+            borderColor: 'white',
           },
-          Shadows.medium,
+          Shadows.large,
         ]}>
         <ThemedText
           style={{ fontWeight: 'bold', alignSelf: 'center', fontSize: 12, color: 'white' }}>

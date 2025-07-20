@@ -67,4 +67,57 @@ export class GroupMemberService extends BaseSyncableRepoService {
 
     return rankedMembers;
   }
+
+  public async getMembersRankedByCompletionRate(groupId: string, includeDeleted: boolean = false) {
+    // get array of user IDs in the group
+    const groupMembers = await this.getMembersByGroupId(groupId, includeDeleted);
+    const userIds = groupMembers.map((entry) => String(entry.groupMember.user_id));
+
+    // map each user ID to a completion rate stat { totalNoOfExpectedDays: number, totalNoOfExpectedDays: number }
+    const totalCompletionRateStatsArray = await Promise.all(
+      userIds.map((userId) => this.dbService.user.getTotalCompletionRateStatsByUserId(userId)),
+    );
+
+    // get array of Users
+    const userArray = await Promise.all(
+      userIds.map((userId) => this.dbService.user.getUserById(userId)),
+    );
+
+    // get array of {
+    //  rank: number,
+    //  user: User,
+    //  totalCompletionRateStats: { totalNoOfExpectedDays: number, totalNoOfActualDays: number }
+    // }
+    const membersWithCompletionRateStats = await Promise.all(
+      groupMembers.map(async (entry, idx) => ({
+        rank: 0,
+        user: userArray[idx],
+        totalCompletionRateStats: totalCompletionRateStatsArray[idx],
+      })),
+    );
+
+    // rank the members
+    const rankedMembers = membersWithCompletionRateStats
+      .sort((first, second) => {
+        const firstPercent =
+          first.totalCompletionRateStats.totalNoOfExpectedDays === 0
+            ? // makes sure users with 0 expected days are properly sorted as having 0%
+              0
+            : first.totalCompletionRateStats.totalNoOfActualDays /
+              first.totalCompletionRateStats.totalNoOfExpectedDays;
+        const secondPercent =
+          second.totalCompletionRateStats.totalNoOfExpectedDays === 0
+            ? // makes sure users with 0 expected days are properly sorted as having 0%
+              0
+            : second.totalCompletionRateStats.totalNoOfActualDays /
+              second.totalCompletionRateStats.totalNoOfExpectedDays;
+        return secondPercent - firstPercent;
+      })
+      .map((entry, idx) => ({
+        ...entry,
+        rank: idx + 1,
+      }));
+
+    return rankedMembers;
+  }
 }

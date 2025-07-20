@@ -187,4 +187,36 @@ export class UserService extends BaseSyncableRepoService {
 
     return result;
   }
+
+  public async getTotalCompletionRateStatsByUserId(userId: string) {
+    // get all habits of the user first [habit1, habit2,...]
+    const habits = await this.dbService.habit.getHabitsByUserId(userId);
+
+    // convert to array of habit Id strings [habitId1, habitId2,...]
+    const habitIdsArray = habits.map((habit) => String(habit.id));
+
+    // convert to array of completion rate stats
+    const completionRatesArray = await Promise.all(
+      habitIdsArray.map((habitId) => this.dbService.habit.getCompletionRateStatsByHabitId(habitId)),
+    );
+
+    let totalNoOfExpectedDays = 0;
+    let totalNoOfActualDays = 0;
+
+    for (let i = 0; i < completionRatesArray.length; i++) {
+      const stats = completionRatesArray[i]('all');
+      totalNoOfExpectedDays += stats.expectedNoOfDays;
+      totalNoOfActualDays += stats.actualNoOfDays;
+    }
+
+    console.log('Total Completion Rate Stats for User ID:', userId);
+    console.log('Total No. of Actual Days:', totalNoOfActualDays);
+    console.log('Total No. of Expected Days:', totalNoOfExpectedDays);
+    console.log('////////////////////////////////////////////////////////////////////////');
+
+    return {
+      totalNoOfExpectedDays,
+      totalNoOfActualDays,
+    };
+  }
 }

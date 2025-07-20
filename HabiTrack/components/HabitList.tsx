@@ -28,19 +28,21 @@ export function HabitList({
       <ThemedText>No habits</ThemedText>
     </ThemedView>
   ) : (
-    <ScrollView>
-      <ThemedView style={{ padding: 10, gap: 10 }}>
-        {data.map((habitItem) => (
-          <HabitCard
-            key={habitItem.id}
-            habit={habitItem}
-            habit_completion={null}
-            isEditable={isEditable}
-            isCompletable={false}
-            habit_milestone={null}
-          />
-        ))}
-      </ThemedView>
-    </ScrollView>
+    <ThemedView style={{ flex: 1 }}>
+      <ScrollView>
+        <ThemedView style={{ padding: 10, gap: 10 }}>
+          {data.map((habitItem) => (
+            <HabitCard
+              key={habitItem.id}
+              habit={habitItem}
+              habit_completion={null}
+              isEditable={isEditable}
+              isCompletable={false}
+              habit_milestone={null}
+            />
+          ))}
+        </ThemedView>
+      </ScrollView>
+    </ThemedView>
   );
 }

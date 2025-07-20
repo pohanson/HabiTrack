@@ -194,4 +194,72 @@ export class HabitService extends BaseSyncableRepoService {
     this.dbService.habitMilestone.deleteMilestoneByHabitId(habitId);
     await this._habitRepository.delete(habitId);
   }
+
+  /**
+   * Calculates the completion rate statistics for a habit by its ID.
+   * Returns an array of objects: {
+   *    startDate: string;
+   *    expectedNoOfDays: number;
+   *    actualNoOfDays: number
+   * }
+   * @param habitId
+   */
+  public async getCompletionRateStatsByHabitId(habitId: string) {
+    try {
+      // fetch habit first
+      const habit = await this._habitRepository.getById(habitId);
+      if (!habit) {
+        throw new Error('Habit with ID ' + habitId + ' not found');
+      }
+
+      // fetch start date (frequencyLastModifiedAt or createdAt, whichever is later)
+      const createdAtDate = String(habit.createdAt).split('T')[0]; // yyyy-mm-dd
+      const frequencyLastModifiedAt = String(habit.frequencyModifiedAt).split('T')[0]; // yyyy-mm-dd
+      const startDate =
+        frequencyLastModifiedAt > createdAtDate ? frequencyLastModifiedAt : createdAtDate;
+
+      const startDateIso = new Date(startDate + 'T00:00:00.000Z').toISOString();
+
+      // fetch completion data for the habit
+      const completions = await this.dbService.habitCompletion.getCompletionsForHabit(habitId, {
+        completedStart: startDateIso,
+      });
+
+      // get frequency array for this habit
+      const freqData = await this.dbService.reminder.getRemindersForHabitQuery(habitId).execute();
+      const freq = freqData?.map((r) => r.day).sort() || [];
+      const freqSet = new Set(freq);
+
+      // filter out phantom completedAt
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayDOW = new Date(todayStr).getDay();
+      const filteredCompletions = completions
+        .map((entry) => ({
+          completedAt: String(entry.completedAt).split('T')[0],
+        }))
+        .filter((entry) => {
+          // don't include today's completedAt if today is not in freq
+          if (entry.completedAt === todayStr && !freq.includes(todayDOW)) {
+            return false;
+          }
+          // don't include completions on days not in freq (phantom completions)
+          const dow = new Date(entry.completedAt).getDay();
+          if (!freqSet.has(dow)) {
+            return false;
+          }
+          return entry.completedAt >= startDate;
+        });
+
+      // return the stats, array of:
+      // {
+      //    startDate: string;
+      //    expectedNoOfDays: number;
+      //    actualNoOfDays: number;
+      // }
+      return this.dbService.statistic.calcHabitStatistics(startDate, freq, filteredCompletions);
+    } catch (error) {
+      console.error('Error getting habit completion rate stats for habit: ' + habitId, error);
+      throw error;
+    }
+  }
 }

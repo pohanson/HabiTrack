@@ -3,10 +3,11 @@ import { ThemedView } from '@/components/ThemedView';
 import React, { useEffect, useState } from 'react';
 import { router, useNavigation } from 'expo-router';
 import { IconButton } from '@/components/IconButton';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, useColorScheme, View } from 'react-native';
 import { DatabaseService } from '@/services';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { GroupCard } from '@/components/GroupCard';
+import { Colors } from '@/constants/Colors';
 
 export default function HabitCirclesView() {
   const navigation = useNavigation();
@@ -33,8 +34,11 @@ export default function HabitCirclesView() {
     }
   }, [groupsData]);
 
+  const colorScheme = useColorScheme() ?? 'light';
+  const theme = Colors[colorScheme];
+
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: theme.background }}>
       <View
         style={{
           flexDirection: 'row',
@@ -43,13 +47,14 @@ export default function HabitCirclesView() {
           width: '80%',
           padding: 10,
           alignSelf: 'center',
+          backgroundColor: theme.background,
         }}>
         <ThemedText type="title">Your Groups</ThemedText>
         <IconButton iconName="plus" onPress={() => router.push('/habitCircles/create')} />
       </View>
 
       {!isLoading ? (
-        <View style={{ width: '100%' }}>
+        <View style={{ width: '100%', backgroundColor: theme.background }}>
           <ThemedView style={{ gap: 10, padding: 10 }}>
             {groupsData?.length === 0 ? (
               <ThemedText>

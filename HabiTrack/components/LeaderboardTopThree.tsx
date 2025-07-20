@@ -1,5 +1,5 @@
 import { User } from '@/db/localSchema';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { Shadows } from '@/constants/Shadows';
 
@@ -22,11 +22,15 @@ export function LeaderboardTopThree({
   const gapBetween = 1; // in percentage
   const borderRadius = 15;
 
-  const firstPlaceHeight = 55; // (min 40) in percentage
+  const firstPlaceHeight = 50; // (min 40) in percentage
 
   const firstPlaceHeightPercentage = `${firstPlaceHeight}%`;
-  const secondPlaceHeightPercentage = `${firstPlaceHeight - 20}%`; // 20% less than first place
-  const thirdPlaceHeightPercentage = `${firstPlaceHeight - 40}%`; // 40% less than first place
+  const secondPlaceHeightPercentage = `${firstPlaceHeight - 20}%`; // 15% less than first place
+  const thirdPlaceHeightPercentage = `${firstPlaceHeight - 30}%`; // 30% less than first place
+
+  const podiumNumberSizeFirstPlace = 50;
+  const podiumNumberSizeSecondPlace = 40;
+  const podiumNumberSizeThirdPlace = 30;
 
   return (
     <View
@@ -56,10 +60,19 @@ export function LeaderboardTopThree({
               height: secondPlaceHeightPercentage,
               backgroundColor: color2,
               borderTopLeftRadius: borderRadius,
+              justifyContent: 'center',
             },
             Shadows.large,
-          ]}
-        />
+          ]}>
+          <Image
+            style={{
+              width: podiumNumberSizeSecondPlace,
+              height: podiumNumberSizeSecondPlace,
+              alignSelf: 'center',
+            }}
+            source={require('@/assets/images/2.png')}
+          />
+        </View>
       </View>
 
       {/* first place */}
@@ -82,10 +95,19 @@ export function LeaderboardTopThree({
               backgroundColor: color1,
               borderTopLeftRadius: borderRadius,
               borderTopRightRadius: borderRadius,
+              justifyContent: 'center',
             },
             Shadows.large,
-          ]}
-        />
+          ]}>
+          <Image
+            style={{
+              width: podiumNumberSizeFirstPlace,
+              height: podiumNumberSizeFirstPlace,
+              alignSelf: 'center',
+            }}
+            source={require('@/assets/images/1.png')}
+          />
+        </View>
       </View>
 
       {/* third place */}
@@ -107,10 +129,19 @@ export function LeaderboardTopThree({
               height: thirdPlaceHeightPercentage,
               backgroundColor: color3,
               borderTopRightRadius: borderRadius,
+              justifyContent: 'center',
             },
             Shadows.large,
-          ]}
-        />
+          ]}>
+          <Image
+            style={{
+              width: podiumNumberSizeThirdPlace,
+              height: podiumNumberSizeThirdPlace,
+              alignSelf: 'center',
+            }}
+            source={require('@/assets/images/3.png')}
+          />
+        </View>
       </View>
     </View>
   );
