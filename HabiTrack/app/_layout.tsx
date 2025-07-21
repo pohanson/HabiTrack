@@ -94,6 +94,11 @@ export default function RootLayout() {
   }
   addNetworkStateListener((networkState) => {
     if (networkState.isInternetReachable) {
+      Toast.show({
+        text1: 'Connected to Internet',
+        text2: 'Syncing data...',
+        type: 'info',
+      });
       SyncService.init().syncAll();
     }
   });
