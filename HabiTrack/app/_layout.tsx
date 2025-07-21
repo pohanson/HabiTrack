@@ -10,7 +10,7 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useFonts } from 'expo-font';
 import { addNetworkStateListener, useNetworkState } from 'expo-network';
 import { Stack } from 'expo-router';
-import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
+import { openDatabaseSync } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
@@ -56,12 +56,26 @@ const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 const databaseService = DatabaseService.init(expoDb);
 const db = databaseService.db;
 NotificationManager.init();
+SyncService.init();
 export default function RootLayout() {
   const networkState = useNetworkState();
   useEffect(() => {
     NotificationManager.registerForPushNotificationsAsync().catch(console.error);
     NotificationManager.regeneratePushNotifications().catch(console.error);
   }, []);
+
+  useEffect(() => {
+    // sync every minute if internet is reachable
+    const syncInterval = setInterval(() => {
+      if (networkState.isInternetReachable) {
+        SyncService.instance.syncAll();
+      }
+    }, 60000);
+    return () => {
+      clearInterval(syncInterval);
+      console.log('Sync interval cleared');
+    };
+  }, [networkState, networkState.isInternetReachable]);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -80,15 +94,16 @@ export default function RootLayout() {
   }
   addNetworkStateListener((networkState) => {
     if (networkState.isInternetReachable) {
+      Toast.show({
+        text1: 'Connected to Internet',
+        text2: 'Syncing data...',
+        type: 'info',
+      });
       SyncService.init().syncAll();
     }
   });
 
-  console.log('networkstate', networkState);
-  if (networkState.isInternetReachable) {
-    SyncService.init();
-    SyncService.instance.syncAll();
-  } else {
+  if (!networkState.isInternetReachable) {
     Toast.show({
       text1: 'No Internet Connection',
       text2: 'No syncing done',
@@ -101,14 +116,9 @@ export default function RootLayout() {
       <UserProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Suspense fallback={<ActivityIndicator size="large" />}>
-            <SQLiteProvider
-              databaseName={DATABASE_NAME}
-              options={{ enableChangeListener: true }}
-              useSuspense>
-              <RootNavigator />
-              <StatusBar style="auto" hidden={true} />
-              <Toast config={toastConfig} />
-            </SQLiteProvider>
+            <RootNavigator />
+            <StatusBar style="auto" hidden={true} />
+            <Toast config={toastConfig} />
           </Suspense>
         </ThemeProvider>
       </UserProvider>
@@ -136,12 +146,6 @@ function RootNavigator() {
           name="(app)/friend/view"
           options={{
             headerTitle: 'Friends',
-          }}
-        />
-        <Stack.Screen
-          name="(app)/friend/notification"
-          options={{
-            headerTitle: 'Friends Notifications',
           }}
         />
         <Stack.Screen

@@ -7,7 +7,9 @@ const UserContext = createContext<{
 }>({ currentUserId: null, setCurrentUser: (user: string | null) => {} });
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const databaseService = DatabaseService.instance;
-  const [currentUserId, setCurrentUserId] = useState<string | null>(databaseService.userId);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(
+    databaseService?.userId || null,
+  );
   return (
     <UserContext.Provider
       value={{ currentUserId: currentUserId, setCurrentUser: setCurrentUserId }}>
