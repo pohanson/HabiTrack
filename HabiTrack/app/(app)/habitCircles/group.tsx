@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { DatabaseService } from '@/services';
 import { ThemedView } from '@/components/ThemedView';
@@ -6,8 +6,10 @@ import { LeaderboardHeader } from '@/components/LeaderboardHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { User } from '@/db/localSchema';
 import { LeaderboardElement } from '@/components/LeaderboardElement';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Pressable, Alert } from 'react-native';
 import { LeaderboardTopThree } from '@/components/LeaderboardTopThree';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function Group() {
   const navigation = useNavigation();
@@ -19,6 +21,35 @@ export default function Group() {
 
   const databaseService = DatabaseService.instance;
 
+  const iconColor = useThemeColor({}, 'text');
+
+  const handleLeaveGroup = useCallback(async () => {
+    try {
+      console.log('Leaving group:', groupId);
+      databaseService.groupMember.leaveGroup(groupId, databaseService.userId);
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error leaving group:', error);
+      Alert.alert('Error', 'Failed to leave group. Please try again.');
+    }
+  }, [databaseService.groupMember, databaseService.userId, groupId, navigation]);
+
+  const handleMenuPress = useCallback(() => {
+    Alert.alert('Leave Group', 'Are you sure you want to leave this group?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Confirm',
+        style: 'destructive',
+        onPress: () => {
+          handleLeaveGroup();
+        },
+      },
+    ]);
+  }, [handleLeaveGroup]);
+
   type LeaderboardEntry = {
     rank: number;
     user: User | null;
@@ -27,8 +58,15 @@ export default function Group() {
   };
 
   useEffect(() => {
-    navigation.setOptions({ headerTitle: groupName });
-  }, [databaseService.group, groupId, groupName, navigation]);
+    navigation.setOptions({
+      headerTitle: groupName,
+      headerRight: () => (
+        <Pressable onPress={handleMenuPress} style={{ padding: 10 }}>
+          <IconSymbol name="rectangle.portrait.and.arrow.right" size={24} color={iconColor} />
+        </Pressable>
+      ),
+    });
+  }, [databaseService.group, groupId, groupName, navigation, handleMenuPress, iconColor]);
 
   const getLeaderboardData = async (leaderboardMode: string) => {
     setIsLoading(true);

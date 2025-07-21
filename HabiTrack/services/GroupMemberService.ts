@@ -120,4 +120,11 @@ export class GroupMemberService extends BaseSyncableRepoService {
 
     return rankedMembers;
   }
+
+  public leaveGroup(groupId: string, userId: string | null = this.dbService.userId) {
+    if (userId == null) {
+      throw new Error('User ID is required to leave a group');
+    }
+    return this._groupMemberRepository.deleteByGroupIdAndUserId(groupId, userId);
+  }
 }

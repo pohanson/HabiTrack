@@ -66,14 +66,14 @@ export function GroupCard({ group }: { group: Group }) {
           <ThemedText
             style={{
               fontWeight: 'bold',
-              fontSize: 13,
+              fontSize: 10,
               textAlign: 'center',
               color: useThemeColor({}, 'lightGray'),
             }}>
-            Admin
+            Created by
           </ThemedText>
           <ThemedText
-            style={{ fontSize: 12, color: useThemeColor({}, 'blue'), textAlign: 'center' }}>
+            style={{ fontSize: 10, color: useThemeColor({}, 'blue'), textAlign: 'center' }}>
             @{adminUsername}
           </ThemedText>
         </View>
