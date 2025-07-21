@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { DatabaseService } from '@/services';
 import { ThemedView } from '@/components/ThemedView';
-import { LeaderboardHeader } from '@/components/LeaderboardHeader';
+import { LeaderboardHeader } from '@/components/leaderboard/LeaderboardHeader';
 import { ThemedText } from '@/components/ThemedText';
 import { User } from '@/db/localSchema';
-import { LeaderboardElement } from '@/components/LeaderboardElement';
+import { LeaderboardElement } from '@/components/leaderboard/LeaderboardElement';
 import { ScrollView, View, Pressable, Alert } from 'react-native';
-import { LeaderboardTopThree } from '@/components/LeaderboardTopThree';
+import { LeaderboardTopThree } from '@/components/leaderboard/LeaderboardTopThree';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useThemeColor } from '@/hooks/useThemeColor';
 

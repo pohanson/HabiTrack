@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { HabitMilestoneCard } from './HabitMilestoneCard';
 import { HabitMilestoneHeader } from './HabitMilestoneHeader';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
 
 export function HabitMilestoneList({ userId = undefined }: { userId?: string | null }) {
   const [refresh, setRefresh] = useState(0);

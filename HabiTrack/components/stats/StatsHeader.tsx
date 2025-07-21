@@ -1,6 +1,6 @@
 import { getNiceDateString, reorderDateString } from '@/utils/dateUtils';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
 import { Image } from 'react-native';
 
 export function StatsHeader({

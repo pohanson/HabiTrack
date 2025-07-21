@@ -1,8 +1,8 @@
-import { HabitList } from '@/components/HabitList';
-import { HabitMilestoneList } from '@/components/HabitMilestoneList';
+import { HabitList } from '@/components/habit/HabitList';
+import { HabitMilestoneList } from '@/components/milestone/HabitMilestoneList';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { UserInformation } from '@/components/UserInformation';
+import { UserInformation } from '@/components/user/UserInformation';
 import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';

@@ -1,7 +1,7 @@
-import { StatsCalendarView } from '@/components/StatsCalendarView';
-import { StatsCompletionRateView } from '@/components/StatsCompletionRateView';
-import { StatsDayStreakView } from '@/components/StatsDayStreakView';
-import { StatsHeader } from '@/components/StatsHeader';
+import { StatsCalendarView } from '@/components/stats/StatsCalendarView';
+import { StatsCompletionRateView } from '@/components/stats/StatsCompletionRateView';
+import { StatsDayStreakView } from '@/components/stats/StatsDayStreakView';
+import { StatsHeader } from '@/components/stats/StatsHeader';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 import { DatabaseService } from '@/services';

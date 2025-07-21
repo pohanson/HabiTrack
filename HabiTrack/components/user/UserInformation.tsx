@@ -1,7 +1,7 @@
 import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { View, Image } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { ThemedText } from '../ThemedText';
 
 export function UserInformation({ user }: { user: User | null }) {
   const borderColor = useThemeColor({}, 'border');

@@ -1,4 +1,4 @@
-import { HabitCard } from '@/components/HabitCard';
+import { HabitCard } from '@/components/habit/HabitCard';
 import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';

@@ -1,7 +1,7 @@
 import { User } from '@/db/localSchema';
 import { View, Image } from 'react-native';
 import { Shadows } from '@/constants/Shadows';
-import { UserProfileDisplay } from './UserProfileDisplay';
+import { UserProfileDisplay } from '../user/UserProfileDisplay';
 
 export function LeaderboardTopThree({
   user1,

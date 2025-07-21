@@ -1,6 +1,6 @@
 import { useColorScheme, View } from 'react-native';
-import { ThemedView } from './ThemedView';
-import { ThemedText } from './ThemedText';
+import { ThemedView } from '../ThemedView';
+import { ThemedText } from '../ThemedText';
 import { User } from '@/db/localSchema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Shadows } from '@/constants/Shadows';

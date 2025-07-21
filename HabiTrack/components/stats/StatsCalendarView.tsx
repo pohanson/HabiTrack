@@ -2,8 +2,8 @@ import { useColorScheme } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Shadows } from '@/constants/Shadows';
 import { Colors } from '@/constants/Colors';
-import { ThemedView } from './ThemedView';
-import { ThemedText } from './ThemedText';
+import { ThemedView } from '../ThemedView';
+import { ThemedText } from '../ThemedText';
 import { Circle } from '@/components/Circle';
 
 export function StatsCalendarView({

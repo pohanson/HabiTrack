@@ -1,6 +1,6 @@
 import { Shadows } from '@/constants/Shadows';
 import { TouchableOpacity, View } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { ThemedText } from '../ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export function LeaderboardHeader({
