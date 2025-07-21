@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React, { useEffect, useState } from 'react';
-import { router, useNavigation } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { IconButton } from '@/components/IconButton';
 import { ScrollView, useColorScheme, View } from 'react-native';
 import { DatabaseService } from '@/services';
@@ -16,12 +16,16 @@ export default function HabitCirclesView() {
 
   const databaseService = DatabaseService.instance;
 
+  const [refresh, setRefresh] = useState(0);
+  useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
+
   useEffect(() => {
     navigation.setOptions({ headerTitle: 'Habit Circles' });
   }, [navigation]);
 
   const { data: groupsData, error: groupsError } = useLiveQuery(
     databaseService.group.getGroupsByUserIdQuery(databaseService.userId),
+    [refresh],
   );
 
   if (groupsError) {

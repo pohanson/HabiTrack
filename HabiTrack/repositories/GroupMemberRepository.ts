@@ -24,4 +24,17 @@ export class GroupMemberRepository extends SyncableRepository<GroupMember> {
         ),
       );
   }
+
+  public async deleteByGroupIdAndUserId(groupId: string, userId: string) {
+    return this.db
+      .update(groupMember)
+      .set({ isDeleted: true })
+      .where(
+        and(
+          eq(groupMember.group_id, groupId),
+          eq(groupMember.user_id, userId),
+          eq(groupMember.isDeleted, false),
+        ),
+      );
+  }
 }

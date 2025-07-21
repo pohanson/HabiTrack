@@ -30,6 +30,7 @@ const MAPPING = {
   'person.crop.circle': 'account-circle',
   pencil: 'edit',
   'person.2': 'group',
+  'rectangle.portrait.and.arrow.right': 'logout',
 } as IconMapping;
 
 /**
