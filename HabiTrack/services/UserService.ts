@@ -147,4 +147,76 @@ export class UserService extends BaseSyncableRepoService {
     const userId = this.dbService.userId;
     return userId ? this.getUserById(userId) : null;
   }
+  
+  /**
+   * Retrieves a username by their user ID.
+   * @returns string if found, otherwise null
+   */
+  public async getUsernameById(userId: string): Promise<string | null> {
+    const user = await this._userRepository.getById(userId);
+    if (user) {
+      return user.username;
+    }
+    console.warn(`User with ID ${userId} not found.`);
+    return null;
+  }
+
+  /**
+   * Retrieves total no. of badges earned of all habits of a user by user ID
+   * @param userId
+   */
+  public async getTotalBadgesEarnedByUserId(userId: string) {
+    // [habit, habit, habit...]
+    const habitArray = await this.dbService.habit.getHabitsByUserId(userId);
+    // converts array of habit rows into habit id strings [String, String, String...]
+    const habitIds = habitArray.map((habit) => String(habit.id));
+
+    // case where user has no habits, return 0
+    if (habitIds.length === 0) {
+      return 0;
+    }
+
+    // iterate through array and sum up the badges earned
+    let result = 0;
+    for (let i = 0; i < habitIds.length; i++) {
+      const badgesEarned = await this.dbService.habitMilestone.getBadgesEarnedByHabitId(
+        habitIds[i],
+      );
+      result += badgesEarned;
+    }
+
+    return result;
+  }
+
+  public async getTotalCompletionRateStatsByUserId(userId: string) {
+    // get all habits of the user first [habit1, habit2,...]
+    const habits = await this.dbService.habit.getHabitsByUserId(userId);
+
+    // convert to array of habit Id strings [habitId1, habitId2,...]
+    const habitIdsArray = habits.map((habit) => String(habit.id));
+
+    // convert to array of completion rate stats
+    const completionRatesArray = await Promise.all(
+      habitIdsArray.map((habitId) => this.dbService.habit.getCompletionRateStatsByHabitId(habitId)),
+    );
+
+    let totalNoOfExpectedDays = 0;
+    let totalNoOfActualDays = 0;
+
+    for (let i = 0; i < completionRatesArray.length; i++) {
+      const stats = completionRatesArray[i]('all');
+      totalNoOfExpectedDays += stats.expectedNoOfDays;
+      totalNoOfActualDays += stats.actualNoOfDays;
+    }
+
+    console.log('Total Completion Rate Stats for User ID:', userId);
+    console.log('Total No. of Actual Days:', totalNoOfActualDays);
+    console.log('Total No. of Expected Days:', totalNoOfExpectedDays);
+    console.log('////////////////////////////////////////////////////////////////////////');
+
+    return {
+      totalNoOfExpectedDays,
+      totalNoOfActualDays,
+    };
+  }
 }

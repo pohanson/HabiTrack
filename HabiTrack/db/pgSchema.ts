@@ -78,3 +78,27 @@ export const friend = pgTable('friend', {
   modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
+
+export const group = pgTable('group', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  admin_id: text('admin_id')
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
+  modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});
+
+export const groupMember = pgTable('group_member', {
+  id: text('id').primaryKey(),
+  group_id: text('group_id')
+    .notNull()
+    .references(() => group.id),
+  user_id: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
+  modifiedAt: timestamp('modifiedAt', { withTimezone: true }).notNull().defaultNow(),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});

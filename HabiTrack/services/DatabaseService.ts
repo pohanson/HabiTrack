@@ -8,6 +8,8 @@ import { HabitMilestoneService } from './HabitMilestoneService';
 import { StatisticService } from './StatisticService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FriendService } from './FriendService';
+import { GroupService } from './GroupService';
+import { GroupMemberService } from './GroupMemberService';
 
 export class DatabaseService {
   static #instance: DatabaseService;
@@ -21,6 +23,8 @@ export class DatabaseService {
   private _habitMilestoneService: HabitMilestoneService; // Placeholder for HabitMilestoneService, if needed
   private _statisticService: StatisticService;
   private _friendService: FriendService;
+  private _groupService: GroupService;
+  private _groupMemberService: GroupMemberService;
 
   private constructor(expoDb: SQLiteDatabase) {
     this._db = drizzle(expoDb);
@@ -35,6 +39,8 @@ export class DatabaseService {
     this._habitMilestoneService = HabitMilestoneService.init(this);
     this._statisticService = StatisticService.init(this);
     this._friendService = FriendService.init(this);
+    this._groupService = GroupService.init(this);
+    this._groupMemberService = GroupMemberService.init(this);
   }
 
   public static init(db: SQLiteDatabase) {
@@ -92,7 +98,16 @@ export class DatabaseService {
   public get statistic() {
     return this._statisticService;
   }
+
   public get friend() {
     return this._friendService;
+  }
+
+  public get group() {
+    return this._groupService;
+  }
+
+  public get groupMember() {
+    return this._groupMemberService;
   }
 }

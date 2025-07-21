@@ -104,12 +104,46 @@ export const friend = sqliteTable('friend', {
   isDeleted: boolean('isDeleted').notNull().default(false),
 });
 
+export const group = sqliteTable('group', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  admin_id: text('admin_id')
+    .notNull()
+    .references(() => user.id),
+  createdAt: text('createdAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  modifiedAt: text('modifiedAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});
+
+export const groupMember = sqliteTable('group_member', {
+  id: text('id').primaryKey(),
+  group_id: text('group_id')
+    .notNull()
+    .references(() => group.id),
+  user_id: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  createdAt: text('createdAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  modifiedAt: text('modifiedAt')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  isDeleted: boolean('isDeleted').notNull().default(false),
+});
+
 export type Habit = typeof habit.$inferSelect;
 export type Reminder = typeof reminder.$inferSelect;
 export type HabitCompletion = typeof habitCompletion.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type HabitMilestone = typeof habitMilestone.$inferSelect;
 export type Friend = typeof friend.$inferSelect;
+export type Group = typeof group.$inferSelect;
+export type GroupMember = typeof groupMember.$inferSelect;
 
 export type InsertHabit = typeof habit.$inferInsert;
 export type InsertReminder = typeof reminder.$inferInsert;
@@ -117,3 +151,5 @@ export type InsertHabitCompletion = typeof habitCompletion.$inferInsert;
 export type InsertUser = typeof user.$inferInsert;
 export type InsertHabitMilestone = typeof habitMilestone.$inferInsert;
 export type InsertFriend = typeof friend.$inferInsert;
+export type InsertGroup = typeof group.$inferInsert;
+export type InsertGroupMember = typeof groupMember.$inferInsert;
