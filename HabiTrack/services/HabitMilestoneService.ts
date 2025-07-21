@@ -142,4 +142,8 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
     );
     return result.reduce((sum, unit) => sum + unit.badges_earned, 0);
   }
+
+  public async getActiveStreakByHabitId(habitId: string) {
+    // first check for streak breaks then update habitMilestone
+  }
 }

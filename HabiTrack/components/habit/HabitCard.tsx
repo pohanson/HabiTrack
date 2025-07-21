@@ -5,11 +5,11 @@ import { calculateDaysBetweenDates } from '@/utils/dateUtils';
 import { router } from 'expo-router';
 import { Dispatch, SetStateAction } from 'react';
 import { View } from 'react-native';
-import { Shadows } from '../constants/Shadows';
-import { IconButton } from './IconButton';
-import { ThemedText } from './ThemedText';
-import { ToggleInput } from './ToggleInput';
 import { getBadgesEarned } from '@/utils/milestoneUtils';
+import { Shadows } from '@/constants/Shadows';
+import { IconButton } from '../IconButton';
+import { ThemedText } from '../ThemedText';
+import { ToggleInput } from '../ToggleInput';
 
 export function HabitCard({
   habit,

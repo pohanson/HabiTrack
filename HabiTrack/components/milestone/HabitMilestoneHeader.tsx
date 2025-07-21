@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Image, Modal, TouchableOpacity, useColorScheme, View } from 'react-native';
-import { ThemedView } from './ThemedView';
-import { ThemedText } from './ThemedText';
+import { ThemedView } from '../ThemedView';
+import { ThemedText } from '../ThemedText';
 import { Colors } from '@/constants/Colors';
 
 export function HabitMilestoneHeader({

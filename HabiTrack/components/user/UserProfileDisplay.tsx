@@ -1,6 +1,6 @@
 import { User } from '@/db/localSchema';
 import { View, Image } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { ThemedText } from '../ThemedText';
 
 export function UserProfileDisplay({
   user,

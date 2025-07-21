@@ -3,8 +3,8 @@ import { DatabaseService } from '@/services';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { HabitCard } from './HabitCard';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
 
 export function HabitList({
   userId = undefined,

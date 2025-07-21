@@ -4,8 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 import React, { useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import PieChart from './PieChart';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
 import { getColorForPercentage } from '@/utils/colorUtils';
 import { reorderDateString } from '@/utils/dateUtils';
 

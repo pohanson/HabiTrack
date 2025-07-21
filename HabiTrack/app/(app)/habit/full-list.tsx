@@ -1,4 +1,4 @@
-import { HabitList } from '@/components/HabitList';
+import { HabitList } from '@/components/habit/HabitList';
 
 export default function FullHabitListScreen() {
   return <HabitList />;

@@ -1,7 +1,7 @@
 import { TextButton } from '@/components/TextButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { UserInformation } from '@/components/UserInformation';
+import { UserInformation } from '@/components/user/UserInformation';
 import { useUserContext } from '@/context/UserContext';
 import { User } from '@/db/schema';
 import { DatabaseService } from '@/services';

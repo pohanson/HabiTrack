@@ -1,9 +1,9 @@
+import { Shadows } from '@/constants/Shadows';
 import { getProgressBarColorForPercentage } from '@/utils/colorUtils';
 import { Image, Text, useColorScheme, View } from 'react-native';
-import { Colors } from '../constants/Colors';
-import { Shadows } from '../constants/Shadows';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import { Colors } from '@/constants/Colors';
 
 export function HabitMilestoneCard({
   habitName,
