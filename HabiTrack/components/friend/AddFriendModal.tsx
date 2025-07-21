@@ -34,7 +34,7 @@ export function AddFriendModal({
       });
   }, [databaseService.friend, databaseService.user, databaseService.userId, searchStr]);
   return (
-    <Modal {...props}>
+    <Modal {...props} onRequestClose={() => setIsAddModalVisible(false)}>
       <View
         style={{
           flex: 1,
