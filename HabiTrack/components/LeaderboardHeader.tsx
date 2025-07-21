@@ -59,6 +59,7 @@ export function LeaderboardHeader({
             borderColor:
               selectionType === 'Badges Earned' ? selectedTextColor : deselectedTextColor,
             borderWidth: 2,
+            borderBottomRightRadius: 15,
           },
           Shadows.large,
         ]}
@@ -71,31 +72,6 @@ export function LeaderboardHeader({
             fontWeight: 'bold',
           }}>
           Badges Earned
-        </ThemedText>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[
-          {
-            height: '50%',
-            backgroundColor: selectionType === 'Active Streak' ? selectedColor : deselectedColor,
-            width: '33%',
-            borderColor:
-              selectionType === 'Active Streak' ? selectedTextColor : deselectedTextColor,
-            borderWidth: 2,
-            borderBottomRightRadius: 15,
-          },
-          Shadows.large,
-        ]}
-        onPress={() => onSelectionChange('Active Streak')}>
-        <ThemedText
-          style={{
-            color: selectionType === 'Active Streak' ? selectedTextColor : deselectedTextColor,
-            fontSize: 13,
-            textAlign: 'center',
-            fontWeight: 'bold',
-          }}>
-          Active Streak
         </ThemedText>
       </TouchableOpacity>
     </View>

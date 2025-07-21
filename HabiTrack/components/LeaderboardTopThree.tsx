@@ -1,7 +1,7 @@
 import { User } from '@/db/localSchema';
 import { View, Image } from 'react-native';
-import { ThemedText } from './ThemedText';
 import { Shadows } from '@/constants/Shadows';
+import { UserProfileDisplay } from './UserProfileDisplay';
 
 export function LeaderboardTopThree({
   user1,
@@ -43,16 +43,7 @@ export function LeaderboardTopThree({
       }}>
       {/* second place */}
       <View style={{ alignItems: 'center', width: width }}>
-        {user2 && (
-          <View style={{ marginBottom: 4 }}>
-            <ThemedText style={{ fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>
-              {user2.name}
-            </ThemedText>
-            <ThemedText style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>
-              @{user2.username}
-            </ThemedText>
-          </View>
-        )}
+        {user2 && <UserProfileDisplay user={user2} />}
         <View
           style={[
             {
@@ -77,16 +68,7 @@ export function LeaderboardTopThree({
 
       {/* first place */}
       <View style={{ alignItems: 'center', width: width }}>
-        {user1 && (
-          <View style={{ marginBottom: 4 }}>
-            <ThemedText style={{ fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>
-              {user1.name}
-            </ThemedText>
-            <ThemedText style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>
-              @{user1.username}
-            </ThemedText>
-          </View>
-        )}
+        {user1 && <UserProfileDisplay user={user1} />}
         <View
           style={[
             {
@@ -112,16 +94,7 @@ export function LeaderboardTopThree({
 
       {/* third place */}
       <View style={{ alignItems: 'center', width: width }}>
-        {user3 && (
-          <View style={{ marginBottom: 4 }}>
-            <ThemedText style={{ fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>
-              {user3.name}
-            </ThemedText>
-            <ThemedText style={{ fontSize: 12, color: '#888', textAlign: 'center' }}>
-              @{user3.username}
-            </ThemedText>
-          </View>
-        )}
+        {user3 && <UserProfileDisplay user={user3} />}
         <View
           style={[
             {
