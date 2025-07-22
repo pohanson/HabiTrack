@@ -1,24 +1,15 @@
-import { DatabaseService } from '@/services';
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ScrollView } from 'react-native';
-import { HabitMilestoneCard } from './HabitMilestoneCard';
-import { HabitMilestoneHeader } from './HabitMilestoneHeader';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
+import { HabitMilestoneCard } from './HabitMilestoneCard';
+import { HabitMilestoneHeader } from './HabitMilestoneHeader';
 
-export function HabitMilestoneList({ userId = undefined }: { userId?: string | null }) {
-  const [refresh, setRefresh] = useState(0);
-  const [data, setData] = useState<
-    { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[]
-  >([]);
-
-  const databaseService = DatabaseService.instance;
-
-  useEffect(() => {
-    databaseService.habitMilestone.getAllMilestonesQuery(userId).then(setData);
-  }, [databaseService.habitMilestone, userId, refresh]);
-
+export function HabitMilestoneList({
+  data,
+}: {
+  data: { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[];
+}) {
   // extra calcs for active badges. Define complete habits as habits with all 5 milestone badges
   const totalMilestoneBadges = useMemo(
     () =>
@@ -28,12 +19,6 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
   const totalCompleteHabits = useMemo(
     () => data?.filter((item) => Number(item.badges_earned) >= 5).length,
     [data],
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      setRefresh((prev) => prev + 1);
-    }, []),
   );
 
   return (
@@ -62,7 +47,7 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
           {data.map(({ habit_name, habit_id, week_streak, badges_earned }) => (
             <HabitMilestoneCard
               testID={`habit-milestone-card-${habit_id}`}
-              key={`${habit_id}-${refresh}`}
+              key={`${habit_id}`}
               habitName={habit_name || 'No name'}
               weekStreak={week_streak}
               badgesEarned={badges_earned}

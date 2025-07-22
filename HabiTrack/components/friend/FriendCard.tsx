@@ -1,10 +1,11 @@
 import { Shadows } from '@/constants/Shadows';
 import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Image, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { IconButton } from '../IconButton';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function FriendCard({
   testID = 'friend-card',
@@ -48,39 +49,8 @@ export function FriendCard({
           },
           Shadows.large,
         ]}>
-        <View testID={`friend-info-${friend.id}`} style={{ flexDirection: 'row', gap: 10 }}>
-          {friend.profilePicture ? (
-            <Image
-              testID={`friend-profile-picture-${friend.id}`}
-              source={{
-                uri: friend.profilePicture
-                  ? `data:image/jpeg;base64,${friend.profilePicture}`
-                  : undefined,
-              }}
-              style={{ width: 50, height: 50, borderRadius: 25 }}
-            />
-          ) : (
-            <View
-              testID={`friend-profile-placeholder-${friend.id}`}
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 100,
-                backgroundColor: '#ccc',
-                marginBottom: 4,
-                justifyContent: 'center',
-              }}>
-              <ThemedText
-                testID={`friend-profile-initial-${friend.id}`}
-                style={{
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  color: 'black',
-                }}>
-                {friend.username.charAt(0).toUpperCase()}
-              </ThemedText>
-            </View>
-          )}
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ProfilePicture user={friend} />
           <View testID={`friend-text-info-${friend.id}`}>
             <ThemedText testID={`friend-name-${friend.id}`}>{friend.name}</ThemedText>
             <ThemedText testID={`friend-username-${friend.id}`}>@{friend.username}</ThemedText>

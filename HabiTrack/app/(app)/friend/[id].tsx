@@ -3,10 +3,10 @@ import { HabitMilestoneList } from '@/components/milestone/HabitMilestoneList';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { UserInformation } from '@/components/user/UserInformation';
-import { User } from '@/db/schema';
+import { Habit, User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { MaterialTabBar, Tabs } from 'react-native-collapsible-tab-view';
@@ -97,12 +97,19 @@ function FriendTabs() {
 function FriendHabitScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
+  const habitService = DatabaseService.instance.habit;
+  const [data, setData] = useState<Habit[]>([]);
+  useEffect(() => {
+    if (!friend) return;
+    habitService.getAllHabits(friend.id).then(setData);
+  }, [habitService, friend]);
+
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
-        <HabitList userId={friend.id} />
+        <HabitList data={data.map((habit) => ({ habit }))} />
       )}
     </ThemedView>
   );
@@ -111,12 +118,27 @@ function FriendHabitScreen() {
 function FriendMilestoneScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
+
+  const [data, setData] = useState<
+    { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[]
+  >([]);
+  const [refresh, setRefresh] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      setRefresh((prev) => prev + 1);
+    }, []),
+  );
+  const databaseService = DatabaseService.instance;
+  useEffect(() => {
+    databaseService.habitMilestone.getAllMilestonesQuery(friend?.id).then(setData);
+  }, [databaseService.habitMilestone, friend?.id, refresh]);
+
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
-        <HabitMilestoneList userId={friend.id} />
+        <HabitMilestoneList data={data} />
       )}
     </ThemedView>
   );
