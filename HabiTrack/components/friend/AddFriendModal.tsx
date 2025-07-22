@@ -6,6 +6,7 @@ import { Modal, ModalProps, TextInput, View } from 'react-native';
 import { TextButton } from '../TextButton';
 import { ThemedText } from '../ThemedText';
 import { FriendCard } from './FriendCard';
+import { SyncService } from '@/services/SyncService';
 
 export function AddFriendModal({
   setIsAddModalVisible,
@@ -17,6 +18,10 @@ export function AddFriendModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [friendSuggestions, setFriendSuggestion] = useState<User[]>([]);
   const databaseService = DatabaseService.instance;
+
+  useEffect(() => {
+    SyncService.syncRepoService(databaseService.friend);
+  }, [databaseService.friend]);
 
   useEffect(() => {
     databaseService.friend
@@ -76,6 +81,9 @@ export function AddFriendModal({
               onAdd={() => {
                 databaseService.friend
                   .addFriend(friendData.id)
+                  .then(() => {
+                    SyncService.syncRepoService(databaseService.friend);
+                  })
                   .then(() => {
                     setIsAddModalVisible(false);
                   })

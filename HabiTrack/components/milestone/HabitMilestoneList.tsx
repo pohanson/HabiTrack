@@ -1,24 +1,15 @@
-import { DatabaseService } from '@/services';
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ScrollView } from 'react-native';
-import { HabitMilestoneCard } from './HabitMilestoneCard';
-import { HabitMilestoneHeader } from './HabitMilestoneHeader';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
+import { HabitMilestoneCard } from './HabitMilestoneCard';
+import { HabitMilestoneHeader } from './HabitMilestoneHeader';
 
-export function HabitMilestoneList({ userId = undefined }: { userId?: string | null }) {
-  const [refresh, setRefresh] = useState(0);
-  const [data, setData] = useState<
-    { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[]
-  >([]);
-
-  const databaseService = DatabaseService.instance;
-
-  useEffect(() => {
-    databaseService.habitMilestone.getAllMilestonesQuery(userId).then(setData);
-  }, [databaseService.habitMilestone, userId, refresh]);
-
+export function HabitMilestoneList({
+  data,
+}: {
+  data: { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[];
+}) {
   // extra calcs for active badges. Define complete habits as habits with all 5 milestone badges
   const totalMilestoneBadges = useMemo(
     () =>
@@ -30,20 +21,8 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
     [data],
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      setRefresh((prev) => prev + 1);
-    }, []),
-  );
-
   return (
     <ThemedView style={{ flex: 1 }}>
-      {data?.length === 0 && (
-        <ThemedView>
-          <ThemedText>No habits</ThemedText>
-        </ThemedView>
-      )}
-
       <ScrollView>
         <ThemedView
           style={{ gap: 10, padding: 10, justifyContent: 'center', alignItems: 'center' }}>
@@ -55,9 +34,20 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
         </ThemedView>
 
         <ThemedView style={{ gap: 10, padding: 10 }}>
+          {data?.length === 0 && (
+            <ThemedText
+              type="title"
+              style={{
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                height: '100%',
+              }}>
+              No Habits
+            </ThemedText>
+          )}
           {data.map(({ habit_name, habit_id, week_streak, badges_earned }) => (
             <HabitMilestoneCard
-              key={`${habit_id}-${refresh}`}
+              key={`${habit_id}`}
               habitName={habit_name || 'No name'}
               weekStreak={week_streak}
               badgesEarned={badges_earned}

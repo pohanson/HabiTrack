@@ -7,30 +7,32 @@ import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
 import { SyncService } from '@/services/SyncService';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
 export default function FriendView() {
+  const [refresh, setRefresh] = useState(0);
+  useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
   const [userFriends, setUserFriends] = useState<User[]>([]);
-  const [refresh, setRefresh] = useState(0);
   const [searchStr, setSearchStr] = useState('');
   const databaseService = DatabaseService.instance;
 
   useEffect(() => {
-    SyncService.syncRepoService(databaseService.friend);
-    databaseService.friend
-      .getIncomingPendingRequests()
-      .then((result) => setPendingRequests(result || []));
-    databaseService.friend.getUserFriends().then((result) => setUserFriends(result || []));
+    SyncService.syncRepoService(databaseService.friend).then(() => {
+      databaseService.friend
+        .getIncomingPendingRequests()
+        .then((result) => setPendingRequests(result || []));
+      databaseService.friend.getUserFriends().then((result) => setUserFriends(result || []));
+    });
   }, [databaseService.friend, refresh]);
 
   return (
     <ThemedView style={{ flex: 1, alignItems: 'center' }}>
       {pendingRequests.length > 0 && (
-        <>
+        <View style={{ gap: 10 }}>
           <ThemedText type="subtitle">Your Pending Request</ThemedText>
           {pendingRequests.map((user) => (
             <FriendCard
@@ -48,7 +50,7 @@ export default function FriendView() {
               }
             />
           ))}
-        </>
+        </View>
       )}
       <AddFriendModal
         visible={isAddModalVisible}

@@ -5,18 +5,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { GroupInsertionData } from '@/services/GroupService';
-import { useNavigation } from 'expo-router';
-import { useEffect } from 'react';
+import { router } from 'expo-router';
 import { FieldValues, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 export default function CreateGroupScreen() {
-  const navigation = useNavigation();
-  useEffect(() => {
-    navigation.setOptions({ headerTitle: 'Create Group' });
-  }, [navigation]);
-
   const databaseService = DatabaseService.instance;
 
   const useFormReturn = useForm<FieldValues>({
@@ -37,7 +31,7 @@ export default function CreateGroupScreen() {
           type: 'success',
         });
         useFormReturn.reset();
-        navigation.goBack();
+        router.back();
       } catch (error) {
         console.error('Error inserting group:', error);
         Toast.show({

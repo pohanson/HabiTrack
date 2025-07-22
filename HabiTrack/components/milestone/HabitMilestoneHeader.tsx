@@ -128,30 +128,30 @@ function getAdditionalMilestoneBadgesRequired(totalMilestoneBadges: number) {
 
 function getMasteryBadgeImage(badgeType: number, masteryBadgeLevel: number) {
   if (badgeType === 0 && masteryBadgeLevel === 0)
-    return require('../assets/images/badges/colored/mastery0.png');
+    return require('@/assets/images/badges/colored/mastery0.png');
   if (badgeType === 0 && masteryBadgeLevel !== 0)
-    return require('../assets/images/badges/greyscale/gmastery0.png');
+    return require('@/assets/images/badges/greyscale/gmastery0.png');
   if (badgeType === 1 && masteryBadgeLevel === 1)
-    return require('../assets/images/badges/colored/mastery1.png');
+    return require('@/assets/images/badges/colored/mastery1.png');
   if (badgeType === 1 && masteryBadgeLevel !== 1)
-    return require('../assets/images/badges/greyscale/gmastery1.png');
+    return require('@/assets/images/badges/greyscale/gmastery1.png');
   if (badgeType === 2 && masteryBadgeLevel === 2)
-    return require('../assets/images/badges/colored/mastery2.png');
+    return require('@/assets/images/badges/colored/mastery2.png');
   if (badgeType === 2 && masteryBadgeLevel !== 2)
-    return require('../assets/images/badges/greyscale/gmastery2.png');
+    return require('@/assets/images/badges/greyscale/gmastery2.png');
   if (badgeType === 3 && masteryBadgeLevel === 3)
-    return require('../assets/images/badges/colored/mastery3.png');
+    return require('@/assets/images/badges/colored/mastery3.png');
   if (badgeType === 3 && masteryBadgeLevel !== 3)
-    return require('../assets/images/badges/greyscale/gmastery3.png');
+    return require('@/assets/images/badges/greyscale/gmastery3.png');
   if (badgeType === 4 && masteryBadgeLevel === 4)
-    return require('../assets/images/badges/colored/mastery4.png');
+    return require('@/assets/images/badges/colored/mastery4.png');
   if (badgeType === 4 && masteryBadgeLevel !== 4)
-    return require('../assets/images/badges/greyscale/gmastery4.png');
+    return require('@/assets/images/badges/greyscale/gmastery4.png');
   if (badgeType === 5 && masteryBadgeLevel === 5)
-    return require('../assets/images/badges/colored/mastery5.png');
+    return require('@/assets/images/badges/colored/mastery5.png');
   if (badgeType === 5 && masteryBadgeLevel !== 5)
-    return require('../assets/images/badges/greyscale/gmastery5.png');
-  return require('../assets/images/badges/greyscale/gmastery0.png');
+    return require('@/assets/images/badges/greyscale/gmastery5.png');
+  return require('@/assets/images/badges/greyscale/gmastery0.png');
 }
 
 function getMasteryBadgeName(badgeType: number) {
@@ -283,13 +283,13 @@ function getAdditionalCompleteHabitsRequired(totalCompleteHabits: number) {
 }
 
 function getCompletionBadgeImage(badgeType: number) {
-  if (badgeType === 0) return require('../assets/images/badges/colored/locked.png');
-  if (badgeType === 1) return require('../assets/images/badges/colored/bronze.png');
-  if (badgeType === 2) return require('../assets/images/badges/colored/silver.png');
-  if (badgeType === 3) return require('../assets/images/badges/colored/gold.png');
-  if (badgeType === 4) return require('../assets/images/badges/colored/emerald.png');
-  if (badgeType === 5) return require('../assets/images/badges/colored/diamond.png');
-  return require('../assets/images/badges/colored/locked.png');
+  if (badgeType === 0) return require('@/assets/images/badges/colored/locked.png');
+  if (badgeType === 1) return require('@/assets/images/badges/colored/bronze.png');
+  if (badgeType === 2) return require('@/assets/images/badges/colored/silver.png');
+  if (badgeType === 3) return require('@/assets/images/badges/colored/gold.png');
+  if (badgeType === 4) return require('@/assets/images/badges/colored/emerald.png');
+  if (badgeType === 5) return require('@/assets/images/badges/colored/diamond.png');
+  return require('@/assets/images/badges/colored/locked.png');
 }
 
 function getCompletionBadgeName(badgeType: number) {

@@ -126,7 +126,6 @@ export class UserService extends BaseSyncableRepoService {
 
   public async signinUser(username: string, password: string): Promise<User | null> {
     const user = await this.getUserByUsername(username);
-    console.log('User found:', user);
     if (!user) {
       return null;
     }
@@ -147,7 +146,7 @@ export class UserService extends BaseSyncableRepoService {
     const userId = this.dbService.userId;
     return userId ? this.getUserById(userId) : null;
   }
-  
+
   /**
    * Retrieves a username by their user ID.
    * @returns string if found, otherwise null

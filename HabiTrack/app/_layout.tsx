@@ -52,6 +52,25 @@ const toastConfig = {
   ),
 };
 
+const screenConfigs = {
+  unauthenticated: [
+    { name: 'signup', options: { headerShown: false } },
+    { name: 'signin', options: { headerShown: false } },
+  ],
+  authenticated: [
+    { name: '(app)/(tabs)', options: { headerTransparent: true, headerTitle: '' } },
+    { name: '(app)/habit/full-list', options: { headerTitle: 'All Habits' } },
+    { name: '(app)/friend/view', options: { headerTitle: 'Friends' } },
+    { name: '(app)/account/edit/[id]', options: { headerTitle: 'Edit Account' } },
+    { name: '(app)/friend/[id]', options: { headerTitle: 'Friend Profile' } },
+    { name: '(app)/habitCircles/view', options: { headerTitle: 'Habit Circles' } },
+    { name: '(app)/habitCircles/create', options: { headerTitle: 'Create Habit Circle' } },
+    { name: '(app)/habit/create', options: { headerTitle: 'Create Habit' } },
+    { name: '(app)/habit/edit', options: { headerTitle: 'Edit Habit' } },
+    { name: '(app)/habit/statistics', options: { headerTitle: 'Statistics' } },
+  ],
+};
+
 const expoDb = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 const databaseService = DatabaseService.init(expoDb);
 const db = databaseService.db;
@@ -73,13 +92,12 @@ export default function RootLayout() {
     }, 60000);
     return () => {
       clearInterval(syncInterval);
-      console.log('Sync interval cleared');
     };
   }, [networkState, networkState.isInternetReachable]);
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
   });
   const { error } = useMigrations(db, migrations);
 
@@ -127,40 +145,17 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  console.log(useUserContext(), databaseService.userId);
   return (
     <Stack initialRouteName={useUserContext().currentUserId == null ? 'signup' : '(app)/(tabs)'}>
       <Stack.Protected guard={useUserContext().currentUserId == null}>
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
-        <Stack.Screen name="signin" options={{ headerShown: false }} />
+        {screenConfigs.unauthenticated.map((screen) => (
+          <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
+        ))}
       </Stack.Protected>
       <Stack.Protected guard={useUserContext().currentUserId != null}>
-        <Stack.Screen name="(app)/(tabs)" options={{ headerTransparent: true, headerTitle: '' }} />
-        <Stack.Screen
-          name="(app)/habit/full-list"
-          options={{
-            headerTitle: 'All Habits',
-          }}
-        />
-        <Stack.Screen
-          name="(app)/friend/view"
-          options={{
-            headerTitle: 'Friends',
-          }}
-        />
-        <Stack.Screen
-          name="(app)/account/edit/[id]"
-          options={{
-            headerTitle: 'Edit Account',
-            headerShown: true,
-          }}
-        />
-        <Stack.Screen
-          name="(app)/friend/[id]"
-          options={{
-            headerTitle: 'Friend Profile',
-          }}
-        />
+        {screenConfigs.authenticated.map((screen) => (
+          <Stack.Screen key={screen.name} name={screen.name} options={screen.options} />
+        ))}
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>

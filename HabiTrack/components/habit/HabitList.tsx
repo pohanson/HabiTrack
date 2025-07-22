@@ -1,28 +1,24 @@
-import { Habit } from '@/db/localSchema';
-import { DatabaseService } from '@/services';
-import { useEffect, useState } from 'react';
+import { Habit, HabitCompletion, HabitMilestone } from '@/db/localSchema';
 import { ScrollView } from 'react-native';
-import { HabitCard } from './HabitCard';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
+import { HabitCard } from './HabitCard';
 
 export function HabitList({
-  userId = undefined,
+  data,
   isEditable = false,
+  isCompletable = false,
+  today = null,
 }: {
-  userId?: string | null;
+  data: {
+    habit: Habit;
+    habitCompletion?: HabitCompletion | null;
+    habitMilestone?: HabitMilestone | null;
+  }[];
   isEditable?: boolean;
+  isCompletable?: boolean;
+  today?: string | null;
 }) {
-  const habitService = DatabaseService.instance.habit;
-  const [data, setData] = useState<Habit[]>([]);
-  useEffect(() => {
-    if (userId === undefined) {
-      habitService.getAllHabits().then(setData);
-    } else {
-      habitService.getAllHabits(userId).then(setData);
-    }
-  }, [habitService, userId]);
-
   return data?.length === 0 ? (
     <ThemedView style={{ flex: 1, padding: 8 }}>
       <ThemedText>No habits</ThemedText>
@@ -31,14 +27,15 @@ export function HabitList({
     <ThemedView style={{ flex: 1 }}>
       <ScrollView>
         <ThemedView style={{ padding: 10, gap: 10 }}>
-          {data.map((habitItem) => (
+          {data.map(({ habit: habitItem, habitCompletion, habitMilestone }) => (
             <HabitCard
               key={habitItem.id}
               habit={habitItem}
-              habit_completion={null}
+              habit_completion={habitCompletion || null}
               isEditable={isEditable}
-              isCompletable={false}
-              habit_milestone={null}
+              isCompletable={isCompletable}
+              habit_milestone={habitMilestone || null}
+              today={today}
             />
           ))}
         </ThemedView>

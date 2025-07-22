@@ -6,18 +6,17 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { HabitInsertionData } from '@/services/HabitService';
+import { NotificationManager } from '@/services/NotificationManager';
 import { dateFromPaddedTime } from '@/utils';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
-import { Toast } from 'toastify-react-native';
-import { NotificationManager } from '@/services/NotificationManager';
-import ToastManager from 'toastify-react-native/components/ToastManager';
 import { Alert } from 'react-native';
+import { Toast } from 'toastify-react-native';
+import ToastManager from 'toastify-react-native/components/ToastManager';
 
 export default function EditHabitScreen() {
   const { id }: { id: string } = useLocalSearchParams();
-  const navigation = useNavigation();
 
   const databaseService = DatabaseService.instance;
 
@@ -34,14 +33,13 @@ export default function EditHabitScreen() {
 
   useEffect(() => {
     if (!id) return;
-    navigation.setOptions({ headerTitle: 'Edit Habit' });
     const loadHabit = async () => {
       // get habit and reminder data from db
       try {
         const data = await databaseService.habit.getHabitWithReminders(id);
         if (!data) {
           Toast.error('Habit not found');
-          navigation.goBack();
+          router.back();
           return;
         }
 
@@ -59,7 +57,7 @@ export default function EditHabitScreen() {
     };
     loadHabit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, navigation]);
+  }, [id]);
 
   const onSaveChanges = handleSubmit(
     async (data) => {
@@ -86,7 +84,7 @@ export default function EditHabitScreen() {
             });
             Toast.success('Habit Updated');
             NotificationManager.upsertPushNotificationForHabit(id);
-            navigation.goBack();
+            router.back();
           };
 
           if (!freqHasNotBeenEdited) {
@@ -126,7 +124,7 @@ export default function EditHabitScreen() {
       // Soft delete habit, associated reminders, and completions
       databaseService.habit.deleteHabit(id);
       Toast.success('Habit Deleted');
-      navigation.goBack();
+      router.back();
     } catch (error) {
       console.error('Error deleting habit:', error);
       Toast.error('Failed to delete habit');

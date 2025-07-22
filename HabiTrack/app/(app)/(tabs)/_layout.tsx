@@ -27,7 +27,7 @@ export default function TabLayout() {
   // DAY STREAK HANDLING
   useEffect(() => {
     try {
-      console.log('ALL DAY STREAKS RECALCULATED');
+      if (process.env.NODE_ENV === 'development') console.log('ALL DAY STREAKS RECALCULATED');
       data.forEach(
         async ({
           habit_id,
@@ -80,7 +80,8 @@ export default function TabLayout() {
             const nextExpectedDate = new Date(lastCompletedStr);
             nextExpectedDate.setDate(nextExpectedDate.getDate() + noOfDaysTillNextExpectedDate);
 
-            console.log('nextExpectedDate calculated as', nextExpectedDate);
+            if (process.env.NODE_ENV === 'development')
+              console.log('nextExpectedDate calculated as', nextExpectedDate);
 
             // define safeZoneEndDate as the day before nextExpectedDate
             const safeZoneEndDate = new Date(nextExpectedDate);
@@ -95,7 +96,8 @@ export default function TabLayout() {
             if (todayStr > nextExpectedStr) {
               // streak broken case, set streak_started_at to 'inactive' and update best_day_streak if necessary
               // (outside of nextExpectedDate)
-              console.log(habit_id, 'Streak Broken, streak_started_at reset to inactive');
+              if (process.env.NODE_ENV === 'development')
+                console.log(habit_id, 'Streak Broken, streak_started_at reset to inactive');
               // find new best_day_streak
               const latestStreak =
                 String(streak_started_at) === 'inactive'
@@ -118,7 +120,8 @@ export default function TabLayout() {
               });
             } else if (todayStr < nextExpectedStr) {
               // within safeZone, don't change streak_started_at, just update best_day_streak if necessary
-              console.log(habit_id, 'In Safezone, streak_started_at unchanged');
+              if (process.env.NODE_ENV === 'development')
+                console.log(habit_id, 'In Safezone, streak_started_at unchanged');
               const latestStreak =
                 String(streak_started_at) === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, todayStr) + 1
@@ -140,10 +143,11 @@ export default function TabLayout() {
             } else {
               // case where (todayStr === nextExpectedStr)
               // don't change streak_started_at, just update best_day_streak if necessary
-              console.log(
-                habit_id,
-                'is on next expected day (since last completedAt), streak_started_at unchanged',
-              );
+              if (process.env.NODE_ENV === 'development')
+                console.log(
+                  habit_id,
+                  'is on next expected day (since last completedAt), streak_started_at unchanged',
+                );
               const latestStreak =
                 streak_started_at === 'inactive'
                   ? calculateDaysBetweenDates(lastCompletedStr, safeZoneEndStr) + 1

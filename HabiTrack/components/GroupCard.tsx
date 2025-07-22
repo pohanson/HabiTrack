@@ -40,15 +40,14 @@ export function GroupCard({ group }: { group: Group }) {
     databaseService.userId,
   ]);
 
-  const press = (groupId: string, groupName: string) => {
-    router.push({
-      pathname: '../habitCircles/group',
-      params: { groupId: group.id, groupName: group.name },
-    });
-  };
-
   return (
-    <TouchableOpacity onPress={() => press(group.id, group.name)}>
+    <TouchableOpacity
+      onPress={() => {
+        router.push({
+          pathname: '/habitCircles/group',
+          params: { groupId: group.id, groupName: group.name },
+        });
+      }}>
       <View
         style={[
           {

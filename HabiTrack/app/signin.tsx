@@ -6,7 +6,7 @@ import { useUserContext } from '@/context/UserContext';
 import { DatabaseService } from '@/services';
 import { addNetworkStateListener, getNetworkStateAsync, useNetworkState } from 'expo-network';
 import { router } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
@@ -43,7 +43,6 @@ export default function SigninPage() {
 
   const onSubmit = useFormReturn.handleSubmit(
     async (data: any) => {
-      setIsLoading(true);
       try {
         const user = await databaseService.user.signinUser(data.username, data.password);
         if (user) {
@@ -69,13 +68,14 @@ export default function SigninPage() {
         setIsLoading(false);
       }
     },
-    () => {
-      console.log('Form submission failed');
+    (error) => {
+      console.log('Form submission failed', error);
       Toast.show({
         text1: 'Form submission failed.',
         text2: 'Please check your inputs.',
         type: 'error',
       });
+      setIsLoading(false);
     },
   );
 
@@ -106,7 +106,10 @@ export default function SigninPage() {
         <ThemedView>
           <TextButton
             label="Login"
-            onPress={onSubmit}
+            onPress={() => {
+              setIsLoading(true);
+              setTimeout(onSubmit, 10); // needed to ensure the state is updated.
+            }}
             style={{ marginTop: 20 }}
             disabled={isLoading}
           />

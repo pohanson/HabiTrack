@@ -39,7 +39,7 @@ export class SyncService {
       log = console.log;
     }
     log(`Syncing repository: ${repoService.tableName} at ${syncStartTimestamp}`);
-    // push changes changes to remote
+    // push changes to remote
     repoService.getModifiedAfter(lastSyncedTimestamp).then((deltas) => {
       log(`Pushing ${deltas.length} deltas to remote for ${repoService.tableName}`);
       supabase
@@ -53,13 +53,15 @@ export class SyncService {
         });
     });
     // fetch and pull changes from remote
-    log(`Pulling changes for ${repoService.tableName} since ${lastSyncedTimestamp}`);
     await supabase
       .from(repoService.tableName)
-      .select()
+      .select('*', { count: 'exact' })
       .gt('modifiedAt', lastSyncedTimestamp)
       .lt('modifiedAt', syncStartTimestamp) // prevent the item we just pushed to be synced back.
       .then((res) => {
+        log(
+          `Successfully pulled ${res.count} changes for ${repoService.tableName} since ${lastSyncedTimestamp}`,
+        );
         repoService
           .updateModifiedItems(res.data as SyncableModel[])
           .then(() => repoService.setLastSyncTimestamp(syncStartTimestamp));

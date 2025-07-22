@@ -4,6 +4,7 @@ import { User } from '@/db/localSchema';
 import { Pressable, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { IconSymbol } from '../ui/IconSymbol';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function AddGroupMemberCard({
   friend,
@@ -34,18 +35,7 @@ export function AddGroupMemberCard({
         Shadows.large,
       ]}>
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        {/* profile pic placeholder: */}
-        <View
-          style={{
-            height: 50,
-            width: 50,
-            backgroundColor: theme.card,
-            borderRadius: 1000,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <ThemedText>{friend.username.charAt(0).toUpperCase()}</ThemedText>
-        </View>
+        <ProfilePicture user={friend} />
         <View>
           <ThemedText style={{ fontSize: 14 }}>{friend.name}</ThemedText>
           <ThemedText style={{ fontSize: 14 }}>@{friend.username}</ThemedText>

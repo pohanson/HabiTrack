@@ -1,27 +1,22 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import React, { useCallback, useEffect, useState } from 'react';
-import { router, useFocusEffect, useNavigation } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { IconButton } from '@/components/IconButton';
 import { ScrollView, useColorScheme, View } from 'react-native';
 import { DatabaseService } from '@/services';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { GroupCard } from '@/components/GroupCard';
 import { Colors } from '@/constants/Colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HabitCirclesView() {
-  const navigation = useNavigation();
-
   const [isLoading, setIsLoading] = useState(true);
 
   const databaseService = DatabaseService.instance;
 
   const [refresh, setRefresh] = useState(0);
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
-
-  useEffect(() => {
-    navigation.setOptions({ headerTitle: 'Habit Circles' });
-  }, [navigation]);
 
   const { data: groupsData, error: groupsError } = useLiveQuery(
     databaseService.group.getGroupsByUserIdQuery(databaseService.userId),
@@ -40,9 +35,15 @@ export default function HabitCirclesView() {
 
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const bottomPadding = useSafeAreaInsets().bottom;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: theme.background }}>
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: theme.background,
+        marginBottom: bottomPadding,
+      }}>
       <View
         style={{
           flexDirection: 'row',

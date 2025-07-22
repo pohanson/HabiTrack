@@ -1,10 +1,11 @@
 import { Shadows } from '@/constants/Shadows';
 import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Image, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { IconButton } from '../IconButton';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function FriendCard({
   friend,
@@ -42,35 +43,7 @@ export function FriendCard({
           Shadows.large,
         ]}>
         <View style={{ flexDirection: 'row', gap: 10 }}>
-          {friend.profilePicture ? (
-            <Image
-              source={{
-                uri: friend.profilePicture
-                  ? `data:image/jpeg;base64,${friend.profilePicture}`
-                  : undefined,
-              }}
-              style={{ width: 50, height: 50, borderRadius: 25 }}
-            />
-          ) : (
-            <View
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 100,
-                backgroundColor: '#ccc',
-                marginBottom: 4,
-                justifyContent: 'center',
-              }}>
-              <ThemedText
-                style={{
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  color: 'black',
-                }}>
-                {friend.username.charAt(0).toUpperCase()}
-              </ThemedText>
-            </View>
-          )}
+          <ProfilePicture user={friend} />
           <View>
             <ThemedText>{friend.name}</ThemedText>
             <ThemedText>@{friend.username}</ThemedText>

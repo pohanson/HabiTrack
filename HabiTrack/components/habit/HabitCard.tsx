@@ -11,6 +11,16 @@ import { IconButton } from '../IconButton';
 import { ThemedText } from '../ThemedText';
 import { ToggleInput } from '../ToggleInput';
 
+/**
+ * Display a habit card.
+ *
+ * @param habit - The habit to display.
+ * @param habit_completion - The completion status of the habit.
+ * @param habit_milestone - The milestone associated with the habit.
+ * @param today - ISO format. This should not be null if habit_completion or habit_milestone is needed.
+ * @param isEditable - Whether the card is editable. Defaults to true.
+ * @param isCompletable - Whether the habit can be marked as complete. Defaults to true.
+ */
 export function HabitCard({
   habit,
   habit_completion,
@@ -55,10 +65,6 @@ export function HabitCard({
     );
 
     // Use latestMilestone instead of habit_milestone prop
-    // const frequencyArray = await databaseService.reminder
-    //   .getRemindersForHabit(habit.id)
-    //   .then((reminder) => reminder.map((r) => r.day).sort());
-    // const todayDOW = new Date(today).getDay();
     const todayDateStr = new Date().toJSON().split('T')[0];
 
     if (habit_completion === null) {
@@ -157,7 +163,15 @@ export function HabitCard({
         },
         Shadows.large,
       ]}>
-      <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
+      <ThemedText
+        style={[
+          { flex: 1, fontWeight: 'bold' },
+          isCompletable && habit_completion != null
+            ? { color: '#888', textDecorationLine: 'line-through' }
+            : {},
+        ]}>
+        {habit.name}
+      </ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         {isEditable && (
           <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
