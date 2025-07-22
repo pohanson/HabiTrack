@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { paddedTimeFromDate } from '@/utils';
+import { paddedTimeFromDate } from '@/utils/dateUtils';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
@@ -66,7 +66,7 @@ export function RHFTimeInput({
           </View>
           {showTimePicker && (
             <DateTimePicker
-              value={reminderTime || new Date(0)}
+              value={reminderTime || new Date('2000-01-01T04:00:00Z')}
               onChange={(event, selectedDate) => {
                 setShowTimePicker(false);
                 onChange(selectedDate);

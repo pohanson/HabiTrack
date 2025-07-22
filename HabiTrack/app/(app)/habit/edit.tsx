@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { HabitInsertionData } from '@/services/HabitService';
 import { NotificationManager } from '@/services/NotificationManager';
-import { dateFromPaddedTime } from '@/utils';
+import { dateFromPaddedTime } from '@/utils/dateUtils';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
