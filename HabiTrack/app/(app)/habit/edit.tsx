@@ -120,7 +120,6 @@ export default function EditHabitScreen() {
 
   const onDelete = async () => {
     try {
-      // TODO: add soft delete of milestone too!
       // Soft delete habit, associated reminders, and completions
       databaseService.habit.deleteHabit(id);
       Toast.success('Habit Deleted');

@@ -70,9 +70,15 @@ export class DatabaseService {
   }
 
   public set userId(value: string | null) {
-    // TODO: Add validation for userid
-
-    this._userId = value;
+    if (value === null) {
+      this._userId = null;
+    } else {
+      this.user.getUsernameById(value).then((username) => {
+        if (username) {
+          this._userId = value;
+        }
+      });
+    }
   }
 
   public get habitCompletion() {
