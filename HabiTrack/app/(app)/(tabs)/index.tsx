@@ -2,24 +2,30 @@ import { HabitCard } from '@/components/habit/HabitCard';
 import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Habit, HabitCompletion, HabitMilestone, Reminder } from '@/db/schema';
 import { DatabaseService } from '@/services';
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import ToastManager from 'toastify-react-native/components/ToastManager';
 
 export default function HomeScreen() {
   const [refresh, setRefresh] = useState(0);
+  const [data, setData] = useState<
+    {
+      habit: Habit;
+      habit_completion: HabitCompletion | null;
+      reminder: Reminder | null;
+      habit_milestone: HabitMilestone | null;
+    }[]
+  >([]);
 
   const databaseService = DatabaseService.instance;
 
-  const { data, error } = useLiveQuery(databaseService.habit.getAllHabitsTodayQuery(), [refresh]);
-  if (error) {
-    console.error('Error fetching habits:', error);
-    Toast.error('Error fetching habits.');
-  }
+  useEffect(() => {
+    databaseService.habit.getAllHabitsToday().then(setData);
+  }, [databaseService.habit, refresh]);
 
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   Toast.success('Welcome to HabiTrack! Here are your habits for today.');

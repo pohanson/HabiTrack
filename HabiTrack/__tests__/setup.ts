@@ -3,11 +3,12 @@ import '@testing-library/jest-native/extend-expect';
 import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
 
 // Suppress console output during test
+const originalConsoleWarn = console.warn;
 console.warn = jest.fn((...args) => {
   if (args[0].includes('bcrypt.setRandomFallback')) {
     return;
   }
-  console.warn(...args);
+  originalConsoleWarn(...args);
 });
 
 // Mock the UserContext

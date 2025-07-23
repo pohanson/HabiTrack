@@ -116,8 +116,8 @@ export class HabitService extends BaseSyncableRepoService {
   /**
    * Retrieves all habits with today's completions, reminder, milestone for the given user.
    */
-  public getAllHabitsTodayQuery(userId: string | null = this.dbService.userId) {
-    return this._habitRepository.getAllHabitsTodayQuery(userId);
+  public async getAllHabitsToday(userId: string | null = this.dbService.userId) {
+    return this._habitRepository.getAllHabitsToday(userId);
   }
 
   public getHabitStatsWithRemindersQuery() {

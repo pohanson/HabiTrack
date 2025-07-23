@@ -80,7 +80,7 @@ export class HabitRepository extends SyncableRepository<Habit> {
    * Get all habits for a user with today's completions, reminder, milestone as a query.
    * @param userId - The ID of the user to filter habits by. If null, retrieves all habits.
    */
-  public getAllHabitsTodayQuery(userId: string | null, includeDeleted: boolean = false) {
+  public getAllHabitsToday(userId: string | null, includeDeleted: boolean = false) {
     const today = new Date().toJSON().split('T')[0];
     const dayOfWeek = new Date().getDay();
     return this.db
