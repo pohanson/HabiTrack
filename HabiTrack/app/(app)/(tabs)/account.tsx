@@ -24,6 +24,16 @@ export default function AccountPage() {
         .finally(() => setIsLoading(false));
     }, [databaseService.user]),
   );
+  if (!isLoading && currentUser === null) {
+    return (
+      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+        <ThemedText type="defaultSemiBold" style={{ fontSize: 24 }}>
+          User Profile
+        </ThemedText>
+        <ThemedText type="default">No user found. Please logout and relogin.</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>

@@ -12,10 +12,10 @@ console.warn = jest.fn((...args) => {
 
 // Mock the UserContext
 jest.mock('@/context/UserContext', () => ({
-  useUserContext: () => ({
+  useUserContext: jest.fn(() => ({
     currentUserId: null,
     setCurrentUserId: jest.fn(),
-  }),
+  })),
 }));
 
 // Mock AsyncStorage
@@ -27,17 +27,21 @@ jest.mock('@supabase/supabase-js', () => ({
 }));
 
 // Mock Expo network
-// Allow the mock network state to be controlled
-let mockIsInternetReachable = true;
-export function setIsInternetReachableJest(value: boolean) {
-  mockIsInternetReachable = value;
-}
 jest.mock('expo-network', () => ({
   useNetworkState: jest.fn(() => ({ isInternetReachable: mockIsInternetReachable })),
   getNetworkStateAsync: jest.fn(() =>
     Promise.resolve({ isInternetReachable: mockIsInternetReachable }),
   ),
   addNetworkStateListener: jest.fn(() => jest.fn()), // Return cleanup function
+}));
+// Allow the mock network state to be controlled
+let mockIsInternetReachable = true;
+export function setIsInternetReachableJest(value: boolean) {
+  mockIsInternetReachable = value;
+}
+
+jest.mock('expo-router', () => ({
+  useFocusEffect: jest.fn(),
 }));
 
 expect.extend({
