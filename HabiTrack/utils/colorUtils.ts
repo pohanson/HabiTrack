@@ -16,8 +16,8 @@ export function getColorForPercentage(percentage: number) {
 
 // blue -> purple transition
 export function getProgressBarColorForPercentage(percentage: number) {
-  // blue: 0 160 200
-  // purple: 140 40 225
+  // blue: 0 170 200
+  // purple: 140 60 220
 
   const r = Math.round(140 * (percentage / 100));
   const g = Math.round(170 - (percentage * 110) / 100);
