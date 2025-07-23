@@ -32,8 +32,9 @@ export default function SignupPage() {
           padding: 20,
         }}>
         <ThemedText style={{ textAlign: 'center' }}>
-          Please connect to internet for the signin and signup. The rest of the app could be used
-          without wifi
+          No internet connection detected.
+          <br /> Please connect to internet for the signin and signup. The rest of the app could be
+          used without wifi
         </ThemedText>
       </ThemedView>
     );

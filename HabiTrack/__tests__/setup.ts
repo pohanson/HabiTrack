@@ -29,7 +29,7 @@ jest.mock('@supabase/supabase-js', () => ({
 // Mock Expo network
 // Allow the mock network state to be controlled
 let mockIsInternetReachable = true;
-export function setIsInternetRachableJest(value: boolean) {
+export function setIsInternetReachableJest(value: boolean) {
   mockIsInternetReachable = value;
 }
 jest.mock('expo-network', () => ({

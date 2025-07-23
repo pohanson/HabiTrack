@@ -1,10 +1,10 @@
 import SigninPage from '@/app/signin';
 import { render, waitFor } from '@testing-library/react-native';
-import { setIsInternetRachableJest } from '../setup';
+import { setIsInternetReachableJest } from '../setup';
 
 describe('<SigninPage />', () => {
   afterEach(() => {
-    setIsInternetRachableJest(true);
+    setIsInternetReachableJest(true);
   });
 
   it('should render signin form when internet is available', async () => {
@@ -19,7 +19,7 @@ describe('<SigninPage />', () => {
   });
 
   it('should render no internet message when offline', async () => {
-    setIsInternetRachableJest(false);
+    setIsInternetReachableJest(false);
 
     const { getByText, queryByText } = render(<SigninPage />);
     await waitFor(() => {
