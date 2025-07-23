@@ -30,7 +30,7 @@ export function StatsHeader({
   return (
     <ThemedView style={{ flexDirection: 'row' }}>
       {badgesEarned > 0 && (
-        <ThemedView style={{ justifyContent: 'center' }}>
+        <ThemedView testID="badge" style={{ justifyContent: 'center' }}>
           <Image
             source={badgeImage}
             style={{
@@ -44,6 +44,7 @@ export function StatsHeader({
 
       <ThemedView style={{ flex: 3 }}>
         <ThemedText
+          testID="habit-name"
           style={{
             fontSize: 28,
             fontWeight: 'bold',
@@ -54,6 +55,7 @@ export function StatsHeader({
           {habitName}
         </ThemedText>
         <ThemedText
+          testID="today-date"
           style={{
             fontSize: 18,
           }}>
@@ -63,6 +65,7 @@ export function StatsHeader({
 
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ThemedText
+          testID="created-at"
           style={{
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -73,6 +76,7 @@ export function StatsHeader({
           {'Created on'}
         </ThemedText>
         <ThemedText
+          testID="created-at-date"
           style={{
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -84,6 +88,7 @@ export function StatsHeader({
 
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ThemedText
+          testID="last-reset"
           style={{
             textAlign: 'center',
             textAlignVertical: 'center',
@@ -94,6 +99,7 @@ export function StatsHeader({
           {'Last reset'}
         </ThemedText>
         <ThemedText
+          testID="start-date"
           style={{
             textAlign: 'center',
             textAlignVertical: 'center',

@@ -31,6 +31,7 @@ export function StatsCalendarView({
         Shadows.large,
       ]}>
       <Calendar
+        testID="calendar"
         markedDates={completedAtDates}
         style={{
           width: '100%',
