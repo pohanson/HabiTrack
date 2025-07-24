@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest --watchAll",
+    "testCoverage": "jest --coverage",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
@@ -113,6 +114,16 @@
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|webp|svg)$": "jest-transform-stub"
-    }
+    },
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx,js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/*.config.{ts,js}",
+      "!**/expo-env.d.ts",
+      "!**/.expo/**",
+      "!**/db/**",
+      "!**/drizzle/**"
+    ]
   }
 }
