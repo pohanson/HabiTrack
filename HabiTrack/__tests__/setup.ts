@@ -1,11 +1,14 @@
-// Jest setup file for custom matchers
-import '@testing-library/jest-native/extend-expect';
 import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock';
+import '@testing-library/jest-native/extend-expect';
+import React from 'react';
 
 // Suppress console output during test
 const originalConsoleWarn = console.warn;
 console.warn = jest.fn((...args) => {
-  if (args[0].includes('bcrypt.setRandomFallback')) {
+  if (
+    args[0].includes('bcrypt.setRandomFallback') ||
+    args[0].includes('[Reanimated] Reading from `value` during component render.')
+  ) {
     return;
   }
   originalConsoleWarn(...args);
@@ -25,6 +28,16 @@ jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 // Mock Supabase client
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(),
+}));
+
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
+  useSafeAreaInsets: () => ({
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  }),
 }));
 
 // Mock Expo network
