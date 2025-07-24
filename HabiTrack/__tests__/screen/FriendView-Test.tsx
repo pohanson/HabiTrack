@@ -118,8 +118,10 @@ describe('FriendView', () => {
       getByText('Jane Doe');
     });
 
-    const addButton = screen.getByTestId('add-friend-button');
-    await userEvent.press(addButton);
+    await act(async () => {
+      const addButton = screen.getByTestId('add-friend-button');
+      await userEvent.press(addButton);
+    });
 
     screen.getByText('Add Friend');
   });

@@ -122,7 +122,12 @@
       "!**/expo-env.d.ts",
       "!**/.expo/**",
       "!**/db/**",
-      "!**/drizzle/**"
+      "!**/drizzle/**",
+      "!**/constants.ts",
+      "!**/constants/**",
+      "!**/mocks/**",
+      "!**/hooks/**",
+      "!**/context/**"
     ]
   }
 }
