@@ -1,14 +1,13 @@
+import { Shadows } from '@/constants/Shadows';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { paddedTimeFromDate } from '@/utils/dateUtils';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getCalendars } from 'expo-localization';
 import React, { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import { Pressable, View } from 'react-native';
 import { IconButton } from '../IconButton';
 import { STYLES } from '../Styles';
 import { ThemedText } from '../ThemedText';
-import { Shadows } from '@/constants/Shadows';
 
 export function RHFTimeInput({
   control,
@@ -18,9 +17,7 @@ export function RHFTimeInput({
   label?: string;
 }) {
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const timeZone = getCalendars()[0]?.timeZone || 'Asia/Singapore';
   const cardColor = useThemeColor({}, 'card');
-  // const textColor = useThemeColor({}, 'text');
   return (
     <Controller
       name="time"
@@ -72,9 +69,6 @@ export function RHFTimeInput({
                 onChange(selectedDate);
               }}
               mode="time"
-              timeZoneName={timeZone === 'Asia/Singapore' ? 'UTC' : timeZone}
-              // 8*60=480 SG is UTC+8, required because Locale is not properly working.
-              timeZoneOffsetInMinutes={timeZone === 'Asia/Singapore' ? 480 : undefined}
             />
           )}
         </>

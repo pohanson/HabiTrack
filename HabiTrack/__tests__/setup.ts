@@ -22,10 +22,21 @@ jest.mock('@/context/UserContext', () => ({
   })),
 }));
 
+// Mock SyncService
 jest.mock('@/services/SyncService', () => ({
   SyncService: {
     syncRepoService: jest.fn().mockResolvedValue(() => {}),
     syncAll: jest.fn().mockResolvedValue(() => {}),
+  },
+}));
+
+// Mock Notification
+jest.mock('@/services/NotificationManager', () => ({
+  NotificationManager: {
+    scheduleWeeklyPushNotification: jest.fn().mockResolvedValue(null),
+    regeneratePushNotification: jest.fn().mockResolvedValue(null),
+    upsertPushNotificationForHabit: jest.fn().mockResolvedValue(null),
+    registerForPushNotificationAsync: jest.fn().mockResolvedValue(null),
   },
 }));
 
@@ -37,6 +48,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(),
 }));
 
+// Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
   useSafeAreaInsets: () => ({
@@ -61,6 +73,7 @@ export function setIsInternetReachableJest(value: boolean) {
   mockIsInternetReachable = value;
 }
 
+// Mock Expo router
 jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(),
 }));
