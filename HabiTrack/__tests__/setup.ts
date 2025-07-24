@@ -22,6 +22,13 @@ jest.mock('@/context/UserContext', () => ({
   })),
 }));
 
+jest.mock('@/services/SyncService', () => ({
+  SyncService: {
+    syncRepoService: jest.fn().mockResolvedValue(() => {}),
+    syncAll: jest.fn().mockResolvedValue(() => {}),
+  },
+}));
+
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 

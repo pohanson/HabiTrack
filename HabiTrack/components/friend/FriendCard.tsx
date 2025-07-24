@@ -64,6 +64,7 @@ export function FriendCard({
               onPress={onAccept}
               transparentBackground={true}
               iconColor={greenColor}
+              testID="friend-card-accept-button"
             />
           )}
           {onReject && (
@@ -73,6 +74,7 @@ export function FriendCard({
               onPress={onReject}
               transparentBackground={true}
               iconColor={redColor}
+              testID="friend-card-reject-button"
             />
           )}
           {onAdd && (
@@ -82,6 +84,7 @@ export function FriendCard({
               onPress={onAdd}
               transparentBackground={true}
               iconColor={tabIconDefaultColor}
+              testID="friend-card-add-button"
             />
           )}
         </View>

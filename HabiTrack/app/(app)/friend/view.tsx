@@ -20,12 +20,18 @@ export default function FriendView() {
   const [searchStr, setSearchStr] = useState('');
   const databaseService = DatabaseService.instance;
 
+  const filteredFriend = userFriends.filter(
+    (friend) =>
+      friend.name.toLowerCase().includes(searchStr) ||
+      friend.username.toLowerCase().includes(searchStr),
+  );
+
   useEffect(() => {
     SyncService.syncRepoService(databaseService.friend).then(() => {
       databaseService.friend
         .getIncomingPendingRequests()
         .then((result) => setPendingRequests(result || []));
-      databaseService.friend.getUserFriends().then((result) => setUserFriends(result || []));
+      databaseService.friend.getUserFriends().then((result) => setUserFriends(result));
     });
   }, [databaseService.friend, refresh]);
 
@@ -67,7 +73,11 @@ export default function FriendView() {
           padding: 10,
         }}>
         <ThemedText type="title">Your Friends</ThemedText>
-        <IconButton iconName="plus" onPress={() => setIsAddModalVisible(true)} />
+        <IconButton
+          iconName="plus"
+          onPress={() => setIsAddModalVisible(true)}
+          testID="add-friend-button"
+        />
       </View>
       <TextInput
         style={{
@@ -83,19 +93,17 @@ export default function FriendView() {
         placeholder="Search for friends..."
       />
       <View style={{ gap: 10, marginTop: 20 }}>
-        {userFriends
-          .filter(
-            (friend) =>
-              friend.name.toLowerCase().includes(searchStr) ||
-              friend.username.toLowerCase().includes(searchStr),
-          )
-          .map((friend) => (
+        {filteredFriend.length === 0 ? (
+          <ThemedText type="default">No friends found.</ThemedText>
+        ) : (
+          filteredFriend.map((friend) => (
             <FriendCard
               key={friend.id}
               friend={friend}
               onPress={() => router.push(`/friend/${friend.id}`)}
             />
-          ))}
+          ))
+        )}
       </View>
     </ThemedView>
   );
