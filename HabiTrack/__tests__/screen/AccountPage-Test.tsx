@@ -11,11 +11,15 @@ jest.mock('@/services', () => ({
       user: {
         getCurrentUser: jest.fn().mockResolvedValue({
           id: 'asdfqwertyuizxcv',
-          name: 'John Doe',
           username: 'johndoe',
+          name: 'John Doe',
+          password: '$2a$10$syT94VQnn/TXIoNiZmMGzejcUpEOUA2aqCjzD2O5fetvBVWeESRnW',
           bio: 'This is a test user.',
-          profilePictureUrl: null,
-        } as Partial<User>),
+          profilePicture: null,
+          createdAt: '2025-06-26T19:16:14.823Z',
+          modifiedAt: '2025-07-26T19:16:14.823Z',
+          isDeleted: false,
+        } as User),
       },
     },
   },
