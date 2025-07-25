@@ -31,7 +31,7 @@ export default function FriendView() {
     <ThemedView style={{ flex: 1, alignItems: 'center' }}>
       {pendingRequests.length > 0 && (
         <>
-          <ThemedText type="subtitle">Your Pending Request</ThemedText>
+          <ThemedText type="subtitle">Pending Requests</ThemedText>
           {pendingRequests.map((user) => (
             <FriendCard
               key={user.id}

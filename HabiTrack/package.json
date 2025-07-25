@@ -85,6 +85,7 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "husky": "^9.1.7",
+    "jest-transform-stub": "^2.0.0",
     "lint-staged": "^16.0.0",
     "typescript": "~5.8.3"
   },
@@ -100,12 +101,17 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/__tests__/setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/__tests__/setup.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|toastify-react-native)"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/__tests__/setup.js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|webp|svg)$": "jest-transform-stub"
+    }
   }
 }

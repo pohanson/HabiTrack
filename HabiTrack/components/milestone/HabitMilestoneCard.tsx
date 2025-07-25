@@ -6,10 +6,12 @@ import { ThemedView } from '../ThemedView';
 import { Colors } from '@/constants/Colors';
 
 export function HabitMilestoneCard({
+  testID,
   habitName,
   weekStreak,
   badgesEarned,
 }: {
+  testID?: string;
   habitName: string;
   weekStreak: number;
   badgesEarned: number;
@@ -19,6 +21,7 @@ export function HabitMilestoneCard({
 
   return (
     <ThemedView
+      testID="habit-milestone-card"
       style={[
         {
           alignItems: 'center',
@@ -29,13 +32,16 @@ export function HabitMilestoneCard({
         },
         Shadows.large,
       ]}>
-      <ThemedText style={{ fontSize: 22, fontWeight: 'bold', padding: 10 }}>{habitName}</ThemedText>
+      <ThemedText testID="habit-name" style={{ fontSize: 22, fontWeight: 'bold', padding: 10 }}>
+        {habitName}
+      </ThemedText>
       <RowOfBadges weekStreak={weekStreak} badgesEarned={badgesEarned} />
     </ThemedView>
   );
 }
 
 type BadgeProps = {
+  testID: string;
   badgeType: number;
   color: string;
   completed: boolean;
@@ -45,17 +51,17 @@ type BadgeProps = {
 
 function getBadgeImage(badgeType: number, completed: boolean) {
   if (completed) {
-    if (badgeType === 1) return require('../assets/images/badges/colored/msb1.png');
-    if (badgeType === 2) return require('../assets/images/badges/colored/msb2.png');
-    if (badgeType === 3) return require('../assets/images/badges/colored/msb3.png');
-    if (badgeType === 4) return require('../assets/images/badges/colored/msb4.png');
-    if (badgeType === 5) return require('../assets/images/badges/colored/msb5.png');
+    if (badgeType === 1) return require('../../assets/images/badges/colored/msb1.png');
+    if (badgeType === 2) return require('../../assets/images/badges/colored/msb2.png');
+    if (badgeType === 3) return require('../../assets/images/badges/colored/msb3.png');
+    if (badgeType === 4) return require('../../assets/images/badges/colored/msb4.png');
+    if (badgeType === 5) return require('../../assets/images/badges/colored/msb5.png');
   } else {
-    if (badgeType === 1) return require('../assets/images/badges/greyscale/gmsb1.png');
-    if (badgeType === 2) return require('../assets/images/badges/greyscale/gmsb2.png');
-    if (badgeType === 3) return require('../assets/images/badges/greyscale/gmsb3.png');
-    if (badgeType === 4) return require('../assets/images/badges/greyscale/gmsb4.png');
-    if (badgeType === 5) return require('../assets/images/badges/greyscale/gmsb5.png');
+    if (badgeType === 1) return require('../../assets/images/badges/greyscale/gmsb1.png');
+    if (badgeType === 2) return require('../../assets/images/badges/greyscale/gmsb2.png');
+    if (badgeType === 3) return require('../../assets/images/badges/greyscale/gmsb3.png');
+    if (badgeType === 4) return require('../../assets/images/badges/greyscale/gmsb4.png');
+    if (badgeType === 5) return require('../../assets/images/badges/greyscale/gmsb5.png');
   }
 }
 
@@ -65,8 +71,9 @@ function Badge(props: BadgeProps) {
   const badgeImage = getBadgeImage(props.badgeType, props.completed);
 
   return (
-    <View style={{ rowGap: 5, alignItems: 'center' }}>
+    <View testID={props.testID} style={{ rowGap: 5, alignItems: 'center' }}>
       <Image
+        testID={`${props.testID}-image`}
         source={badgeImage}
         style={{
           width: 70,
@@ -77,6 +84,7 @@ function Badge(props: BadgeProps) {
       />
       <View>
         <ProgressBar
+          testID={`${props.testID}-progress-bar`}
           weekStreak={props.weekStreak}
           weeksRequired={props.weeksRequired}
           completed={props.completed}
@@ -92,6 +100,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
 
   return (
     <ThemedView
+      testID="row-of-badges"
       style={{
         backgroundColor: theme.card,
         flexDirection: 'row',
@@ -100,6 +109,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
         justifyContent: 'space-between',
       }}>
       <Badge
+        testID="badge-1"
         badgeType={1}
         color={theme.tint}
         weekStreak={weekStreak}
@@ -107,6 +117,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
         completed={badgesEarned >= 1}
       />
       <Badge
+        testID="badge-2"
         badgeType={2}
         color={theme.tint}
         weekStreak={weekStreak}
@@ -114,6 +125,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
         completed={badgesEarned >= 2}
       />
       <Badge
+        testID="badge-3"
         badgeType={3}
         color={theme.tint}
         weekStreak={weekStreak}
@@ -121,6 +133,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
         completed={badgesEarned >= 3}
       />
       <Badge
+        testID="badge-4"
         badgeType={4}
         color={theme.tint}
         weekStreak={weekStreak}
@@ -128,6 +141,7 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
         completed={badgesEarned >= 4}
       />
       <Badge
+        testID="badge-5"
         badgeType={5}
         color={theme.tint}
         weekStreak={weekStreak}
@@ -139,10 +153,12 @@ function RowOfBadges({ weekStreak, badgesEarned }: { weekStreak: number; badgesE
 }
 
 function ProgressBar({
+  testID,
   weekStreak,
   weeksRequired,
   completed,
 }: {
+  testID: string;
   weekStreak: number;
   weeksRequired: number;
   completed: boolean;
@@ -167,8 +183,9 @@ function ProgressBar({
 
   return completed ? (
     // completed progress bar + message
-    <View>
+    <View testID={testID}>
       <View
+        testID={`${testID}-complete-bar`}
         style={{
           position: 'relative',
           width: progressBarWidth,
@@ -180,6 +197,7 @@ function ProgressBar({
           justifyContent: 'center',
         }}></View>
       <Text
+        testID={`${testID}-complete-message`}
         style={{
           fontWeight: 'bold',
           fontSize: 10,
@@ -193,6 +211,7 @@ function ProgressBar({
     // incomplete progress bar + message
     <View>
       <View
+        testID={`${testID}-incomplete-bar`}
         style={{
           position: 'relative',
           width: progressBarWidth,
@@ -204,6 +223,7 @@ function ProgressBar({
           justifyContent: 'center',
         }}>
         <View
+          testID={`${testID}-incomplete-progress`}
           style={{
             width: completionWidth,
             height: progressBarHeight,
@@ -213,6 +233,7 @@ function ProgressBar({
         />
       </View>
       <Text
+        testID={`${testID}-incomplete-message`}
         style={{
           fontWeight: 'bold',
           fontSize: 10,

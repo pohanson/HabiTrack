@@ -23,7 +23,7 @@ describe('<PieChart />', () => {
   it('displays without crashing w/ default props', () => {
     const { getByTestId } = render(<PieChart actualNoOfDays={10} expectedNoOfDays={20} />);
 
-    expect(getByTestId('pie-chart-container')).toBeTruthy();
+    expect(getByTestId('pie-chart')).toBeTruthy();
     expect(getByTestId('pie-chart-svg')).toBeTruthy();
     expect(getByTestId('pie-chart-group')).toBeTruthy();
     expect(getByTestId('pie-chart-circle-background')).toBeTruthy();

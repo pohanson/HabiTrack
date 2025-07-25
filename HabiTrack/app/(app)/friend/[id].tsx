@@ -80,12 +80,12 @@ function FriendTabs() {
           activeColor={activeTextColor}
         />
       )}>
-      <Tabs.Tab name="FriendHabit" label="Habit">
+      <Tabs.Tab name="FriendHabit" label="Habits">
         <Tabs.ScrollView>
           <FriendHabitScreen />
         </Tabs.ScrollView>
       </Tabs.Tab>
-      <Tabs.Tab name="FriendMilestone" label="Milestone">
+      <Tabs.Tab name="FriendMilestone" label="Milestones">
         <Tabs.ScrollView>
           <FriendMilestoneScreen />
         </Tabs.ScrollView>
