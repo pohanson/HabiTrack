@@ -11,7 +11,7 @@ import { LeaderboardTopThree } from '@/components/leaderboard/LeaderboardTopThre
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-export default function Group() {
+export default function GroupPage() {
   const navigation = useNavigation();
   const { groupId, groupName } = useLocalSearchParams<{ groupId: string; groupName: string }>();
 
@@ -111,7 +111,7 @@ export default function Group() {
         } else {
           // percentage in __._ number
           const adjustedPercentage =
-            Math.floor(
+            Math.round(
               (obj.totalCompletionRateStats?.totalNoOfActualDays /
                 obj.totalCompletionRateStats?.totalNoOfExpectedDays) *
                 1000,
@@ -127,6 +127,11 @@ export default function Group() {
 
   return (
     <ThemedView style={{ flex: 1, alignItems: 'center' }}>
+      <Pressable
+        onPress={handleMenuPress}
+        style={{ height: 0, width: 0 }}
+        testID="leaveGroupButton"
+      />
       <View style={{ height: '2%' }} />
 
       {/* leaderboard selection top bar */}
@@ -145,9 +150,9 @@ export default function Group() {
           <View
             style={{ width: '90%', height: '33%', alignItems: 'center', justifyContent: 'center' }}>
             <LeaderboardTopThree
-              user1={leaderboardData.length > 0 ? leaderboardData[0]?.user || undefined : undefined}
-              user2={leaderboardData.length > 1 ? leaderboardData[1]?.user || undefined : undefined}
-              user3={leaderboardData.length > 2 ? leaderboardData[2]?.user || undefined : undefined}
+              user1={leaderboardData.length > 0 ? leaderboardData[0].user || undefined : undefined}
+              user2={leaderboardData.length > 1 ? leaderboardData[1].user || undefined : undefined}
+              user3={leaderboardData.length > 2 ? leaderboardData[2].user || undefined : undefined}
             />
           </View>
 

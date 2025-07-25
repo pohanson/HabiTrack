@@ -23,3 +23,15 @@ export const mockUser2: User = {
   modifiedAt: '2025-07-16T19:16:14.823Z',
   isDeleted: false,
 };
+
+export const mockUser3: User = {
+  id: 'rsdfqwertyuizxcv',
+  username: 'friendb',
+  name: 'Friend B',
+  password: '$2a$10$syT94VQnn/TXIoNiZmMGzejcUpEOUA2aqCjzD2O5fetvBVWeESRnW',
+  bio: 'This is friend B',
+  profilePicture: null,
+  createdAt: '2025-06-26T19:16:14.823Z',
+  modifiedAt: '2025-07-26T19:16:14.823Z',
+  isDeleted: false,
+};
