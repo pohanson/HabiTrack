@@ -9,14 +9,15 @@ import { HabitInsertionData } from '@/services/HabitService';
 import { NotificationManager } from '@/services/NotificationManager';
 import { dateFromPaddedTime } from '@/utils/dateUtils';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { Alert } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import ToastManager from 'toastify-react-native/components/ToastManager';
 
-export default function EditHabitScreen() {
+export default function EditHabitPage() {
   const { id }: { id: string } = useLocalSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   const databaseService = DatabaseService.instance;
 
@@ -32,7 +33,11 @@ export default function EditHabitScreen() {
   const { handleSubmit } = useFormReturn;
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      Toast.error('Unknown Error');
+      router.back();
+      return;
+    }
     const loadHabit = async () => {
       // get habit and reminder data from db
       try {
@@ -55,7 +60,11 @@ export default function EditHabitScreen() {
         Toast.error('Failed to load habit');
       }
     };
-    loadHabit();
+
+    setIsLoading(true);
+    loadHabit().finally(() => {
+      setIsLoading(false);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -129,6 +138,14 @@ export default function EditHabitScreen() {
       Toast.error('Failed to delete habit');
     }
   };
+
+  if (isLoading) {
+    return (
+      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ThemedText type="default">Loading...</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView style={{ flex: 1, padding: 8 }}>

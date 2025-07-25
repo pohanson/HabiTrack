@@ -22,6 +22,7 @@ export function RHFToggleInput({
       <ThemedText>{label}</ThemedText>
       <Pressable
         testID={`RHFToggleInput-${label}`}
+        aria-label={`${label} ${selected ? 'selected' : 'not selected'}`}
         pressRetentionOffset={50}
         hitSlop={8}
         style={{
