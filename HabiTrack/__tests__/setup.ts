@@ -18,7 +18,7 @@ console.warn = jest.fn((...args) => {
 jest.mock('@/context/UserContext', () => ({
   useUserContext: jest.fn(() => ({
     currentUserId: null,
-    setCurrentUserId: jest.fn(),
+    setCurrentUser: jest.fn(),
   })),
 }));
 

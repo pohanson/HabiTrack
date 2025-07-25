@@ -1,8 +1,35 @@
 import SignupPage from '@/app/signup';
-import { render, waitFor } from '@testing-library/react-native';
+import { mockUser1 } from '@/mocks/user';
+import { DatabaseService } from '@/services';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { router } from 'expo-router';
+import Toast from 'react-native-toast-message';
 import { setIsInternetReachableJest } from '../setup';
 
-describe('<SignupPage />', () => {
+jest.mock('expo-router', () => ({
+  router: {
+    replace: jest.fn(),
+  },
+}));
+
+jest.mock('@/services', () => ({
+  DatabaseService: {
+    instance: {
+      user: {
+        checkValidUsername: jest.fn(),
+        signupUser: jest.fn(),
+      },
+    },
+  },
+}));
+
+describe('SignupPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setIsInternetReachableJest(true);
+    DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(true);
+    DatabaseService.instance.user.signupUser = jest.fn().mockResolvedValue(mockUser1);
+  });
   afterEach(() => {
     setIsInternetReachableJest(true);
   });
@@ -27,5 +54,105 @@ describe('<SignupPage />', () => {
       expect(queryByText('Username', { exact: false })).toBeNull();
       expect(queryByText('Password', { exact: false })).toBeNull();
     });
+  });
+
+  it('should signup successfully', async () => {
+    const { getByTestId } = render(<SignupPage />);
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), 'a');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), 'password');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+
+    await waitFor(() => {
+      expect(DatabaseService.instance.user.checkValidUsername).toHaveBeenCalledWith('a');
+      expect(DatabaseService.instance.user.signupUser).toHaveBeenCalledWith({
+        username: 'a',
+        name: 'name',
+        password: 'password',
+      });
+    });
+    expect(router.replace).toHaveBeenCalledWith('/signin');
+  });
+
+  it('should show error when input is missing', async () => {
+    DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(false);
+    const { getByText, getByTestId } = render(<SignupPage />);
+
+    await act(async () => {
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+
+    await waitFor(() => {
+      getByText('Username (Case Sensitive) is required');
+      getByText('Name is required');
+      getByText('Password is required');
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it('should show error when username is taken', async () => {
+    const spiedToastShow = jest.spyOn(Toast, 'show');
+    DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(false);
+
+    const { getByTestId } = render(<SignupPage />);
+
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), 'a');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), 'password');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+    await waitFor(() => {
+      expect(spiedToastShow).toHaveBeenCalledWith({
+        text1: 'Error',
+        text2: 'Username is taken! Please choose another.',
+        type: 'error',
+      });
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it('should show error when password is too short', async () => {
+    DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(false);
+
+    const { getByText, getByTestId } = render(<SignupPage />);
+
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), 'a');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), 'pas');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+    await waitFor(() => {
+      getByText('Too Short! Password length must be between 6-18.');
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it('should show error when password is too long', async () => {
+    DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(false);
+
+    const { getByText, getByTestId } = render(<SignupPage />);
+
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), 'a');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), '1235678901234567890');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+    await waitFor(() => {
+      getByText('Too Long! Password length must be between 6-18.');
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it('should register navigation to signup page', async () => {
+    const { getByText } = render(<SignupPage />);
+    await act(async () => {
+      fireEvent.press(getByText('Sign In', { exact: false }));
+    });
+    expect(router.replace).toHaveBeenCalledWith('/signin');
   });
 });

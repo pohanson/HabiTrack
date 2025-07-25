@@ -127,7 +127,8 @@
       "!**/constants/**",
       "!**/mocks/**",
       "!**/hooks/**",
-      "!**/context/**"
+      "!**/context/**",
+      "!**/_layout.tsx"
     ]
   }
 }
