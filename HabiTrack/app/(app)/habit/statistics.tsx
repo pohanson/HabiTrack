@@ -12,7 +12,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, useColorScheme } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
-export default function StatisticsScreen() {
+export default function StatisticsPage() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const [streakData, setStreakData] = useState<{
     badgesEarned: number;
@@ -46,7 +46,7 @@ export default function StatisticsScreen() {
   );
   // get the start date to use for stats (frequencyModifiedAtDate if possible, if not fallback to createdAtDate)
   const statsStartDate = useMemo(() => {
-    return frequencyModifiedAtDate || createdAtDate || new Date().toISOString().split('T')[0];
+    return frequencyModifiedAtDate || createdAtDate;
   }, [frequencyModifiedAtDate, createdAtDate]);
 
   // get completedAt data for this habit
@@ -56,7 +56,7 @@ export default function StatisticsScreen() {
 
   // get frequency array for this habit
   const { data: freqData } = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id));
-  const freq = useMemo(() => (freqData || []).map((r) => r.day).sort(), [freqData]);
+  const freq = useMemo(() => freqData.map((r) => r.day).sort(), [freqData]);
 
   // handle errors
   useEffect(() => {
