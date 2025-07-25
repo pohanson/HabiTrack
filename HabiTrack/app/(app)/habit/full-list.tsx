@@ -3,7 +3,7 @@ import { Habit } from '@/db/localSchema';
 import { DatabaseService } from '@/services';
 import { useState, useEffect } from 'react';
 
-export default function FullHabitListScreen() {
+export default function FullHabitListPage() {
   const habitService = DatabaseService.instance.habit;
   const [data, setData] = useState<Habit[]>([]);
 
