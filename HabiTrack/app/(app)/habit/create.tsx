@@ -10,7 +10,7 @@ import { NotificationManager } from '@/services/NotificationManager';
 import { FieldValues, useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
-export default function CreateHabitScreen() {
+export default function CreateHabitPage() {
   const databaseService = DatabaseService.instance;
 
   const useFormReturn = useForm<FieldValues>({

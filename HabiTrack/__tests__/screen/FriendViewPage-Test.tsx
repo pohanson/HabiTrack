@@ -1,4 +1,4 @@
-import FriendView from '@/app/(app)/friend/view';
+import FriendViewPage from '@/app/(app)/friend/view';
 import { mockUser2 } from '@/mocks/user';
 import { DatabaseService } from '@/services';
 import { render, waitFor, screen, act, userEvent } from '@testing-library/react-native';
@@ -31,7 +31,7 @@ const mockPendingUser = {
   isDeleted: false,
 };
 
-describe('FriendView', () => {
+describe('FriendViewPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     DatabaseService.instance.friend.getUserFriends = jest.fn().mockResolvedValue([mockUser2]);
@@ -45,7 +45,7 @@ describe('FriendView', () => {
 
   it('should render friends list w/o pending', async () => {
     (DatabaseService.instance.friend.getIncomingPendingRequests as jest.Mock).mockResolvedValue([]);
-    const { getByText, queryByText } = render(<FriendView />);
+    const { getByText, queryByText } = render(<FriendViewPage />);
 
     getByText('Your Friends');
     await waitFor(() => {
@@ -56,7 +56,7 @@ describe('FriendView', () => {
   });
 
   it('should render friends list with pending', async () => {
-    const { getByText } = render(<FriendView />);
+    const { getByText } = render(<FriendViewPage />);
 
     getByText('Your Friends');
     await waitFor(() => {
@@ -69,7 +69,7 @@ describe('FriendView', () => {
   });
 
   it('should filter friend list, contains user', async () => {
-    render(<FriendView />);
+    render(<FriendViewPage />);
     const user = userEvent.setup();
     const searchboxInput = screen.getByPlaceholderText('Search for friends...');
 
@@ -84,7 +84,7 @@ describe('FriendView', () => {
   });
 
   it("should filter friend list, don't contains user", async () => {
-    render(<FriendView />);
+    render(<FriendViewPage />);
     const user = userEvent.setup();
     const searchboxInput = screen.getByPlaceholderText('Search for friends...');
 
@@ -102,7 +102,7 @@ describe('FriendView', () => {
   it('should render no friend', async () => {
     (DatabaseService.instance.friend.getUserFriends as jest.Mock).mockResolvedValue([]);
 
-    const { getByText } = render(<FriendView />);
+    const { getByText } = render(<FriendViewPage />);
 
     getByText('Your Friends');
     await waitFor(() => {
@@ -111,7 +111,7 @@ describe('FriendView', () => {
   });
 
   it('should open modal', async () => {
-    const { getByText } = render(<FriendView />);
+    const { getByText } = render(<FriendViewPage />);
 
     getByText('Your Friends');
     await waitFor(() => {
@@ -127,7 +127,7 @@ describe('FriendView', () => {
   });
 
   it('should accept friend request', async () => {
-    const { getByText } = render(<FriendView />);
+    const { getByText } = render(<FriendViewPage />);
     getByText('Your Friends');
     await waitFor(() => {
       getByText('Pending User');
@@ -143,7 +143,7 @@ describe('FriendView', () => {
   });
 
   it('should reject friend request', async () => {
-    const { getByText } = render(<FriendView />);
+    const { getByText } = render(<FriendViewPage />);
     getByText('Your Friends');
     await waitFor(() => {
       getByText('Pending User');

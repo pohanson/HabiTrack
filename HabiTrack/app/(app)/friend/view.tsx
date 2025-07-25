@@ -11,7 +11,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
-export default function FriendView() {
+export default function FriendViewPage() {
   const [refresh, setRefresh] = useState(0);
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);

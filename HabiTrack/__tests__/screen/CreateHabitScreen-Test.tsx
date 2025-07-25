@@ -1,4 +1,4 @@
-import CreateHabitScreen from '@/app/(app)/habit/create';
+import CreateHabitPage from '@/app/(app)/habit/create';
 import { DatabaseService } from '@/services';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
@@ -15,12 +15,12 @@ jest.mock('@/services', () => ({
   },
 }));
 
-describe('CreateHabitScreen', () => {
+describe('CreateHabitPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
   it('should submit form data and create habit', async () => {
-    const { getByText, getByTestId } = render(<CreateHabitScreen />);
+    const { getByText, getByTestId } = render(<CreateHabitPage />);
     await waitFor(() => {
       expect(getByText('Create Habit')).toBeTruthy();
     });
@@ -40,7 +40,7 @@ describe('CreateHabitScreen', () => {
   });
 
   it('should not submit form data and show error', async () => {
-    const { getByText } = render(<CreateHabitScreen />);
+    const { getByText } = render(<CreateHabitPage />);
     await waitFor(() => {
       expect(getByText('Create Habit')).toBeTruthy();
     });
@@ -54,7 +54,7 @@ describe('CreateHabitScreen', () => {
   });
 
   it('should not submit form data and show for name only', async () => {
-    const { getByText, getByTestId, queryByText } = render(<CreateHabitScreen />);
+    const { getByText, getByTestId, queryByText } = render(<CreateHabitPage />);
     await waitFor(() => {
       expect(getByText('Create Habit')).toBeTruthy();
     });
