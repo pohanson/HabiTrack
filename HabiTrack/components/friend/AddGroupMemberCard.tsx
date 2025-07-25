@@ -46,7 +46,7 @@ export function AddGroupMemberCard({
       </View>
 
       <Pressable
-        testID={`friend-toggle-${friend.id}`}
+        testID={`${friend.id}-${selected ? 'remove' : 'add'}`}
         pressRetentionOffset={50}
         hitSlop={8}
         style={{

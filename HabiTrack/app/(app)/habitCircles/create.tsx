@@ -10,7 +10,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-export default function CreateGroupScreen() {
+export default function CreateGroupPage() {
   const databaseService = DatabaseService.instance;
 
   const useFormReturn = useForm<FieldValues>({
