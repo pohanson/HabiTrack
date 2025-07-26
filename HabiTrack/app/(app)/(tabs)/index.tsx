@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const today = new Date().toISOString().split('T')[0];
   const todayDateStr = getNiceDateString(today);
 
-  const lightGray = useThemeColor({}, 'lightGray');
+  const subTextColor = useThemeColor({}, 'subText');
 
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   Toast.success('Welcome to HabiTrack! Here are your habits for today.');
@@ -45,7 +45,7 @@ export default function HomeScreen() {
           <ThemedText type="title" style={{ fontSize: 26 }}>
             Today&apos;s Habits
           </ThemedText>
-          <ThemedText style={{ fontSize: 18, color: lightGray }}>{todayDateStr}</ThemedText>
+          <ThemedText style={{ fontSize: 20, color: subTextColor }}>{todayDateStr}</ThemedText>
         </View>
         <IconButton
           iconName="list.bullet"
@@ -56,7 +56,7 @@ export default function HomeScreen() {
         <IconButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
       {data?.length === 0 && (
-        <ThemedText style={{ padding: 10, color: lightGray }}>No habits for today.</ThemedText>
+        <ThemedText style={{ padding: 10, color: subTextColor }}>No habits for today.</ThemedText>
       )}
       <ScrollView>
         <ThemedView style={{ gap: 10, padding: 10 }}>

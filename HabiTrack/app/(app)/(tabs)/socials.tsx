@@ -5,7 +5,7 @@ import { Image, StyleProp, ViewStyle } from 'react-native';
 const buttonStyle: StyleProp<ViewStyle> = { width: '100%' };
 
 export default function SocialsPage() {
-  const imageSize = 225;
+  const imageSize = 250;
 
   return (
     <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -16,7 +16,7 @@ export default function SocialsPage() {
           width: '80%',
         }}>
         <Image
-          source={require('@/assets/images/socials.png')}
+          source={require('@/assets/images/socials4.png')}
           style={{ width: imageSize, height: imageSize, alignSelf: 'center' }}
         />
         <TextButton

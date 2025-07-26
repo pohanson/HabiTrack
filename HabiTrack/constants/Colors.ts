@@ -24,6 +24,7 @@ export const Colors = {
     green: green,
     red: red,
     progressBarIncomplete: '#878787',
+    subText: '#666666ff',
   },
   dark: {
     text: '#ECEDEE',
@@ -40,5 +41,6 @@ export const Colors = {
     green: green,
     red: red,
     progressBarIncomplete: '#5c5c5c',
+    subText: '#a1a1a1',
   },
 };
