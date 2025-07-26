@@ -76,7 +76,12 @@ export function setIsInternetReachableJest(value: boolean) {
 // Mock Expo router
 jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(),
-  router: { push: jest.fn() },
+  useLocalSearchParams: jest.fn(),
+  router: { push: jest.fn(), back: jest.fn() },
+}));
+
+jest.mock('expo-image-picker', () => ({
+  launchImageLibraryAsync: jest.fn(),
 }));
 
 expect.extend({
