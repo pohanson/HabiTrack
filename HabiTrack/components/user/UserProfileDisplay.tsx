@@ -49,7 +49,7 @@ export function UserProfileDisplay({
               textAlign: 'center',
               color: 'black',
             }}>
-            {user.username.charAt(0).toUpperCase()}
+            {user.name.charAt(0).toUpperCase()}
           </ThemedText>
         </View>
       )}

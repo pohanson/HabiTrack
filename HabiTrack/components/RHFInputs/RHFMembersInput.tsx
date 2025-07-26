@@ -111,7 +111,7 @@ export function RHFMembersInput({
                                 justifyContent: 'center',
                                 alignItems: 'center',
                               }}>
-                              <ThemedText>{friend?.username?.charAt(0)?.toUpperCase()}</ThemedText>
+                              <ThemedText>{friend?.name?.charAt(0)?.toUpperCase()}</ThemedText>
                             </View>
                           )}
                           {/* username below profile pic: */}
