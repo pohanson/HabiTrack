@@ -57,7 +57,7 @@ export function AddGroupMemberCard({
               justifyContent: 'center',
             }}>
             <ThemedText testID={`placeholder-profile-picture-text-${friend.id}`}>
-              {friend.username.charAt(0).toUpperCase()}
+              {friend.name.charAt(0).toUpperCase()}
             </ThemedText>
           </View>
         )}
