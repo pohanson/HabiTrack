@@ -16,7 +16,7 @@ export default function SocialsPage() {
           width: '80%',
         }}>
         <Image
-          source={require('@/assets/images/socials4.png')}
+          source={require('@/assets/images/socials.png')}
           style={{ width: imageSize, height: imageSize, alignSelf: 'center' }}
         />
         <TextButton
