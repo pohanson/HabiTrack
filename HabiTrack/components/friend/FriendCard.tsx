@@ -7,12 +7,14 @@ import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 
 export function FriendCard({
+  testID = 'friend-card',
   friend,
   onReject = undefined,
   onAccept = undefined,
   onAdd = undefined,
   onPress = undefined,
 }: {
+  testID?: string;
   friend: User;
   onReject?: () => void;
   onAccept?: () => void;
@@ -26,8 +28,13 @@ export function FriendCard({
   const tabIconDefaultColor = useThemeColor({}, 'tabIconDefault');
 
   return (
-    <Pressable style={{ width: '100%' }} disabled={onPress === undefined} onPress={onPress}>
+    <Pressable
+      testID={testID}
+      style={{ width: '100%' }}
+      disabled={onPress === undefined}
+      onPress={onPress}>
       <ThemedView
+        testID={`friend-card-container-${friend.id}`}
         style={[
           {
             display: 'flex',
@@ -41,9 +48,10 @@ export function FriendCard({
           },
           Shadows.large,
         ]}>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View testID={`friend-info-${friend.id}`} style={{ flexDirection: 'row', gap: 10 }}>
           {friend.profilePicture ? (
             <Image
+              testID={`friend-profile-picture-${friend.id}`}
               source={{
                 uri: friend.profilePicture
                   ? `data:image/jpeg;base64,${friend.profilePicture}`
@@ -53,6 +61,7 @@ export function FriendCard({
             />
           ) : (
             <View
+              testID={`friend-profile-placeholder-${friend.id}`}
               style={{
                 width: 50,
                 height: 50,
@@ -62,6 +71,7 @@ export function FriendCard({
                 justifyContent: 'center',
               }}>
               <ThemedText
+                testID={`friend-profile-initial-${friend.id}`}
                 style={{
                   fontWeight: 'bold',
                   textAlign: 'center',
@@ -71,14 +81,15 @@ export function FriendCard({
               </ThemedText>
             </View>
           )}
-          <View>
-            <ThemedText>{friend.name}</ThemedText>
-            <ThemedText>@{friend.username}</ThemedText>
+          <View testID={`friend-text-info-${friend.id}`}>
+            <ThemedText testID={`friend-name-${friend.id}`}>{friend.name}</ThemedText>
+            <ThemedText testID={`friend-username-${friend.id}`}>@{friend.username}</ThemedText>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View testID={`friend-buttons-${friend.id}`} style={{ flexDirection: 'row', gap: 10 }}>
           {onAccept && (
             <IconButton
+              testID={`friend-accept-button-${friend.id}`}
               iconName="checkmark"
               onPress={onAccept}
               transparentBackground={true}
@@ -87,6 +98,7 @@ export function FriendCard({
           )}
           {onReject && (
             <IconButton
+              testID={`friend-reject-button-${friend.id}`}
               iconName="xmark"
               onPress={onReject}
               transparentBackground={true}
@@ -95,6 +107,7 @@ export function FriendCard({
           )}
           {onAdd && (
             <IconButton
+              testID={`friend-add-button-${friend.id}`}
               iconName="plus"
               onPress={onAdd}
               transparentBackground={true}

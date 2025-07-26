@@ -47,6 +47,7 @@ export function StatsCompletionRateView({
         Shadows.large,
       ]}>
       <Picker
+        testID="picker"
         style={{
           padding: 0,
           flex: 1,
@@ -72,6 +73,7 @@ export function StatsCompletionRateView({
         Evaluated since: {reorderDateString(startDate)}
       </ThemedText>
       <PieChart
+        testID="pie-chart"
         actualNoOfDays={actual}
         expectedNoOfDays={expected}
         radius={pieChartSize}

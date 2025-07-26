@@ -18,6 +18,7 @@ export function LeaderboardHeader({
 
   return (
     <View
+      testID="leaderboard-header"
       style={{
         height: '7.5%',
         width: '90%',
@@ -26,6 +27,7 @@ export function LeaderboardHeader({
         flexDirection: 'row',
       }}>
       <TouchableOpacity
+        testID="leaderboard-header-completion-rate-button"
         style={[
           {
             height: '50%',
@@ -40,6 +42,7 @@ export function LeaderboardHeader({
         ]}
         onPress={() => onSelectionChange('Completion Rate')}>
         <ThemedText
+          testID="leaderboard-header-completion-rate-button-text"
           style={{
             color: selectionType === 'Completion Rate' ? selectedTextColor : deselectedTextColor,
             fontSize: 13,
@@ -51,6 +54,7 @@ export function LeaderboardHeader({
       </TouchableOpacity>
 
       <TouchableOpacity
+        testID="leaderboard-header-badges-earned-button"
         style={[
           {
             height: '50%',
@@ -65,6 +69,7 @@ export function LeaderboardHeader({
         ]}
         onPress={() => onSelectionChange('Badges Earned')}>
         <ThemedText
+          testID="leaderboard-header-badges-earned-button-text"
           style={{
             color: selectionType === 'Badges Earned' ? selectedTextColor : deselectedTextColor,
             fontSize: 13,

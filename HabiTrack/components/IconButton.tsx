@@ -4,12 +4,14 @@ import { IconSymbol, IconSymbolName } from './ui/IconSymbol';
 import { Shadows } from '../constants/Shadows';
 
 export function IconButton({
+  testID = 'icon-button',
   onPress,
   iconName,
   iconSize = 24,
   iconColor = null,
   transparentBackground = false,
 }: {
+  testID?: string;
   onPress: () => void;
   iconName: IconSymbolName;
   iconSize?: number;
@@ -19,8 +21,9 @@ export function IconButton({
   const backgroundColor = useThemeColor({}, 'tint');
   const defaultIconColor = useThemeColor({}, 'icon');
   return (
-    <View>
+    <View testID={testID}>
       <Pressable
+        testID={`${testID}-pressable`}
         onPress={onPress}
         style={(isPressed) => [
           {

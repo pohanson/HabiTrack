@@ -7,9 +7,10 @@ export function UserInformation({ user }: { user: User | null }) {
   const borderColor = useThemeColor({}, 'border');
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+    <View testID="user-information" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       {user?.profilePicture ? (
         <Image
+          testID="user-information-profile-picture"
           source={{
             uri: user.profilePicture ? `data:image/jpeg;base64,${user.profilePicture}` : undefined,
           }}
@@ -17,6 +18,7 @@ export function UserInformation({ user }: { user: User | null }) {
         />
       ) : (
         <ThemedText
+          testID="user-information-no-profile-picture"
           type="default"
           style={{
             width: 100,
@@ -30,11 +32,12 @@ export function UserInformation({ user }: { user: User | null }) {
           No profile picture
         </ThemedText>
       )}
-      <View style={{ flex: 1 }}>
-        <ThemedText type="defaultSemiBold" style={{ fontSize: 20 }}>
+      <View testID="user-information-details" style={{ flex: 1 }}>
+        <ThemedText testID="user-information-name" type="defaultSemiBold" style={{ fontSize: 20 }}>
           {user?.name || 'Loading...'}
         </ThemedText>
         <ThemedText
+          testID="user-information-username"
           style={{
             fontSize: 14,
             marginTop: -2,
@@ -42,9 +45,9 @@ export function UserInformation({ user }: { user: User | null }) {
             color: '#999', // Can contrast with both dark and light backgrounds
             fontWeight: '700',
           }}>
-          {user?.username ? '@' + user.username : 'loading...'}
+          {user?.username ? '@' + user.username : 'Loading...'}
         </ThemedText>
-        <ThemedText type="default" style={{ textAlign: 'justify' }}>
+        <ThemedText testID="user-information-bio" type="default" style={{ textAlign: 'justify' }}>
           {user?.bio || 'No bio available.'}
         </ThemedText>
       </View>

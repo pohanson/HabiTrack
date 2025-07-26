@@ -143,6 +143,7 @@ export function HabitCard({
 
   return (
     <View
+      testID={`habit-card-${habit.id}`}
       style={[
         {
           display: 'flex',
@@ -157,18 +158,30 @@ export function HabitCard({
         },
         Shadows.large,
       ]}>
-      <ThemedText style={{ flex: 1, fontWeight: 'bold' }}>{habit.name}</ThemedText>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <ThemedText
+        testID={`habit-card-${habit.id}-habit-name`}
+        style={{ flex: 1, fontWeight: 'bold' }}>
+        {habit.name}
+      </ThemedText>
+      <View
+        testID={`habit-card-${habit.id}-buttons-container`}
+        style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         {isEditable && (
-          <IconButton iconName="pencil" onPress={() => onEditButtonPressed(habit.id)} />
+          <IconButton
+            testID={`habit-card-${habit.id}-edit-button`}
+            iconName="pencil"
+            onPress={() => onEditButtonPressed(habit.id)}
+          />
         )}
 
         <IconButton
+          testID={`habit-card-${habit.id}-stats-button`}
           iconName="chart.bar"
           onPress={() => onStatsButtonPressed(habit.id, habit.name)}
         />
         {isCompletable && (
           <ToggleInput
+            testID={`habit-card-${habit.id}-toggle-completion`}
             label=""
             iconName="checkmark"
             selected={habit_completion !== null}

@@ -34,6 +34,7 @@ export function LeaderboardTopThree({
 
   return (
     <View
+      testID="leaderboard-top-three"
       style={{
         flexDirection: 'row',
         alignItems: 'flex-end',
@@ -42,9 +43,17 @@ export function LeaderboardTopThree({
         gap: `${gapBetween}`,
       }}>
       {/* second place */}
-      <View style={{ alignItems: 'center', width: width }}>
-        {user2 && <UserProfileDisplay user={user2} />}
+      <View
+        testID="leaderboard-top-three-second-place"
+        style={{ alignItems: 'center', width: width }}>
+        {user2 && (
+          <UserProfileDisplay
+            testID="leaderboard-top-three-second-place-user-profile"
+            user={user2}
+          />
+        )}
         <View
+          testID="leaderboard-top-three-second-place-card"
           style={[
             {
               width: '100%',
@@ -56,6 +65,7 @@ export function LeaderboardTopThree({
             Shadows.large,
           ]}>
           <Image
+            testID="leaderboard-top-three-second-place-number"
             style={{
               width: podiumNumberSizeSecondPlace,
               height: podiumNumberSizeSecondPlace,
@@ -67,9 +77,17 @@ export function LeaderboardTopThree({
       </View>
 
       {/* first place */}
-      <View style={{ alignItems: 'center', width: width }}>
-        {user1 && <UserProfileDisplay user={user1} />}
+      <View
+        testID="leaderboard-top-three-first-place"
+        style={{ alignItems: 'center', width: width }}>
+        {user1 && (
+          <UserProfileDisplay
+            testID="leaderboard-top-three-first-place-user-profile"
+            user={user1}
+          />
+        )}
         <View
+          testID="leaderboard-top-three-first-place-card"
           style={[
             {
               width: '100%',
@@ -82,6 +100,7 @@ export function LeaderboardTopThree({
             Shadows.large,
           ]}>
           <Image
+            testID="leaderboard-top-three-first-place-number"
             style={{
               width: podiumNumberSizeFirstPlace,
               height: podiumNumberSizeFirstPlace,
@@ -93,9 +112,17 @@ export function LeaderboardTopThree({
       </View>
 
       {/* third place */}
-      <View style={{ alignItems: 'center', width: width }}>
-        {user3 && <UserProfileDisplay user={user3} />}
+      <View
+        testID="leaderboard-top-three-third-place"
+        style={{ alignItems: 'center', width: width }}>
+        {user3 && (
+          <UserProfileDisplay
+            testID="leaderboard-top-three-third-place-user-profile"
+            user={user3}
+          />
+        )}
         <View
+          testID="leaderboard-top-three-third-place-card"
           style={[
             {
               width: '100%',
@@ -107,6 +134,7 @@ export function LeaderboardTopThree({
             Shadows.large,
           ]}>
           <Image
+            testID="leaderboard-top-three-third-place-number"
             style={{
               width: podiumNumberSizeThirdPlace,
               height: podiumNumberSizeThirdPlace,

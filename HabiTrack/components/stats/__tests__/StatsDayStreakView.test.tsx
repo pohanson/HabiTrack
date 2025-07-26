@@ -3,7 +3,7 @@ import { render } from '@testing-library/react-native';
 import { StatsDayStreakView } from '@/components/stats/StatsDayStreakView';
 
 describe('<StatsDayStreakView />', () => {
-  it('renders active and best streaks correctly', () => {
+  it('displays active and best streaks correctly', () => {
     const { getByText } = render(<StatsDayStreakView activeStreak={5} bestStreak={10} />);
 
     expect(getByText('Active Streak')).toBeTruthy();
@@ -12,7 +12,7 @@ describe('<StatsDayStreakView />', () => {
     expect(getByText('10 days')).toBeTruthy();
   });
 
-  it('displays the correct emojis for different streak values', () => {
+  it('displays correct emojis for different streaks', () => {
     const { getByText } = render(<StatsDayStreakView activeStreak={3} bestStreak={7} />);
 
     expect(getByText('⚡')).toBeTruthy(); // 3 days:⚡
