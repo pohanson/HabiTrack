@@ -4,12 +4,14 @@ import { ThemedText } from './ThemedText';
 import { IconSymbol, IconSymbolName } from './ui/IconSymbol';
 
 export function ToggleInput({
+  testID = 'toggle-input',
   label,
   iconName,
   selected,
   toggleSelected,
   iconSize = 32,
 }: {
+  testID?: string;
   label: string;
   iconName: IconSymbolName;
   selected: boolean;
@@ -19,12 +21,14 @@ export function ToggleInput({
   const colorScheme = useColorScheme() || 'light';
   return (
     <View
+      testID={testID}
       style={{
         alignItems: 'center',
         flexDirection: 'column',
       }}>
       {label && <ThemedText>{label}</ThemedText>}
       <Pressable
+        testID={`${testID}-pressable`}
         pressRetentionOffset={50}
         hitSlop={8}
         style={{

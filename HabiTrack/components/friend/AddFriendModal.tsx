@@ -33,9 +33,11 @@ export function AddFriendModal({
           .then(setFriendSuggestion);
       });
   }, [databaseService.friend, databaseService.user, databaseService.userId, searchStr]);
+
   return (
-    <Modal {...props} onRequestClose={() => setIsAddModalVisible(false)}>
+    <Modal testID="add-friend-modal" {...props} onRequestClose={() => setIsAddModalVisible(false)}>
       <View
+        testID="add-friend-modal-outer-container"
         style={{
           flex: 1,
           justifyContent: 'center',
@@ -44,6 +46,7 @@ export function AddFriendModal({
           opacity: 0.95,
         }}>
         <View
+          testID="add-friend-modal-inner-container"
           style={{
             alignItems: 'center',
             width: '80%',
@@ -52,9 +55,12 @@ export function AddFriendModal({
             borderRadius: 20,
             backgroundColor: useThemeColor({}, 'card'),
           }}>
-          <ThemedText type="title">Add Friend</ThemedText>
+          <ThemedText testID="add-friend-modal-title" type="title">
+            Add Friend
+          </ThemedText>
 
           <TextInput
+            testID="add-friend-modal-search-input"
             style={{
               width: '100%',
               padding: 10,
@@ -68,9 +74,14 @@ export function AddFriendModal({
             value={searchStr}
             onChangeText={setSearchStr}
           />
-          {errorMessage && <ThemedText type="error">{errorMessage}</ThemedText>}
+          {errorMessage && (
+            <ThemedText testID="add-friend-modal-error-message" type="error">
+              {errorMessage}
+            </ThemedText>
+          )}
           {friendSuggestions?.map((friendData) => (
             <FriendCard
+              testID={`friend-card-${friendData.id}`}
               key={friendData.id}
               friend={friendData}
               onAdd={() => {
@@ -80,13 +91,13 @@ export function AddFriendModal({
                     setIsAddModalVisible(false);
                   })
                   .catch((error) => {
-                    console.error('Error adding friend:', error);
                     setErrorMessage(error.message || 'Failed to add friend.');
                   });
               }}
             />
           ))}
           <TextButton
+            testID="add-friend-modal-close-button"
             label="Close"
             onPress={() => setIsAddModalVisible(false)}
             style={{

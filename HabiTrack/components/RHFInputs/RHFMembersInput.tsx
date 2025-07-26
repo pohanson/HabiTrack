@@ -1,5 +1,5 @@
 import { Controller, FieldErrors, FieldValues } from 'react-hook-form';
-import { View, ScrollView, useColorScheme } from 'react-native';
+import { View, ScrollView, useColorScheme, Image } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import { useEffect, useState } from 'react';
@@ -91,19 +91,29 @@ export function RHFMembersInput({
                       const friend = friends.find((f) => f.id === friendId);
                       return (
                         <View key={friendId} style={{ alignItems: 'center' }}>
-                          {/* profile pic placeholder: */}
-                          <View
-                            style={{
-                              height: 60,
-                              width: 60,
-                              borderRadius: 1000,
-                              backgroundColor: theme.background,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <ThemedText>{friend?.username?.charAt(0)?.toUpperCase()}</ThemedText>
-                          </View>
-
+                          {friend?.profilePicture ? (
+                            /* profile pic: */
+                            <Image
+                              testID={`friend-card-${friend.id}`}
+                              source={{
+                                uri: `data:image/jpeg;base64,${friend.profilePicture}`,
+                              }}
+                              style={{ width: 60, height: 60, borderRadius: 30 }}
+                            />
+                          ) : (
+                            /* profile pic placeholder: */
+                            <View
+                              style={{
+                                height: 60,
+                                width: 60,
+                                borderRadius: 1000,
+                                backgroundColor: theme.background,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}>
+                              <ThemedText>{friend?.username?.charAt(0)?.toUpperCase()}</ThemedText>
+                            </View>
+                          )}
                           {/* username below profile pic: */}
                           <ThemedText style={{ fontSize: 12, textAlign: 'center' }}>
                             @{friend?.username}

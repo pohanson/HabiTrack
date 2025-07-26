@@ -27,7 +27,7 @@ export function LeaderboardElement({
       ? quantity + '%'
       : selectionType === 'Badges Earned'
         ? quantity + ' Badges'
-        : quantity + ' Days';
+        : quantity + ' Unknown Type';
 
   function getRankProps() {
     switch (rank) {
@@ -64,6 +64,7 @@ export function LeaderboardElement({
 
   return (
     <ThemedView
+      testID={`leaderboard-element-${rank}`}
       style={[
         {
           backgroundColor: rankStyle.backgroundColor,
@@ -78,27 +79,39 @@ export function LeaderboardElement({
         },
         rankStyle.shadows,
       ]}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+      <View
+        testID={`leaderboard-element-${rank}-rank-container`}
+        style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
         {/* ranking number */}
-        <ThemedText style={{ fontWeight: 'bold', color: useThemeColor({}, 'blue'), padding: 5 }}>
+        <ThemedText
+          testID={`leaderboard-element-${rank}-rank-icon`}
+          style={{ fontWeight: 'bold', color: useThemeColor({}, 'blue'), padding: 5 }}>
           {rankStyle.icon}
         </ThemedText>
-        <ThemedText style={{ fontWeight: 'bold', color: useThemeColor({}, 'blue'), padding: 5 }}>
+        <ThemedText
+          testID={`leaderboard-element-${rank}-rank-number`}
+          style={{ fontWeight: 'bold', color: useThemeColor({}, 'blue'), padding: 5 }}>
           {rank}
         </ThemedText>
 
         {/* name, username, profile pic */}
-        <View style={{ marginLeft: 8 }}>
+        <View testID={`leaderboard-element-${rank}-user-profile`} style={{ marginLeft: 8 }}>
           <ThemedText
+            testID={`leaderboard-element-${rank}-user-name`}
             style={{ color: rank <= 3 ? 'black' : textColor, fontWeight: 'bold', fontSize: 16 }}>
             {user.name}
           </ThemedText>
-          <ThemedText style={{ color: '#888', fontSize: 12 }}>@{user.username}</ThemedText>
+          <ThemedText
+            testID={`leaderboard-element-${rank}-username`}
+            style={{ color: '#888', fontSize: 12 }}>
+            @{user.username}
+          </ThemedText>
         </View>
       </View>
 
       {/* quantity based on selectionType */}
       <View
+        testID={`leaderboard-element-${rank}-quantity-container`}
         style={[
           {
             borderRadius: 10,
@@ -111,6 +124,7 @@ export function LeaderboardElement({
           Shadows.large,
         ]}>
         <ThemedText
+          testID={`leaderboard-element-${rank}-quantity-text`}
           style={{ fontWeight: 'bold', alignSelf: 'center', fontSize: 12, color: 'white' }}>
           {quantifiedText}
         </ThemedText>

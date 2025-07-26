@@ -24,13 +24,13 @@ export function HabitList({
   }, [habitService, userId]);
 
   return data?.length === 0 ? (
-    <ThemedView style={{ flex: 1, padding: 8 }}>
-      <ThemedText>No habits</ThemedText>
+    <ThemedView testID="habit-list-no-habits" style={{ flex: 1, padding: 8 }}>
+      <ThemedText testID="habit-list-no-habits-text">No habits</ThemedText>
     </ThemedView>
   ) : (
-    <ThemedView style={{ flex: 1 }}>
-      <ScrollView>
-        <ThemedView style={{ padding: 10, gap: 10 }}>
+    <ThemedView testID="habit-list-container" style={{ flex: 1 }}>
+      <ScrollView testID="habit-list-scrollview">
+        <ThemedView testID="habit-list-subcontainer" style={{ padding: 10, gap: 10 }}>
           {data.map((habitItem) => (
             <HabitCard
               key={habitItem.id}
