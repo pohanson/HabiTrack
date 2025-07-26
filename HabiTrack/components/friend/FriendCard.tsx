@@ -77,7 +77,7 @@ export function FriendCard({
                   textAlign: 'center',
                   color: 'black',
                 }}>
-                {friend.username.charAt(0).toUpperCase()}
+                {friend.name.charAt(0).toUpperCase()}
               </ThemedText>
             </View>
           )}
