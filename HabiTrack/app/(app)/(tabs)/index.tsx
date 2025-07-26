@@ -2,11 +2,13 @@ import { HabitCard } from '@/components/habit/HabitCard';
 import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
+import { getNiceDateString } from '@/utils/dateUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import ToastManager from 'toastify-react-native/components/ToastManager';
 
@@ -21,6 +23,11 @@ export default function HomeScreen() {
     Toast.error('Error fetching habits.');
   }
 
+  const today = new Date().toISOString().split('T')[0];
+  const todayDateStr = getNiceDateString(today);
+
+  const lightGray = useThemeColor({}, 'lightGray');
+
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   Toast.success('Welcome to HabiTrack! Here are your habits for today.');
 
@@ -34,9 +41,12 @@ export default function HomeScreen() {
           justifyContent: 'space-between',
           padding: 10,
         }}>
-        <ThemedText type="title" style={{ fontSize: 26 }}>
-          Today&apos;s Habits
-        </ThemedText>
+        <View>
+          <ThemedText type="title" style={{ fontSize: 26 }}>
+            Today&apos;s Habits
+          </ThemedText>
+          <ThemedText style={{ fontSize: 18, color: lightGray }}>{todayDateStr}</ThemedText>
+        </View>
         <IconButton
           iconName="list.bullet"
           onPress={() => {
@@ -45,7 +55,9 @@ export default function HomeScreen() {
         />
         <IconButton iconName="plus" onPress={() => router.push('/habit/create')} />
       </ThemedView>
-      {data?.length === 0 && <ThemedText>No habits for today.</ThemedText>}
+      {data?.length === 0 && (
+        <ThemedText style={{ padding: 10, color: lightGray }}>No habits for today.</ThemedText>
+      )}
       <ScrollView>
         <ThemedView style={{ gap: 10, padding: 10 }}>
           {data.map(({ habit, habit_completion, habit_milestone }) => (
