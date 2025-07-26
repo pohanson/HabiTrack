@@ -1,6 +1,7 @@
 import Milestones from '@/app/(app)/(tabs)/milestones';
 import { DatabaseService } from '@/services';
-import { render, waitFor } from '@testing-library/react-native';
+import { act, render, waitFor } from '@testing-library/react-native';
+import { useFocusEffect } from 'expo-router';
 
 jest.mock('@/services', () => ({
   DatabaseService: {
@@ -19,6 +20,10 @@ describe('MilestonesPage', () => {
   it('should render HabitMilestoneList with data', async () => {
     const { getByText, getAllByText } = render(<Milestones />);
 
+    act(() => {
+      const mockUseFocusEffect = useFocusEffect as jest.Mock;
+      mockUseFocusEffect.mock.calls[0][0]();
+    });
     await waitFor(() => {
       getByText('Exercise');
       getByText('Reading');

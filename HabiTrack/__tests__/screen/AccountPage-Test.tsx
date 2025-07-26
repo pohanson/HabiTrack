@@ -1,31 +1,29 @@
 import AccountPage from '@/app/(app)/(tabs)/account';
 import { useUserContext } from '@/context/UserContext';
-import { User } from '@/db/schema';
+import { mockUser1 } from '@/mocks/user';
 import { DatabaseService } from '@/services';
-import { act, render, waitFor } from '@testing-library/react-native';
-import { useFocusEffect } from 'expo-router';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { router, useFocusEffect } from 'expo-router';
 
 jest.mock('@/services', () => ({
   DatabaseService: {
     instance: {
       user: {
-        getCurrentUser: jest.fn().mockResolvedValue({
-          id: 'asdfqwertyuizxcv',
-          username: 'johndoe',
-          name: 'John Doe',
-          password: '$2a$10$syT94VQnn/TXIoNiZmMGzejcUpEOUA2aqCjzD2O5fetvBVWeESRnW',
-          bio: 'This is a test user.',
-          profilePicture: null,
-          createdAt: '2025-06-26T19:16:14.823Z',
-          modifiedAt: '2025-07-26T19:16:14.823Z',
-          isDeleted: false,
-        } as User),
+        getCurrentUser: jest.fn(),
+        signoutUser: jest.fn(),
       },
     },
   },
 }));
 
 describe('AccountPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    router.push = jest.fn();
+    DatabaseService.instance.user.getCurrentUser = jest.fn().mockResolvedValue(mockUser1);
+    DatabaseService.instance.user.signoutUser = jest.fn().mockResolvedValue(null);
+  });
+
   it('should render account details when user is logged in', async () => {
     const { getByText, queryByText } = render(<AccountPage />);
 
@@ -47,7 +45,7 @@ describe('AccountPage', () => {
   });
 
   it("should show 'No user found' when no user is logged in", async () => {
-    (DatabaseService.instance.user.getCurrentUser as jest.Mock).mockResolvedValue(null);
+    DatabaseService.instance.user.getCurrentUser = jest.fn().mockResolvedValue(null);
 
     const { getByText, queryByText } = render(<AccountPage />);
 
@@ -64,6 +62,43 @@ describe('AccountPage', () => {
       expect(queryByText('John Doe')).toBeNull();
       expect(queryByText('@johndoe')).toBeNull();
       expect(queryByText('This is a test user.')).toBeNull();
+    });
+  });
+
+  it('should navigate to edit profile page', async () => {
+    const { getByText } = render(<AccountPage />);
+
+    act(() => {
+      const mockUseFocusEffect = useFocusEffect as jest.Mock;
+      mockUseFocusEffect.mock.calls[0][0]();
+    });
+    await waitFor(() => {
+      getByText(mockUser1.name);
+    });
+    act(() => {
+      fireEvent.press(getByText('Edit Profile'));
+    });
+
+    expect(router.push).toHaveBeenCalledWith(`/account/edit/${mockUser1.id}`);
+  });
+
+  it('should signout user when clicked', async () => {
+    const { getByText } = render(<AccountPage />);
+
+    act(() => {
+      const mockUseFocusEffect = useFocusEffect as jest.Mock;
+      mockUseFocusEffect.mock.calls[0][0]();
+    });
+    await waitFor(() => {
+      getByText(mockUser1.name);
+    });
+    act(() => {
+      fireEvent.press(getByText('Log Out'));
+    });
+
+    expect(DatabaseService.instance.user.signoutUser).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(router.push).toHaveBeenCalledWith('/signin');
     });
   });
 });

@@ -24,7 +24,7 @@ export function IconButton({
   return (
     <View testID={testID}>
       <Pressable
-        testID={`${testID}-pressable`}
+        testID={`${iconName}-icon-button`}
         onPress={onPress}
         style={(isPressed) => [
           {

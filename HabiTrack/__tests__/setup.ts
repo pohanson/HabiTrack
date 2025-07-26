@@ -76,6 +76,7 @@ export function setIsInternetReachableJest(value: boolean) {
 // Mock Expo router
 jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(),
+  router: { push: jest.fn() },
 }));
 
 expect.extend({

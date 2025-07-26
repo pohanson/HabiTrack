@@ -10,7 +10,7 @@ import { ScrollView } from 'react-native';
 import { Toast } from 'toastify-react-native';
 import ToastManager from 'toastify-react-native/components/ToastManager';
 
-export default function HomeScreen() {
+export default function HomePage() {
   const [refresh, setRefresh] = useState(0);
   const [data, setData] = useState<
     {

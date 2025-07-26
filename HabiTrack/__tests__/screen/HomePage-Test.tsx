@@ -1,8 +1,9 @@
-import HomeScreen from '@/app/(app)/(tabs)';
+import HomePage from '@/app/(app)/(tabs)';
 import { Habit, HabitCompletion, HabitMilestone, Reminder } from '@/db/schema';
 import { PartialSync } from '@/repositories/SyncableRepository';
 import { DatabaseService } from '@/services';
-import { render, waitFor } from '@testing-library/react-native/build/pure';
+import { act, render, userEvent, waitFor } from '@testing-library/react-native';
+import { router, useFocusEffect } from 'expo-router';
 
 jest.mock('@/services', () => ({
   DatabaseService: {
@@ -29,10 +30,14 @@ jest.mock('@/services', () => ({
   },
 }));
 
-describe('HomeScreen', () => {
+describe('HomePage', () => {
   it('should render one habit correctly', async () => {
-    const { getByText } = render(<HomeScreen />);
+    const { getByText } = render(<HomePage />);
 
+    act(() => {
+      const mockUseFocusEffect = useFocusEffect as jest.Mock;
+      mockUseFocusEffect.mock.calls[0][0]();
+    });
     getByText("Today's Habits");
 
     await waitFor(() => {
@@ -67,7 +72,7 @@ describe('HomeScreen', () => {
       reminder: Reminder | null;
       habit_milestone: HabitMilestone | null;
     }[]);
-    const { getByText, queryAllByText } = render(<HomeScreen />);
+    const { getByText, queryAllByText } = render(<HomePage />);
 
     getByText("Today's Habits");
 
@@ -78,11 +83,27 @@ describe('HomeScreen', () => {
 
   it('should show "No habits for today." when no habits are present', async () => {
     DatabaseService.instance.habit.getAllHabitsToday = jest.fn().mockResolvedValue([]);
-    const { getByText, queryByText } = render(<HomeScreen />);
+    const { getByText, queryByText } = render(<HomePage />);
 
     await waitFor(() => {
       expect(queryByText('Test Habit fdsa', { exact: false })).toBeNull();
     });
     getByText('No habits for today.');
+  });
+
+  it('should navigate to /habit/full-list when pressed', async () => {
+    const { getByTestId } = render(<HomePage />);
+    await act(async () => {
+      await userEvent.press(getByTestId('list.bullet-icon-button'));
+    });
+    expect(router.push).toHaveBeenCalledWith('/habit/full-list');
+  });
+
+  it('should navigate to /habit/create when pressed', async () => {
+    const { getByTestId } = render(<HomePage />);
+    await act(async () => {
+      await userEvent.press(getByTestId('plus-icon-button'));
+    });
+    expect(router.push).toHaveBeenCalledWith('/habit/create');
   });
 });
