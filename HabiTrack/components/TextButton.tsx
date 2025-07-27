@@ -21,6 +21,7 @@ export function TextButton({
 
   return (
     <Pressable
+      testID={`${label}-button`}
       hitSlop={4}
       pressRetentionOffset={50}
       style={[buttonStyle, style, Shadows.medium]}

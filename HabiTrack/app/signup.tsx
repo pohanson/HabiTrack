@@ -32,8 +32,8 @@ export default function SignupPage() {
           padding: 20,
         }}>
         <ThemedText style={{ textAlign: 'center' }}>
-          Please connect to internet for the signin and signup. The rest of the app could be used
-          without wifi
+          No internet connection detected. Please connect to internet for the signin and signup. The
+          rest of the app could be used without wifi
         </ThemedText>
       </ThemedView>
     );
@@ -80,13 +80,14 @@ export default function SignupPage() {
         setIsLoading(false);
       }
     },
-    () => {
-      console.log('Form submission failed');
+    (error) => {
+      console.log('Form submission failed', error);
       Toast.show({
         text1: 'Form submission failed.',
         text2: ' Please check your inputs.',
         type: 'error',
       });
+      setIsLoading(false);
     },
   );
 
@@ -128,7 +129,10 @@ export default function SignupPage() {
         <ThemedView>
           <TextButton
             label="Sign Up"
-            onPress={onSubmit}
+            onPress={() => {
+              setIsLoading(true);
+              setTimeout(onSubmit, 10); // needed to ensure the state is updated.
+            }}
             style={{ marginTop: 20 }}
             disabled={isLoading}
           />

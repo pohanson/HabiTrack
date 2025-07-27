@@ -1,6 +1,7 @@
 import { User } from '@/db/localSchema';
-import { View, Image } from 'react-native';
+import { View } from 'react-native';
 import { ThemedText } from '../ThemedText';
+import { ProfilePicture } from './ProfilePicture';
 
 export function UserProfileDisplay({
   testID = 'user-profile-display',
@@ -19,42 +20,9 @@ export function UserProfileDisplay({
 }) {
   return (
     <View testID={testID} style={{ marginBottom }}>
-      {user.profilePicture ? (
-        <Image
-          testID={`${testID}-profile-picture`}
-          source={{ uri: `data:image/png;base64,${user.profilePicture}` }}
-          style={{
-            width: profileSize,
-            height: profileSize,
-            borderRadius: 100,
-            marginBottom: 4,
-          }}
-        />
-      ) : (
-        <View
-          testID={`${testID}-placeholder-profile-picture`}
-          style={{
-            width: profileSize,
-            height: profileSize,
-            borderRadius: 100,
-            backgroundColor: '#ccc',
-            marginBottom: 4,
-            justifyContent: 'center',
-          }}>
-          <ThemedText
-            testID={`${testID}-placeholder-profile-picture-text`}
-            style={{
-              fontWeight: 'bold',
-              fontSize: profileSize * 0.4,
-              textAlign: 'center',
-              color: 'black',
-            }}>
-            {user.name.charAt(0).toUpperCase()}
-          </ThemedText>
-        </View>
-      )}
+      <ProfilePicture user={user} profileSize={profileSize} />
       <ThemedText
-        testID={`${testID}-name`}
+        testID={testID + '-name'}
         style={{ fontWeight: 'bold', fontSize: nameSize, textAlign: 'center' }}>
         {user.name}
       </ThemedText>

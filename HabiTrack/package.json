@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest --watchAll",
+    "testCoverage": "jest --coverage",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
@@ -41,7 +42,6 @@
     "expo-image": "~2.3.0",
     "expo-image-picker": "~16.1.4",
     "expo-linking": "~7.1.5",
-    "expo-localization": "~16.1.5",
     "expo-network": "~7.1.5",
     "expo-notifications": "~0.31.3",
     "expo-router": "~5.1.0",
@@ -102,16 +102,36 @@
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
-      "<rootDir>/__tests__/setup.js"
+      "<rootDir>/__tests__/setup.ts"
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|toastify-react-native)"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/__tests__/setup.js"
+      "<rootDir>/__tests__/setup.ts",
+      "<rootDir>/__tests__/jest.d.ts"
     ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|webp|svg)$": "jest-transform-stub"
-    }
+    },
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx,js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/*.config.{ts,js}",
+      "!**/expo-env.d.ts",
+      "!**/.expo/**",
+      "!**/db/**",
+      "!**/drizzle/**",
+      "!**/constants.ts",
+      "!**/constants/**",
+      "!**/mocks/**",
+      "!**/hooks/**",
+      "!**/context/**",
+      "!**/_layout.tsx",
+      "!**/repositories/**",
+      "!**/services/**",
+      "!**/components/ui/**"
+    ]
   }
 }

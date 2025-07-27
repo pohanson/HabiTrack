@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-import { FriendCard } from '../FriendCard';
 import { User } from '@/db/localSchema';
+import { act, fireEvent, render } from '@testing-library/react-native';
+import React from 'react';
+import { FriendCard } from '../FriendCard';
 
 describe('<FriendCard />', () => {
   const mockUser1: User = {
@@ -50,7 +50,6 @@ describe('<FriendCard />', () => {
 
     expect(getByTestId(`friend-card-${mockUser1.id}`)).toBeTruthy();
     expect(getByTestId(`friend-card-container-${mockUser1.id}`)).toBeTruthy();
-    expect(getByTestId(`friend-info-${mockUser1.id}`)).toBeTruthy();
     expect(getByTestId(`friend-text-info-${mockUser1.id}`)).toBeTruthy();
     expect(getByTestId(`friend-name-${mockUser1.id}`)).toBeTruthy();
     expect(getByTestId(`friend-username-${mockUser1.id}`)).toBeTruthy();
@@ -66,7 +65,7 @@ describe('<FriendCard />', () => {
     expect(profilePicture.props.source.uri).toBe(
       `data:image/jpeg;base64,${mockUser1.profilePicture}`,
     );
-    expect(queryByTestId(`friend-card-no-profile-picture-${mockUser1.id}`)).toBeFalsy();
+    expect(queryByTestId(`placeholder-profile-picture-text-${mockUser1.id}`)).toBeFalsy();
   });
 
   it('displays friend profile picture placeholder when friend profile picture is not available', () => {
@@ -78,8 +77,8 @@ describe('<FriendCard />', () => {
       />,
     );
 
-    expect(getByTestId(`friend-profile-placeholder-${mockUser1.id}`)).toBeTruthy();
-    expect(queryByTestId(`friend-profile-picture-${mockUser1.id}`)).toBeFalsy();
+    expect(getByTestId(`placeholder-profile-picture-text-${mockUser1.id}`)).toBeTruthy();
+    expect(queryByTestId(`profile-picture-${mockUser1.id}`)).toBeFalsy();
   });
 
   it('displays friend text information correctly', () => {
@@ -152,33 +151,39 @@ describe('<FriendCard />', () => {
     expect(getByTestId(`friend-add-button-${mockUser2.id}`)).toBeTruthy();
   });
 
-  it('calls onAccept when accept button is pressed', () => {
+  it('calls onAccept when accept button is pressed', async () => {
     const { getByTestId } = render(
       <FriendCard friend={mockUser1} onAccept={mockOnAccept} onReject={mockOnReject} />,
     );
 
-    fireEvent.press(getByTestId('friend-accept-button-1-pressable'));
+    await act(async () => {
+      fireEvent.press(getByTestId('friend-accept-button-1'));
+    });
     expect(mockOnAccept).toHaveBeenCalled();
   });
 
-  it('calls onReject when reject button is pressed', () => {
+  it('calls onReject when reject button is pressed', async () => {
     const { getByTestId } = render(
       <FriendCard friend={mockUser1} onAccept={mockOnAccept} onReject={mockOnReject} />,
     );
 
-    fireEvent.press(getByTestId('friend-reject-button-1-pressable'));
+    await act(async () => {
+      fireEvent.press(getByTestId('friend-reject-button-1'));
+    });
     expect(mockOnReject).toHaveBeenCalled();
   });
 
-  it('calls onAdd when add button is pressed', () => {
+  it('calls onAdd when add button is pressed', async () => {
     const mockOnAdd = jest.fn();
     const { getByTestId } = render(<FriendCard friend={mockUser1} onAdd={mockOnAdd} />);
 
-    fireEvent.press(getByTestId('friend-add-button-1-pressable'));
+    await act(async () => {
+      fireEvent.press(getByTestId('friend-add-button-1'));
+    });
     expect(mockOnAdd).toHaveBeenCalled();
   });
 
-  it('handles multiple actions correctly', () => {
+  it('handles multiple actions correctly', async () => {
     const mockOnAdd = jest.fn();
     const { getByTestId } = render(
       <FriendCard
@@ -188,11 +193,13 @@ describe('<FriendCard />', () => {
         onAdd={mockOnAdd}
       />,
     );
-    fireEvent.press(getByTestId('friend-accept-button-1-pressable'));
+    await act(async () => {
+      fireEvent.press(getByTestId('friend-accept-button-1'));
+      fireEvent.press(getByTestId('friend-reject-button-1'));
+      fireEvent.press(getByTestId('friend-add-button-1'));
+    });
     expect(mockOnAccept).toHaveBeenCalled();
-    fireEvent.press(getByTestId('friend-reject-button-1-pressable'));
     expect(mockOnReject).toHaveBeenCalled();
-    fireEvent.press(getByTestId('friend-add-button-1-pressable'));
     expect(mockOnAdd).toHaveBeenCalled();
   });
 

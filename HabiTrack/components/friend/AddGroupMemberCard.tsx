@@ -1,9 +1,10 @@
 import { Colors } from '@/constants/Colors';
 import { Shadows } from '@/constants/Shadows';
 import { User } from '@/db/localSchema';
-import { Pressable, useColorScheme, View, Image } from 'react-native';
+import { Pressable, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { IconSymbol } from '../ui/IconSymbol';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function AddGroupMemberCard({
   testID = 'add-group-member-card',
@@ -36,44 +37,20 @@ export function AddGroupMemberCard({
         },
         Shadows.large,
       ]}>
-      <View testID={`friend-info-${friend.id}`} style={{ flexDirection: 'row', gap: 10 }}>
-        {friend.profilePicture ? (
-          /* profile pic: */
-          <Image
-            testID={`profile-picture-${friend.id}`}
-            source={{ uri: `data:image/jpeg;base64,${friend.profilePicture}` }}
-            style={{ width: 50, height: 50, borderRadius: 25 }}
-          />
-        ) : (
-          /* profile pic placeholder: */
-          <View
-            testID={`placeholder-profile-picture-${friend.id}`}
-            style={{
-              height: 50,
-              width: 50,
-              backgroundColor: theme.card,
-              borderRadius: 1000,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <ThemedText testID={`placeholder-profile-picture-text-${friend.id}`}>
-              {friend.name.charAt(0).toUpperCase()}
-            </ThemedText>
-          </View>
-        )}
-
-        <View testID={`friend-text-info-${friend.id}`} style={{ flexDirection: 'column' }}>
-          <ThemedText testID={`friend-name-${friend.id}`} style={{ fontSize: 14 }}>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <ProfilePicture user={friend} />
+        <View>
+          <ThemedText style={{ fontSize: 14 }} testID={`friend-name-${friend.id}`}>
             {friend.name}
           </ThemedText>
-          <ThemedText testID={`friend-username-${friend.id}`} style={{ fontSize: 14 }}>
+          <ThemedText style={{ fontSize: 14 }} testID={`friend-username-${friend.id}`}>
             @{friend.username}
           </ThemedText>
         </View>
       </View>
 
       <Pressable
-        testID={`friend-toggle-${friend.id}`}
+        testID={`${friend.id}-${selected ? 'remove' : 'add'}`}
         pressRetentionOffset={50}
         hitSlop={8}
         style={{

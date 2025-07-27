@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
 import { User } from '@/db/localSchema';
 import { AddGroupMemberCard } from '../AddGroupMemberCard';
 
@@ -49,13 +49,12 @@ describe('<AddGroupMemberCard />', () => {
       />,
     );
 
-    expect(getByTestId(`placeholder-profile-picture-${mockUser1.id}`)).toBeTruthy();
+    expect(getByTestId(`placeholder-profile-picture-text-${mockUser1.id}`)).toBeTruthy();
   });
 
   it('displays friend name and username correctly', () => {
     const { getByTestId } = render(<AddGroupMemberCard {...defaultProps} />);
 
-    expect(getByTestId(`friend-text-info-${mockUser1.id}`)).toBeTruthy();
     expect(getByTestId(`friend-name-${mockUser1.id}`).props.children).toBe(mockUser1.name);
     expect(getByTestId(`friend-username-${mockUser1.id}`).props.children).toEqual([
       '@',
@@ -63,23 +62,13 @@ describe('<AddGroupMemberCard />', () => {
     ]);
   });
 
-  it('displays correct profile initial for placeholder profile', () => {
-    const { getByTestId } = render(
-      <AddGroupMemberCard
-        {...defaultProps}
-        friend={{ ...mockUser1, username: 'zebra', profilePicture: null }}
-      />,
-    );
-    expect(getByTestId(`placeholder-profile-picture-text-${mockUser1.id}`).props.children).toBe(
-      'Z',
-    );
-  });
-
-  it('calls onToggle when card is pressed pressed', () => {
+  it('calls onToggle when card is pressed pressed', async () => {
     const { getByTestId } = render(<AddGroupMemberCard {...defaultProps} />);
 
-    const toggleButton = getByTestId(`friend-toggle-${mockUser1.id}`);
-    fireEvent.press(toggleButton);
+    const toggleButton = getByTestId(`${mockUser1.id}-add`);
+    await act(async () => {
+      fireEvent.press(toggleButton);
+    });
 
     expect(defaultProps.onToggle).toHaveBeenCalled();
   });

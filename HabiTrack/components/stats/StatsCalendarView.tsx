@@ -53,8 +53,6 @@ export function StatsCalendarView({
         maxDate={today}
         disableAllTouchEventsForDisabledDays={true}
         disableAllTouchEventsForInactiveDays={true}
-        onDayPress={() => {}}
-        // to disable touch day effect
         dayComponent={({ date, state, marking }) => {
           return (
             <ThemedView

@@ -37,9 +37,15 @@ export class FriendService extends BaseSyncableRepoService {
     }
 
     if (existingFriendship.status === 'PENDING') {
-      throw new Error('Pending friend request.');
+      if (existingFriendship.friend_id === userId) {
+        this._friendRepository.update({ id: existingFriendship.id, status: 'ACCEPTED' });
+      } else {
+        throw new Error('Pending friend request.');
+      }
     }
-    // TODO: handle cases where status is rejected, it should be updated to PENDING.
+    if (existingFriendship.status === 'REJECTED') {
+      this._friendRepository.update({ id: existingFriendship.id, status: 'PENDING' });
+    }
   }
 
   public async getIncomingPendingRequests() {

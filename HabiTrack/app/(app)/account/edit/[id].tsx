@@ -4,8 +4,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
-import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams } from 'expo-router';
+import { launchImageLibraryAsync } from 'expo-image-picker';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { Image, View } from 'react-native';
@@ -35,6 +35,11 @@ export default function EditAccountPage() {
     }
   });
 
+  if (!userId) {
+    Toast.show({ text1: 'Unknown Error', text2: 'Please try again', type: 'error' });
+    router.back();
+    return;
+  }
   return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
       <ThemedText type="title">Edit Account</ThemedText>
@@ -53,7 +58,7 @@ export default function EditAccountPage() {
             }}>
             {image ? (
               <Image
-                source={{ uri: image ? `data:image/jpeg;base64,${image}` : undefined }}
+                source={{ uri: `data:image/jpeg;base64,${image}` }}
                 style={{ width: 100, height: 100, borderRadius: 50 }}
               />
             ) : (
@@ -74,7 +79,7 @@ export default function EditAccountPage() {
             <TextButton
               label="Edit Profile Picture"
               onPress={() =>
-                ImagePicker.launchImageLibraryAsync({
+                launchImageLibraryAsync({
                   mediaTypes: ['images'],
                   allowsEditing: true,
                   aspect: [1, 1],

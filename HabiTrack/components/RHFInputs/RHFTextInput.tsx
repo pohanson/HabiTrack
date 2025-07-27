@@ -39,6 +39,7 @@ export function RHFTextInput({
         rules={{ required: isRequired ? `${label} is required` : false, ...rules }}
         render={({ field: { onChange, value } }) => (
           <TextInput
+            testID={`RHFTextInput-${name}`}
             autoComplete="off"
             autoCorrect={false}
             {...textInputProps}

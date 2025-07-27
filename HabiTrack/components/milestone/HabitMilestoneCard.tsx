@@ -51,17 +51,17 @@ type BadgeProps = {
 
 function getBadgeImage(badgeType: number, completed: boolean) {
   if (completed) {
-    if (badgeType === 1) return require('../../assets/images/badges/colored/msb1.png');
-    if (badgeType === 2) return require('../../assets/images/badges/colored/msb2.png');
-    if (badgeType === 3) return require('../../assets/images/badges/colored/msb3.png');
-    if (badgeType === 4) return require('../../assets/images/badges/colored/msb4.png');
-    if (badgeType === 5) return require('../../assets/images/badges/colored/msb5.png');
+    if (badgeType === 1) return require('@/assets/images/badges/colored/msb1.png');
+    if (badgeType === 2) return require('@/assets/images/badges/colored/msb2.png');
+    if (badgeType === 3) return require('@/assets/images/badges/colored/msb3.png');
+    if (badgeType === 4) return require('@/assets/images/badges/colored/msb4.png');
+    if (badgeType === 5) return require('@/assets/images/badges/colored/msb5.png');
   } else {
-    if (badgeType === 1) return require('../../assets/images/badges/greyscale/gmsb1.png');
-    if (badgeType === 2) return require('../../assets/images/badges/greyscale/gmsb2.png');
-    if (badgeType === 3) return require('../../assets/images/badges/greyscale/gmsb3.png');
-    if (badgeType === 4) return require('../../assets/images/badges/greyscale/gmsb4.png');
-    if (badgeType === 5) return require('../../assets/images/badges/greyscale/gmsb5.png');
+    if (badgeType === 1) return require('@/assets/images/badges/greyscale/gmsb1.png');
+    if (badgeType === 2) return require('@/assets/images/badges/greyscale/gmsb2.png');
+    if (badgeType === 3) return require('@/assets/images/badges/greyscale/gmsb3.png');
+    if (badgeType === 4) return require('@/assets/images/badges/greyscale/gmsb4.png');
+    if (badgeType === 5) return require('@/assets/images/badges/greyscale/gmsb5.png');
   }
 }
 

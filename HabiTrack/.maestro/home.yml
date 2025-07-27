@@ -1,0 +1,16 @@
+appId: com.habitrack.HabiTrack
+# The app user should be logged in
+---
+- launchApp
+- assertVisible: Today's Habits
+- tapOn: 'Milestones'
+- assertVisible: 'Milestones'
+- assertVisible: 'Ranks'
+- tapOn: 'Socials'
+- assertVisible: 'Socials'
+- assertVisible: 'Your Friends'
+- assertVisible: 'Habit Circles'
+- tapOn: 'Account'
+- assertVisible: 'Account'
+- assertVisible: 'Edit Profile'
+- assertVisible: 'Log Out'

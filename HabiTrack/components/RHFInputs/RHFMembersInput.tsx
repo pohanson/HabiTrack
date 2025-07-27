@@ -1,12 +1,13 @@
-import { Controller, FieldErrors, FieldValues } from 'react-hook-form';
-import { View, ScrollView, useColorScheme, Image } from 'react-native';
-import { ThemedText } from '../ThemedText';
-import { ThemedView } from '../ThemedView';
-import { useEffect, useState } from 'react';
+import { Colors } from '@/constants/Colors';
 import { User } from '@/db/localSchema';
 import { DatabaseService } from '@/services';
-import { Colors } from '@/constants/Colors';
+import { useEffect, useState } from 'react';
+import { Controller, FieldErrors, FieldValues } from 'react-hook-form';
+import { ScrollView, TextInput, useColorScheme, View } from 'react-native';
 import { AddGroupMemberCard } from '../friend/AddGroupMemberCard';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function RHFMembersInput({
   control,
@@ -17,6 +18,7 @@ export function RHFMembersInput({
   name: string;
   errorState: FieldErrors<FieldValues>;
 }) {
+  const [searchStr, setSearchStr] = useState('');
   const [friends, setFriends] = useState<User[]>([]);
   const databaseService = DatabaseService.instance;
 
@@ -67,18 +69,20 @@ export function RHFMembersInput({
           {/* card section */}
           <ThemedView
             style={{ backgroundColor: theme.card, padding: 10, borderRadius: 10, flex: 1 }}>
-            {/* Search bar functionality (might add) */}
-            {/* <TextInput
-                            style={{
-                                width: '100%',
-                                padding: 10,
-                                borderWidth: 1,
-                                borderColor: theme.border,
-                                borderRadius: 5,
-                                alignSelf: 'center'
-                            }}
-                            placeholder="Search for friends..."
-                        /> */}
+            <TextInput
+              style={{
+                width: '100%',
+                padding: 10,
+                borderWidth: 1,
+                borderColor: theme.border,
+                color: theme.text,
+                borderRadius: 5,
+                alignSelf: 'center',
+              }}
+              value={searchStr}
+              onChangeText={setSearchStr}
+              placeholder="Search for friends..."
+            />
 
             {/* horizontal scroll preview bar showing currently selected friends (stickied at top) */}
             {value && value.length > 0 && (
@@ -89,31 +93,14 @@ export function RHFMembersInput({
                   <View style={{ flexDirection: 'row', gap: 7 }}>
                     {value.map((friendId) => {
                       const friend = friends.find((f) => f.id === friendId);
+                      if (!friend) return null;
                       return (
-                        <View key={friendId} style={{ alignItems: 'center' }}>
-                          {friend?.profilePicture ? (
-                            /* profile pic: */
-                            <Image
-                              testID={`friend-card-${friend.id}`}
-                              source={{
-                                uri: `data:image/jpeg;base64,${friend.profilePicture}`,
-                              }}
-                              style={{ width: 60, height: 60, borderRadius: 30 }}
-                            />
-                          ) : (
-                            /* profile pic placeholder: */
-                            <View
-                              style={{
-                                height: 60,
-                                width: 60,
-                                borderRadius: 1000,
-                                backgroundColor: theme.background,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}>
-                              <ThemedText>{friend?.name?.charAt(0)?.toUpperCase()}</ThemedText>
-                            </View>
-                          )}
+                        <View
+                          key={friendId}
+                          style={{ alignItems: 'center' }}
+                          testID={`friend-card-${friend.id}`}>
+                          <ProfilePicture user={friend} />
+
                           {/* username below profile pic: */}
                           <ThemedText style={{ fontSize: 12, textAlign: 'center' }}>
                             @{friend?.username}
@@ -141,25 +128,31 @@ export function RHFMembersInput({
               )}
               <ScrollView persistentScrollbar={true}>
                 <View style={{ gap: 10, padding: 10 }}>
-                  {friends.map((friend, idx) => (
-                    <AddGroupMemberCard
-                      key={friend.id}
-                      friend={friend}
-                      selected={value?.includes(friend.id) || false}
-                      onToggle={() => {
-                        const currValue = value || [];
-                        const friendIndex = currValue.indexOf(friend.id);
+                  {friends
+                    .filter(
+                      (friend) =>
+                        friend.username.toLowerCase().includes(searchStr.toLowerCase()) ||
+                        friend.name.toLowerCase().includes(searchStr.toLowerCase()),
+                    )
+                    .map((friend, idx) => (
+                      <AddGroupMemberCard
+                        key={friend.id}
+                        friend={friend}
+                        selected={value?.includes(friend.id) || false}
+                        onToggle={() => {
+                          const currValue = value || [];
+                          const friendIndex = currValue.indexOf(friend.id);
 
-                        if (friendIndex === -1) {
-                          const updatedValue = [...currValue, friend.id];
-                          onChange(updatedValue);
-                        } else {
-                          const updatedValue = currValue.filter((id) => id !== friend.id);
-                          onChange(updatedValue);
-                        }
-                      }}
-                    />
-                  ))}
+                          if (friendIndex === -1) {
+                            const updatedValue = [...currValue, friend.id];
+                            onChange(updatedValue);
+                          } else {
+                            const updatedValue = currValue.filter((id) => id !== friend.id);
+                            onChange(updatedValue);
+                          }
+                        }}
+                      />
+                    ))}
                 </View>
               </ScrollView>
             </ThemedView>

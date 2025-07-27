@@ -7,30 +7,38 @@ import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
 import { SyncService } from '@/services/SyncService';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
-export default function FriendView() {
+export default function FriendViewPage() {
+  const [refresh, setRefresh] = useState(0);
+  useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
   const [userFriends, setUserFriends] = useState<User[]>([]);
-  const [refresh, setRefresh] = useState(0);
   const [searchStr, setSearchStr] = useState('');
   const databaseService = DatabaseService.instance;
 
+  const filteredFriend = userFriends.filter(
+    (friend) =>
+      friend.name.toLowerCase().includes(searchStr) ||
+      friend.username.toLowerCase().includes(searchStr),
+  );
+
   useEffect(() => {
-    SyncService.syncRepoService(databaseService.friend);
-    databaseService.friend
-      .getIncomingPendingRequests()
-      .then((result) => setPendingRequests(result || []));
-    databaseService.friend.getUserFriends().then((result) => setUserFriends(result || []));
+    SyncService.syncRepoService(databaseService.friend).then(() => {
+      databaseService.friend
+        .getIncomingPendingRequests()
+        .then((result) => setPendingRequests(result || []));
+      databaseService.friend.getUserFriends().then((result) => setUserFriends(result));
+    });
   }, [databaseService.friend, refresh]);
 
   return (
     <ThemedView style={{ flex: 1, alignItems: 'center' }}>
       {pendingRequests.length > 0 && (
-        <>
+        <View style={{ gap: 10 }}>
           <ThemedText type="subtitle">Pending Requests</ThemedText>
           {pendingRequests.map((user) => (
             <FriendCard
@@ -48,7 +56,7 @@ export default function FriendView() {
               }
             />
           ))}
-        </>
+        </View>
       )}
       <AddFriendModal
         visible={isAddModalVisible}
@@ -65,7 +73,11 @@ export default function FriendView() {
           padding: 10,
         }}>
         <ThemedText type="title">Your Friends</ThemedText>
-        <IconButton iconName="plus" onPress={() => setIsAddModalVisible(true)} />
+        <IconButton
+          iconName="plus"
+          onPress={() => setIsAddModalVisible(true)}
+          testID="add-friend-button"
+        />
       </View>
       <TextInput
         style={{
@@ -81,19 +93,17 @@ export default function FriendView() {
         placeholder="Search for friends..."
       />
       <View style={{ gap: 10, marginTop: 20 }}>
-        {userFriends
-          .filter(
-            (friend) =>
-              friend.name.toLowerCase().includes(searchStr) ||
-              friend.username.toLowerCase().includes(searchStr),
-          )
-          .map((friend) => (
+        {filteredFriend.length === 0 ? (
+          <ThemedText type="default">No friends found.</ThemedText>
+        ) : (
+          filteredFriend.map((friend) => (
             <FriendCard
               key={friend.id}
               friend={friend}
               onPress={() => router.push(`/friend/${friend.id}`)}
             />
-          ))}
+          ))
+        )}
       </View>
     </ThemedView>
   );

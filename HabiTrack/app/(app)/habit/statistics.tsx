@@ -7,14 +7,13 @@ import { Colors } from '@/constants/Colors';
 import { DatabaseService } from '@/services';
 import { getExpectedDates } from '@/utils/dateUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, useColorScheme } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
-export default function StatisticsScreen() {
+export default function StatisticsPage() {
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
-  const navigation = useNavigation();
   const [streakData, setStreakData] = useState<{
     badgesEarned: number;
     bestStreak: number;
@@ -29,12 +28,6 @@ export default function StatisticsScreen() {
   let renderCount = useRef(0);
   renderCount.current++;
   console.log('Stats page render count: ' + renderCount.current);
-
-  // set header title
-  useEffect(() => {
-    if (!id) return;
-    navigation.setOptions({ headerTitle: 'Statistics' });
-  }, [id, name, navigation]);
 
   // get createdAt data for this habit
   const { data: createdAtData, error: createdAtError } = useLiveQuery(
@@ -53,7 +46,7 @@ export default function StatisticsScreen() {
   );
   // get the start date to use for stats (frequencyModifiedAtDate if possible, if not fallback to createdAtDate)
   const statsStartDate = useMemo(() => {
-    return frequencyModifiedAtDate || createdAtDate || new Date().toISOString().split('T')[0];
+    return frequencyModifiedAtDate || createdAtDate;
   }, [frequencyModifiedAtDate, createdAtDate]);
 
   // get completedAt data for this habit
@@ -63,7 +56,7 @@ export default function StatisticsScreen() {
 
   // get frequency array for this habit
   const { data: freqData } = useLiveQuery(databaseService.reminder.getRemindersForHabitQuery(id));
-  const freq = useMemo(() => (freqData || []).map((r) => r.day).sort(), [freqData]);
+  const freq = useMemo(() => freqData.map((r) => r.day).sort(), [freqData]);
 
   // handle errors
   useEffect(() => {

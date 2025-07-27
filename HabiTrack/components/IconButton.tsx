@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Pressable, View } from 'react-native';
+import { Pressable, PressableProps, View } from 'react-native';
 import { IconSymbol, IconSymbolName } from './ui/IconSymbol';
 import { Shadows } from '../constants/Shadows';
 
@@ -10,6 +10,7 @@ export function IconButton({
   iconSize = 24,
   iconColor = null,
   transparentBackground = false,
+  ...props
 }: {
   testID?: string;
   onPress: () => void;
@@ -17,13 +18,13 @@ export function IconButton({
   iconSize?: number;
   iconColor?: string | null;
   transparentBackground?: boolean;
-}) {
+} & PressableProps) {
   const backgroundColor = useThemeColor({}, 'tint');
   const defaultIconColor = useThemeColor({}, 'icon');
   return (
     <View testID={testID}>
       <Pressable
-        testID={`${testID}-pressable`}
+        testID={`${iconName}-icon-button`}
         onPress={onPress}
         style={(isPressed) => [
           {
@@ -32,7 +33,8 @@ export function IconButton({
             padding: 10,
           },
           transparentBackground ? {} : { backgroundColor: backgroundColor, ...Shadows.medium },
-        ]}>
+        ]}
+        {...props}>
         <IconSymbol name={iconName} color={iconColor || defaultIconColor} size={iconSize} />
       </Pressable>
     </View>

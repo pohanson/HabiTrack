@@ -1,6 +1,6 @@
 import { Reminder } from '@/db/schema';
 import { ReminderRepository } from '@/repositories/ReminderRepository';
-import { paddedTimeFromDate } from '@/utils';
+import { paddedTimeFromDate } from '@/utils/dateUtils';
 import { DatabaseService } from './DatabaseService';
 import { BaseSyncableRepoService } from './BaseSyncableRepoService';
 

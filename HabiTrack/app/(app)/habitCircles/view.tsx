@@ -1,18 +1,28 @@
+import { GroupCard } from '@/components/GroupCard';
+import { IconButton } from '@/components/IconButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React, { useCallback, useEffect, useState } from 'react';
-import { router, useFocusEffect, useNavigation } from 'expo-router';
-import { IconButton } from '@/components/IconButton';
-import { ScrollView, useColorScheme, View } from 'react-native';
-import { DatabaseService } from '@/services';
-import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { GroupCard } from '@/components/GroupCard';
 import { Colors } from '@/constants/Colors';
+import { DatabaseService } from '@/services';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function HabitCirclesView() {
-  const navigation = useNavigation();
-
+export default function HabitCirclesPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [groupsData, setGroupsData] = useState<
+    {
+      group: {
+        id: string;
+        name: string;
+        admin_id: string;
+        createdAt: string;
+        modifiedAt: string;
+        isDeleted: boolean;
+      };
+    }[]
+  >([]);
 
   const databaseService = DatabaseService.instance;
 
@@ -20,29 +30,26 @@ export default function HabitCirclesView() {
   useFocusEffect(useCallback(() => setRefresh((prev) => prev + 1), []));
 
   useEffect(() => {
-    navigation.setOptions({ headerTitle: 'Habit Circles' });
-  }, [navigation]);
+    const fetchGroups = async () => {
+      const groups = await databaseService.group.getGroupsByUserIdQuery(databaseService.userId);
+      setGroupsData(groups);
+    };
 
-  const { data: groupsData, error: groupsError } = useLiveQuery(
-    databaseService.group.getGroupsByUserIdQuery(databaseService.userId),
-    [refresh],
-  );
-
-  if (groupsError) {
-    console.error('Error fetching groups:', groupsError);
-  }
-
-  useEffect(() => {
-    if (groupsData !== undefined) {
-      setIsLoading(false);
-    }
-  }, [groupsData]);
+    setIsLoading(true);
+    fetchGroups().finally(() => setIsLoading(false));
+  }, [databaseService.group, databaseService.userId, refresh]);
 
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
+  const bottomPadding = useSafeAreaInsets().bottom;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: theme.background }}>
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: theme.background,
+        marginBottom: bottomPadding,
+      }}>
       <View
         style={{
           flexDirection: 'row',

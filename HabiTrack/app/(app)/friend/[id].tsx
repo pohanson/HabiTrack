@@ -27,6 +27,9 @@ export default function FriendPage() {
         .getUserById(id)
         .then(setFriend)
         .finally(() => setIsLoading(false));
+    } else {
+      setFriend(null);
+      setIsLoading(false);
     }
   }, [id, databaseService.user]);
 
@@ -97,6 +100,7 @@ function FriendTabs() {
 function FriendHabitScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
+
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
@@ -111,6 +115,7 @@ function FriendHabitScreen() {
 function FriendMilestoneScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
+
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (

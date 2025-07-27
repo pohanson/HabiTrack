@@ -7,14 +7,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { DatabaseService } from '@/services';
 import { HabitInsertionData } from '@/services/HabitService';
 import { NotificationManager } from '@/services/NotificationManager';
-import { useNavigation } from 'expo-router';
-import { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import Toast from 'react-native-toast-message';
 
-export default function CreateHabitScreen() {
-  const navigation = useNavigation();
-  useEffect(() => navigation.setOptions({ headerTitle: 'Create Habit' }), [navigation]);
+export default function CreateHabitPage() {
   const databaseService = DatabaseService.instance;
 
   const useFormReturn = useForm<FieldValues>({

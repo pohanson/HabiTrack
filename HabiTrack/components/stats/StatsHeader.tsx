@@ -17,11 +17,11 @@ export function StatsHeader({
   startDate: string;
 }) {
   function getBadgeImageFromBadgesEarned(badgesEarned: number) {
-    if (badgesEarned === 1) return require('../../assets/images/badges/colored/msb1.png');
-    if (badgesEarned === 2) return require('../../assets/images/badges/colored/msb2.png');
-    if (badgesEarned === 3) return require('../../assets/images/badges/colored/msb3.png');
-    if (badgesEarned === 4) return require('../../assets/images/badges/colored/msb4.png');
-    if (badgesEarned === 5) return require('../../assets/images/badges/colored/msb5.png');
+    if (badgesEarned === 1) return require('@/assets/images/badges/colored/msb1.png');
+    if (badgesEarned === 2) return require('@/assets/images/badges/colored/msb2.png');
+    if (badgesEarned === 3) return require('@/assets/images/badges/colored/msb3.png');
+    if (badgesEarned === 4) return require('@/assets/images/badges/colored/msb4.png');
+    if (badgesEarned === 5) return require('@/assets/images/badges/colored/msb5.png');
     return null;
   }
 
@@ -32,6 +32,7 @@ export function StatsHeader({
       {badgesEarned > 0 && (
         <ThemedView testID="badge" style={{ justifyContent: 'center' }}>
           <Image
+            testID="badge-image"
             source={badgeImage}
             style={{
               height: 70,
