@@ -1,24 +1,74 @@
-import { Habit, HabitCompletion, HabitMilestone } from '@/db/localSchema';
+// import { Habit, HabitCompletion, HabitMilestone } from '@/db/localSchema';
+// import { ScrollView } from 'react-native';
+// import { ThemedText } from '../ThemedText';
+// import { ThemedView } from '../ThemedView';
+// import { HabitCard } from './HabitCard';
+
+// export function HabitList({
+//   data,
+//   isEditable = false,
+//   isCompletable = false,
+//   today = null,
+// }: {
+//   data: {
+//     habit: Habit;
+//     habitCompletion?: HabitCompletion | null;
+//     habitMilestone?: HabitMilestone | null;
+//   }[];
+//   isEditable?: boolean;
+//   isCompletable?: boolean;
+//   today?: string | null;
+// }) {
+//   return data?.length === 0 ? (
+//     <ThemedView testID="habit-list-no-habits" style={{ flex: 1, padding: 8 }}>
+//       <ThemedText testID="habit-list-no-habits-text">No habits</ThemedText>
+//     </ThemedView>
+//   ) : (
+//     <ThemedView testID="habit-list-container" style={{ flex: 1 }}>
+//       <ScrollView testID="habit-list-scrollview">
+//         <ThemedView testID="habit-list-subcontainer" style={{ padding: 10, gap: 10 }}>
+//           {data.map(({ habit: habitItem, habitCompletion, habitMilestone }) => (
+//             <HabitCard
+//               key={habitItem.id}
+//               habit={habitItem}
+//               habit_completion={habitCompletion || null}
+//               isEditable={isEditable}
+//               isCompletable={isCompletable}
+//               habit_milestone={habitMilestone || null}
+//               today={today}
+//             />
+//           ))}
+//         </ThemedView>
+//       </ScrollView>
+//     </ThemedView>
+//   );
+// }
+
+import { Habit } from '@/db/localSchema';
+import { DatabaseService } from '@/services';
+import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { HabitCard } from './HabitCard';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
-import { HabitCard } from './HabitCard';
 
 export function HabitList({
-  data,
+  userId = undefined,
   isEditable = false,
-  isCompletable = false,
-  today = null,
 }: {
-  data: {
-    habit: Habit;
-    habitCompletion?: HabitCompletion | null;
-    habitMilestone?: HabitMilestone | null;
-  }[];
+  userId?: string | null;
   isEditable?: boolean;
-  isCompletable?: boolean;
-  today?: string | null;
 }) {
+  const habitService = DatabaseService.instance.habit;
+  const [data, setData] = useState<Habit[]>([]);
+  useEffect(() => {
+    if (userId === undefined) {
+      habitService.getAllHabits().then(setData);
+    } else {
+      habitService.getAllHabits(userId).then(setData);
+    }
+  }, [habitService, userId]);
+
   return data?.length === 0 ? (
     <ThemedView testID="habit-list-no-habits" style={{ flex: 1, padding: 8 }}>
       <ThemedText testID="habit-list-no-habits-text">No habits</ThemedText>
@@ -27,15 +77,14 @@ export function HabitList({
     <ThemedView testID="habit-list-container" style={{ flex: 1 }}>
       <ScrollView testID="habit-list-scrollview">
         <ThemedView testID="habit-list-subcontainer" style={{ padding: 10, gap: 10 }}>
-          {data.map(({ habit: habitItem, habitCompletion, habitMilestone }) => (
+          {data.map((habitItem) => (
             <HabitCard
               key={habitItem.id}
               habit={habitItem}
-              habit_completion={habitCompletion || null}
+              habit_completion={null}
               isEditable={isEditable}
-              isCompletable={isCompletable}
-              habit_milestone={habitMilestone || null}
-              today={today}
+              isCompletable={false}
+              habit_milestone={null}
             />
           ))}
         </ThemedView>

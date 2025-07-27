@@ -95,9 +95,6 @@ export function HabitCard({
 
       // handling badges_earned (using updated best_day_streak data)
       const updatedBadgesEarned = getBadgesEarned(Math.floor(updatedBestDayStreak / 7));
-
-      console.log('badges_earned for', habit.name + ': ' + updatedBadgesEarned);
-
       databaseService.habitMilestone.updateMilestoneByHabitId(habit.id, {
         streak_started_at: updatedStreakStartedAt,
         best_day_streak: updatedBestDayStreak,

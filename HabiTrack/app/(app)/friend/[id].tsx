@@ -3,7 +3,7 @@ import { HabitMilestoneList } from '@/components/milestone/HabitMilestoneList';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { UserInformation } from '@/components/user/UserInformation';
-import { Habit, User } from '@/db/schema';
+import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -100,19 +100,13 @@ function FriendTabs() {
 function FriendHabitScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
-  const habitService = DatabaseService.instance.habit;
-  const [data, setData] = useState<Habit[]>([]);
-  useEffect(() => {
-    if (!friend) return;
-    habitService.getAllHabits(friend.id).then(setData);
-  }, [habitService, friend]);
 
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
-        <HabitList data={data.map((habit) => ({ habit }))} />
+        <HabitList userId={friend.id} />
       )}
     </ThemedView>
   );
