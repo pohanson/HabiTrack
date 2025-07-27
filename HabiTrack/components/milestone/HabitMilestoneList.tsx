@@ -1,15 +1,24 @@
-import { useMemo } from 'react';
+import { DatabaseService } from '@/services';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import { HabitMilestoneCard } from './HabitMilestoneCard';
 import { HabitMilestoneHeader } from './HabitMilestoneHeader';
 
-export function HabitMilestoneList({
-  data,
-}: {
-  data: { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[];
-}) {
+export function HabitMilestoneList({ userId = undefined }: { userId?: string | null }) {
+  const [refresh, setRefresh] = useState(0);
+  const [data, setData] = useState<
+    { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[]
+  >([]);
+
+  const databaseService = DatabaseService.instance;
+
+  useEffect(() => {
+    databaseService.habitMilestone.getAllMilestonesQuery(userId).then(setData);
+  }, [databaseService.habitMilestone, userId, refresh]);
+
   // extra calcs for active badges. Define complete habits as habits with all 5 milestone badges
   const totalMilestoneBadges = useMemo(
     () =>
@@ -19,6 +28,12 @@ export function HabitMilestoneList({
   const totalCompleteHabits = useMemo(
     () => data?.filter((item) => Number(item.badges_earned) >= 5).length,
     [data],
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setRefresh((prev) => prev + 1);
+    }, []),
   );
 
   return (

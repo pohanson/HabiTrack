@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
-import { HabitMilestoneList } from '../HabitMilestoneList';
 import { DatabaseService } from '@/services';
+import { render, waitFor } from '@testing-library/react-native';
+import React from 'react';
+import { HabitMilestoneList } from '../HabitMilestoneList';
 
 jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(() => {}),
@@ -51,17 +51,19 @@ describe('<HabitMilestoneList />', () => {
     mockDatabaseService.mockResolvedValue([]);
   });
 
-  it('displays without crashing', () => {
+  it('displays without crashing', async () => {
     const mockData = [{ habit_id: '1', habit_name: 'Run', week_streak: 3, badges_earned: 2 }];
     mockDatabaseService.mockResolvedValue(mockData);
     const { getByTestId } = render(<HabitMilestoneList />);
 
-    expect(getByTestId('habit-milestone-list')).toBeTruthy();
-    expect(getByTestId('habit-milestone-scrollview')).toBeTruthy();
-    expect(getByTestId('habit-milestone-ranks-section')).toBeTruthy();
-    expect(getByTestId('ranks-title')).toBeTruthy();
-    expect(getByTestId('habit-milestone-header')).toBeTruthy();
-    expect(getByTestId('milestone-list-container')).toBeTruthy();
+    await waitFor(() => {
+      expect(getByTestId('habit-milestone-list')).toBeTruthy();
+      expect(getByTestId('habit-milestone-scrollview')).toBeTruthy();
+      expect(getByTestId('habit-milestone-ranks-section')).toBeTruthy();
+      expect(getByTestId('ranks-title')).toBeTruthy();
+      expect(getByTestId('habit-milestone-header')).toBeTruthy();
+      expect(getByTestId('milestone-list-container')).toBeTruthy();
+    });
   });
 
   it('displays no habits message when database returns empty array', async () => {
