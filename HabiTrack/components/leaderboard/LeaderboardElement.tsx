@@ -1,10 +1,11 @@
-import { useColorScheme, View, Image } from 'react-native';
-import { ThemedView } from '../ThemedView';
-import { ThemedText } from '../ThemedText';
+import { Colors } from '@/constants/Colors';
+import { Shadows } from '@/constants/Shadows';
 import { User } from '@/db/localSchema';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Shadows } from '@/constants/Shadows';
-import { Colors } from '@/constants/Colors';
+import { useColorScheme, View } from 'react-native';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import { ProfilePicture } from '../user/ProfilePicture';
 
 export function LeaderboardElement({
   selectionType,
@@ -100,36 +101,7 @@ export function LeaderboardElement({
           testID={`leaderboard-element-${rank}-user-profile`}
           style={{ flexDirection: 'row', marginLeft: 8 }}>
           {/* profile pic */}
-          {user.profilePicture ? (
-            <Image
-              source={{ uri: `data:image/png;base64,${user.profilePicture}` }}
-              style={{
-                width: profilePicSize,
-                height: profilePicSize,
-                borderRadius: 25,
-                marginRight: 10,
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                width: profilePicSize,
-                height: profilePicSize,
-                borderRadius: 25,
-                backgroundColor: '#ccc',
-                marginRight: 10,
-                justifyContent: 'center',
-              }}>
-              <ThemedText
-                style={{
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  color: 'black',
-                }}>
-                {user.name.charAt(0).toUpperCase()}
-              </ThemedText>
-            </View>
-          )}
+          <ProfilePicture user={user} profileSize={profilePicSize} />
 
           {/* name and username */}
           <View>

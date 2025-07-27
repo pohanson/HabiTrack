@@ -120,11 +120,6 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
         activeStreak = daysBetween + 1;
       }
     }
-    console.log('/////////////////////////////////////');
-    console.log('Streak started at:', streakStartedAt);
-    console.log('Best streak:', bestStreak);
-    console.log('Active streak:', activeStreak);
-
     return {
       badgesEarned: data[0].badges_earned || 0,
       bestStreak,
@@ -141,9 +136,5 @@ export class HabitMilestoneService extends BaseSyncableRepoService {
       includeDeleted,
     );
     return result.reduce((sum, unit) => sum + unit.badges_earned, 0);
-  }
-
-  public async getActiveStreakByHabitId(habitId: string) {
-    // first check for streak breaks then update habitMilestone
   }
 }

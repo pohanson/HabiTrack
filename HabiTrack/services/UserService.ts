@@ -208,11 +208,6 @@ export class UserService extends BaseSyncableRepoService {
       totalNoOfActualDays += stats.actualNoOfDays;
     }
 
-    console.log('Total Completion Rate Stats for User ID:', userId);
-    console.log('Total No. of Actual Days:', totalNoOfActualDays);
-    console.log('Total No. of Expected Days:', totalNoOfExpectedDays);
-    console.log('////////////////////////////////////////////////////////////////////////');
-
     return {
       totalNoOfExpectedDays,
       totalNoOfActualDays,
