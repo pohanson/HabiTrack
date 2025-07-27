@@ -8,7 +8,6 @@ import { ThemedView } from '../ThemedView';
 import { ProfilePicture } from '../user/ProfilePicture';
 
 export function FriendCard({
-  testID = 'friend-card',
   friend,
   onReject = undefined,
   onAccept = undefined,
@@ -30,7 +29,7 @@ export function FriendCard({
 
   return (
     <Pressable
-      testID={testID}
+      testID={`friend-card-${friend.id}`}
       style={{ width: '100%' }}
       disabled={onPress === undefined}
       onPress={onPress}>
@@ -64,7 +63,6 @@ export function FriendCard({
               onPress={onAccept}
               transparentBackground={true}
               iconColor={greenColor}
-              testID="friend-card-accept-button"
             />
           )}
           {onReject && (
@@ -74,7 +72,6 @@ export function FriendCard({
               onPress={onReject}
               transparentBackground={true}
               iconColor={redColor}
-              testID="friend-card-reject-button"
             />
           )}
           {onAdd && (
@@ -84,7 +81,6 @@ export function FriendCard({
               onPress={onAdd}
               transparentBackground={true}
               iconColor={tabIconDefaultColor}
-              testID="friend-card-add-button"
             />
           )}
         </View>

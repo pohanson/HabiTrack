@@ -27,6 +27,9 @@ export default function FriendPage() {
         .getUserById(id)
         .then(setFriend)
         .finally(() => setIsLoading(false));
+    } else {
+      setFriend(null);
+      setIsLoading(false);
     }
   }, [id, databaseService.user]);
 

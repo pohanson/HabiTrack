@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/Colors';
 import { Shadows } from '@/constants/Shadows';
 import { User } from '@/db/localSchema';
-import { Pressable, useColorScheme, View, Image } from 'react-native';
+import { Pressable, useColorScheme, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { IconSymbol } from '../ui/IconSymbol';
 import { ProfilePicture } from '../user/ProfilePicture';
@@ -40,8 +40,12 @@ export function AddGroupMemberCard({
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <ProfilePicture user={friend} />
         <View>
-          <ThemedText style={{ fontSize: 14 }}>{friend.name}</ThemedText>
-          <ThemedText style={{ fontSize: 14 }}>@{friend.username}</ThemedText>
+          <ThemedText style={{ fontSize: 14 }} testID={`friend-name-${friend.id}`}>
+            {friend.name}
+          </ThemedText>
+          <ThemedText style={{ fontSize: 14 }} testID={`friend-username-${friend.id}`}>
+            @{friend.username}
+          </ThemedText>
         </View>
       </View>
 

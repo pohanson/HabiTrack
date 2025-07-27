@@ -41,7 +41,7 @@ describe('MilestonesPage', () => {
     const { getByText } = render(<Milestones />);
 
     await waitFor(() => {
-      getByText('No Habits');
+      getByText('No habits');
     });
   });
 });

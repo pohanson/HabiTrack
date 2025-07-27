@@ -1,7 +1,7 @@
 import FriendViewPage from '@/app/(app)/friend/view';
 import { mockUser2 } from '@/mocks/user';
 import { DatabaseService } from '@/services';
-import { render, waitFor, screen, act, userEvent } from '@testing-library/react-native';
+import { render, waitFor, screen, act, userEvent, fireEvent } from '@testing-library/react-native';
 
 jest.mock('@/services', () => ({
   DatabaseService: {
@@ -9,8 +9,8 @@ jest.mock('@/services', () => ({
       friend: {
         getIncomingPendingRequests: jest.fn(),
         getUserFriends: jest.fn(),
-        acceptFriendRequest: jest.fn().mockResolvedValue(null),
-        rejectFriendRequest: jest.fn().mockResolvedValue(null),
+        acceptFriendRequest: jest.fn(),
+        rejectFriendRequest: jest.fn(),
       },
       user: {
         searchUser: jest.fn(),
@@ -41,6 +41,8 @@ describe('FriendViewPage', () => {
       .mockResolvedValue([mockPendingUser]);
 
     DatabaseService.instance.user.searchUser = jest.fn().mockResolvedValue([mockUser2]);
+    DatabaseService.instance.friend.acceptFriendRequest = jest.fn().mockResolvedValue(null);
+    DatabaseService.instance.friend.rejectFriendRequest = jest.fn().mockResolvedValue(null);
   });
 
   it('should render friends list w/o pending', async () => {
@@ -60,7 +62,7 @@ describe('FriendViewPage', () => {
 
     getByText('Your Friends');
     await waitFor(() => {
-      getByText('Your Pending Request');
+      getByText('Pending Requests');
       getByText('Pending User');
       getByText('@pendinguser');
       getByText('Jane Doe');
@@ -120,7 +122,7 @@ describe('FriendViewPage', () => {
 
     await act(async () => {
       const addButton = screen.getByTestId('add-friend-button');
-      await userEvent.press(addButton);
+      fireEvent.press(addButton);
     });
 
     screen.getByText('Add Friend');
@@ -134,8 +136,8 @@ describe('FriendViewPage', () => {
     });
 
     await act(async () => {
-      const acceptButton = screen.getByTestId('friend-card-accept-button');
-      await userEvent.press(acceptButton);
+      const acceptButton = screen.getByTestId(`friend-accept-button-${mockPendingUser.id}`);
+      fireEvent.press(acceptButton);
     });
     const mockAcceptReq = DatabaseService.instance.friend.acceptFriendRequest as jest.Mock;
     expect(mockAcceptReq.mock.calls.length).toBe(1);
@@ -150,11 +152,14 @@ describe('FriendViewPage', () => {
     });
 
     await act(async () => {
-      const rejectButton = screen.getByTestId('friend-card-reject-button');
-      await userEvent.press(rejectButton);
+      const rejectButton = screen.getByTestId(`friend-reject-button-${mockPendingUser.id}`);
+      fireEvent.press(rejectButton);
     });
-    const mockRejectReq = DatabaseService.instance.friend.rejectFriendRequest as jest.Mock;
-    expect(mockRejectReq.mock.calls.length).toBe(1);
-    expect(mockRejectReq).toHaveBeenCalledWith(mockPendingUser.id); // the pending userid
+    await waitFor(() => {
+      expect(DatabaseService.instance.friend.rejectFriendRequest).toHaveBeenCalledTimes(1);
+      expect(DatabaseService.instance.friend.rejectFriendRequest).toHaveBeenCalledWith(
+        mockPendingUser.id,
+      ); // the pending userid
+    });
   });
 });

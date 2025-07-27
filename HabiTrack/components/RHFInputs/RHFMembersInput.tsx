@@ -96,7 +96,10 @@ export function RHFMembersInput({
                       console.log(friend);
                       if (!friend) return null;
                       return (
-                        <View key={friendId} style={{ alignItems: 'center' }}>
+                        <View
+                          key={friendId}
+                          style={{ alignItems: 'center' }}
+                          testID={`friend-card-${friend.id}`}>
                           <ProfilePicture user={friend} />
 
                           {/* username below profile pic: */}

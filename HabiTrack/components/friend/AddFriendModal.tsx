@@ -18,12 +18,19 @@ export function AddFriendModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [friendSuggestions, setFriendSuggestion] = useState<User[]>([]);
   const databaseService = DatabaseService.instance;
+  const [isLoading, setIsLoading] = useState(true);
+  const cardBackgroundColor = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'border');
+  const textColor = useThemeColor({}, 'text');
+  const redColor = useThemeColor({}, 'red');
 
   useEffect(() => {
     SyncService.syncRepoService(databaseService.friend);
   }, [databaseService.friend]);
 
   useEffect(() => {
+    setIsLoading(true);
+    // get user's friend list which is then used to filter out already added friends from search
     databaseService.friend
       .getUserFriends()
       .then((friends) => new Set(friends.map((friend) => friend.id)))
@@ -35,7 +42,8 @@ export function AddFriendModal({
               .filter((user) => !userFriendId.has(user.id) && user.id !== databaseService.userId)
               .slice(0, 5),
           )
-          .then(setFriendSuggestion);
+          .then(setFriendSuggestion)
+          .finally(() => setIsLoading(false));
       });
   }, [databaseService.friend, databaseService.user, databaseService.userId, searchStr]);
 
@@ -54,11 +62,10 @@ export function AddFriendModal({
           testID="add-friend-modal-inner-container"
           style={{
             alignItems: 'center',
-            width: '80%',
+            backgroundColor: cardBackgroundColor,
             gap: 10,
             padding: 30,
             borderRadius: 20,
-            backgroundColor: useThemeColor({}, 'card'),
           }}>
           <ThemedText testID="add-friend-modal-title" type="title">
             Add Friend
@@ -67,13 +74,10 @@ export function AddFriendModal({
           <TextInput
             testID="add-friend-modal-search-input"
             style={{
-              width: '100%',
-              padding: 10,
-              margin: 4,
-              borderWidth: 1,
-              borderColor: useThemeColor({}, 'border'),
+              borderColor: borderColor,
               borderRadius: 5,
-              color: useThemeColor({}, 'text'),
+              borderWidth: 1,
+              color: textColor,
             }}
             placeholder="Enter friend's username"
             value={searchStr}
@@ -84,32 +88,36 @@ export function AddFriendModal({
               {errorMessage}
             </ThemedText>
           )}
-          {friendSuggestions?.map((friendData) => (
-            <FriendCard
-              testID={`friend-card-${friendData.id}`}
-              key={friendData.id}
-              friend={friendData}
-              onAdd={() => {
-                databaseService.friend
-                  .addFriend(friendData.id)
-                  .then(() => {
-                    SyncService.syncRepoService(databaseService.friend);
-                  })
-                  .then(() => {
-                    setIsAddModalVisible(false);
-                  })
-                  .catch((error) => {
-                    setErrorMessage(error.message || 'Failed to add friend.');
-                  });
-              }}
-            />
-          ))}
+          {isLoading ? (
+            <ThemedText>Loading...</ThemedText>
+          ) : (
+            friendSuggestions?.map((friendData) => (
+              <FriendCard
+                testID={`friend-card-${friendData.id}`}
+                key={friendData.id}
+                friend={friendData}
+                onAdd={() => {
+                  databaseService.friend
+                    .addFriend(friendData.id)
+                    .then(() => {
+                      SyncService.syncRepoService(databaseService.friend);
+                    })
+                    .then(() => {
+                      setIsAddModalVisible(false);
+                    })
+                    .catch((error) => {
+                      setErrorMessage(error.message || 'Failed to add friend.');
+                    });
+                }}
+              />
+            ))
+          )}
           <TextButton
             testID="add-friend-modal-close-button"
             label="Close"
             onPress={() => setIsAddModalVisible(false)}
             style={{
-              backgroundColor: useThemeColor({}, 'red'),
+              backgroundColor: redColor,
             }}
           />
         </View>

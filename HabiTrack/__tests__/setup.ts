@@ -84,6 +84,46 @@ jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: jest.fn(),
 }));
 
+// Mocking the collapsible tab view to prevent scrollToImpl error
+jest.mock('react-native-collapsible-tab-view', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require('react');
+  return {
+    Tabs: {
+      Container: ({ children, renderHeader }: any) => {
+        const [activeIndex, setActiveIndex] = React.useState(0);
+
+        return React.createElement('View', { key: 'uniquekeyprop' }, [
+          renderHeader && renderHeader(),
+          React.createElement('View', { key: 'tabs' }, [
+            React.createElement(
+              'Pressable',
+              {
+                key: 'habit-tab',
+                onPress: () => setActiveIndex(0),
+                testID: 'habit-tab',
+              },
+              'Habit',
+            ),
+            React.createElement(
+              'Pressable',
+              {
+                key: 'milestone-tab',
+                onPress: () => setActiveIndex(1),
+                testID: 'milestone-tab',
+              },
+              'Milestones',
+            ),
+          ]),
+          children[activeIndex],
+        ]);
+      },
+      Tab: ({ children }: any) => React.createElement('View', {}, children),
+      ScrollView: ({ children }: any) => React.createElement('ScrollView', {}, children),
+    },
+  };
+});
+
 expect.extend({
   toBeCloseInTime(received, expected) {
     const receivedTimeInMins = received.getHours() * 60 + received.getMinutes();
