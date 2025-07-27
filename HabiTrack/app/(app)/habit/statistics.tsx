@@ -8,7 +8,7 @@ import { DatabaseService } from '@/services';
 import { getExpectedDates } from '@/utils/dateUtils';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, useColorScheme } from 'react-native';
 import { Toast } from 'toastify-react-native';
 
@@ -23,11 +23,6 @@ export default function StatisticsPage() {
   const colorScheme = useColorScheme() ?? 'light';
   const theme = Colors[colorScheme];
   const databaseService = DatabaseService.instance;
-
-  // refresh counter
-  let renderCount = useRef(0);
-  renderCount.current++;
-  console.log('Stats page render count: ' + renderCount.current);
 
   // get createdAt data for this habit
   const { data: createdAtData, error: createdAtError } = useLiveQuery(

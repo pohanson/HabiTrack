@@ -62,6 +62,7 @@ export function AddFriendModal({
           testID="add-friend-modal-inner-container"
           style={{
             alignItems: 'center',
+            width: '90%',
             backgroundColor: cardBackgroundColor,
             gap: 10,
             padding: 30,
@@ -78,6 +79,7 @@ export function AddFriendModal({
               borderRadius: 5,
               borderWidth: 1,
               color: textColor,
+              width: '100%',
             }}
             placeholder="Enter friend's username"
             value={searchStr}

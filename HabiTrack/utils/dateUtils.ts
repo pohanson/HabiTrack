@@ -78,7 +78,6 @@ export function getExpectedDates(startDate: string, endDate: string, freq: numbe
   }
   const noOfDOWS = freq.length;
 
-  // const start = new Date(startDate);
   const end = new Date(endDate);
 
   const result: string[] = [];
