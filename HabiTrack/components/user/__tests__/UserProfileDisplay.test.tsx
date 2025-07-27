@@ -1,7 +1,7 @@
-import React from 'react';
-import { render } from '@testing-library/react-native';
-import { UserProfileDisplay } from '../UserProfileDisplay';
 import { User } from '@/db/localSchema';
+import { render } from '@testing-library/react-native';
+import React from 'react';
+import { UserProfileDisplay } from '../UserProfileDisplay';
 
 describe('<UserProfileDisplay />', () => {
   const mockUser: User = {
@@ -24,7 +24,7 @@ describe('<UserProfileDisplay />', () => {
     const { getByTestId } = render(<UserProfileDisplay {...defaultProps} />);
 
     expect(getByTestId('user-profile-display')).toBeTruthy();
-    expect(getByTestId('user-profile-display-profile-picture')).toBeTruthy();
+    expect(getByTestId('profile-picture-' + mockUser.id)).toBeTruthy();
     expect(getByTestId('user-profile-display-name')).toBeTruthy();
     expect(getByTestId('user-profile-display-username')).toBeTruthy();
   });
@@ -34,7 +34,7 @@ describe('<UserProfileDisplay />', () => {
     const profilePicture = getByTestId('user-profile-display').findByType('Image');
 
     expect(profilePicture.props.source.uri).toBe(
-      `data:image/png;base64,${mockUser.profilePicture}`,
+      `data:image/jpeg;base64,${mockUser.profilePicture}`,
     );
   });
 
@@ -82,8 +82,8 @@ describe('<UserProfileDisplay />', () => {
     );
 
     expect(getByTestId('user-profile-display')).toBeTruthy();
-    expect(getByTestId('user-profile-display-placeholder-profile-picture')).toBeTruthy();
-    expect(queryByTestId('user-profile-display-profile-picture')).toBeFalsy();
+    expect(getByTestId('placeholder-profile-picture-text-' + userWithEmptyPicture.id)).toBeTruthy();
+    expect(queryByTestId('profile-picture-' + userWithEmptyPicture.id)).toBeFalsy();
   });
 
   it('handles empty profile picture', () => {
@@ -93,8 +93,8 @@ describe('<UserProfileDisplay />', () => {
     );
 
     expect(getByTestId('user-profile-display')).toBeTruthy();
-    expect(getByTestId('user-profile-display-placeholder-profile-picture')).toBeTruthy();
-    expect(queryByTestId('user-profile-display-profile-picture')).toBeFalsy();
+    expect(getByTestId('placeholder-profile-picture-text-' + userWithEmptyPicture.id)).toBeTruthy();
+    expect(queryByTestId('profile-picture-' + userWithEmptyPicture.id)).toBeFalsy();
   });
 
   it('handles long usernames and names', () => {

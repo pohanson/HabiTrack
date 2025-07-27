@@ -21,7 +21,9 @@ export function UserProfileDisplay({
   return (
     <View testID={testID} style={{ marginBottom }}>
       <ProfilePicture user={user} profileSize={profileSize} />
-      <ThemedText style={{ fontWeight: 'bold', fontSize: nameSize, textAlign: 'center' }}>
+      <ThemedText
+        testID={testID + '-name'}
+        style={{ fontWeight: 'bold', fontSize: nameSize, textAlign: 'center' }}>
         {user.name}
       </ThemedText>
       <ThemedText

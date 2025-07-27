@@ -1,7 +1,7 @@
-import React from 'react';
-import { render } from '@testing-library/react-native';
-import { UserInformation } from '../UserInformation';
 import { User } from '@/db/localSchema';
+import { render } from '@testing-library/react-native';
+import React from 'react';
+import { UserInformation } from '../UserInformation';
 
 describe('<UserInformation />', () => {
   const mockUser: User = {
@@ -31,7 +31,7 @@ describe('<UserInformation />', () => {
 
   it("displays user's profile picture when available", () => {
     const { getByTestId } = render(<UserInformation {...defaultProps} />);
-    const profilePicture = getByTestId('user-information-profile-picture');
+    const profilePicture = getByTestId('profile-picture-' + mockUser.id);
 
     expect(profilePicture.props.source.uri).toBe(
       `data:image/jpeg;base64,${mockUser.profilePicture}`,
@@ -43,8 +43,8 @@ describe('<UserInformation />', () => {
       <UserInformation user={{ ...mockUser, profilePicture: null }} />,
     );
 
-    expect(getByTestId('user-information-no-profile-picture')).toBeTruthy();
-    expect(queryByTestId('user-information-profile-picture')).toBeFalsy();
+    expect(getByTestId('placeholder-profile-picture-text-' + mockUser.id)).toBeTruthy();
+    expect(queryByTestId('profile-picture-' + mockUser.id)).toBeFalsy();
   });
 
   it("displays user's name when available", () => {
@@ -85,7 +85,7 @@ describe('<UserInformation />', () => {
 
   it('applies correct styles to the profile picture', () => {
     const { getByTestId } = render(<UserInformation {...defaultProps} />);
-    const profilePicture = getByTestId('user-information-profile-picture');
+    const profilePicture = getByTestId('profile-picture-' + mockUser.id);
     expect(profilePicture.props.style).toEqual(
       expect.objectContaining({
         width: 100,
@@ -98,8 +98,7 @@ describe('<UserInformation />', () => {
   it('handles missing user data properly', () => {
     const { getByTestId, queryByTestId } = render(<UserInformation user={null} />);
 
-    expect(getByTestId('user-information-no-profile-picture')).toBeTruthy();
-    expect(queryByTestId('user-information-profile-picture')).toBeFalsy();
+    expect(queryByTestId('profile-picture-' + mockUser.id)).toBeFalsy();
     expect(getByTestId('user-information-name').props.children).toBe('Loading...');
     expect(getByTestId('user-information-username').props.children).toBe('Loading...');
     expect(getByTestId('user-information-bio').props.children).toBe('No bio available.');
