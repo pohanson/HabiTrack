@@ -37,8 +37,8 @@ export default function AccountPage() {
 
   return (
     <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-      <ThemedText type="defaultSemiBold" style={{ fontSize: 24 }}>
-        User Profile
+      <ThemedText type="defaultSemiBold" style={{ fontSize: 24, padding: 20 }}>
+        Your Profile
       </ThemedText>
       <ThemedView
         style={{

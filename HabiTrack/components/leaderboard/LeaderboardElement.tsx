@@ -1,4 +1,4 @@
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme, View, Image } from 'react-native';
 import { ThemedView } from '../ThemedView';
 import { ThemedText } from '../ThemedText';
 import { User } from '@/db/localSchema';
@@ -61,6 +61,7 @@ export function LeaderboardElement({
   const rankStyle = getRankProps();
   const themeTextColor = useThemeColor({}, 'text');
   const textColor = rank <= 3 ? 'black' : themeTextColor;
+  const profilePicSize = 50;
 
   return (
     <ThemedView
@@ -95,17 +96,54 @@ export function LeaderboardElement({
         </ThemedText>
 
         {/* name, username, profile pic */}
-        <View testID={`leaderboard-element-${rank}-user-profile`} style={{ marginLeft: 8 }}>
-          <ThemedText
-            testID={`leaderboard-element-${rank}-user-name`}
-            style={{ color: rank <= 3 ? 'black' : textColor, fontWeight: 'bold', fontSize: 16 }}>
-            {user.name}
-          </ThemedText>
-          <ThemedText
-            testID={`leaderboard-element-${rank}-username`}
-            style={{ color: '#888', fontSize: 12 }}>
-            @{user.username}
-          </ThemedText>
+        <View
+          testID={`leaderboard-element-${rank}-user-profile`}
+          style={{ flexDirection: 'row', marginLeft: 8 }}>
+          {/* profile pic */}
+          {user.profilePicture ? (
+            <Image
+              source={{ uri: `data:image/png;base64,${user.profilePicture}` }}
+              style={{
+                width: profilePicSize,
+                height: profilePicSize,
+                borderRadius: 25,
+                marginRight: 10,
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                width: profilePicSize,
+                height: profilePicSize,
+                borderRadius: 25,
+                backgroundColor: '#ccc',
+                marginRight: 10,
+                justifyContent: 'center',
+              }}>
+              <ThemedText
+                style={{
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  color: 'black',
+                }}>
+                {user.name.charAt(0).toUpperCase()}
+              </ThemedText>
+            </View>
+          )}
+
+          {/* name and username */}
+          <View>
+            <ThemedText
+              testID={`leaderboard-element-${rank}-user-name`}
+              style={{ color: rank <= 3 ? 'black' : textColor, fontWeight: 'bold', fontSize: 16 }}>
+              {user.name}
+            </ThemedText>
+            <ThemedText
+              testID={`leaderboard-element-${rank}-username`}
+              style={{ color: '#888', fontSize: 12 }}>
+              @{user.username}
+            </ThemedText>
+          </View>
         </View>
       </View>
 

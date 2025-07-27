@@ -1,10 +1,12 @@
 import { TextButton } from '@/components/TextButton';
 import { ThemedView } from '@/components/ThemedView';
 import { router } from 'expo-router';
-import { StyleProp, ViewStyle } from 'react-native';
+import { Image, StyleProp, ViewStyle } from 'react-native';
 const buttonStyle: StyleProp<ViewStyle> = { width: '100%' };
 
 export default function SocialsPage() {
+  const imageSize = 250;
+
   return (
     <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <ThemedView
@@ -13,6 +15,10 @@ export default function SocialsPage() {
           padding: 20,
           width: '80%',
         }}>
+        <Image
+          source={require('@/assets/images/socials.png')}
+          style={{ width: imageSize, height: imageSize, alignSelf: 'center' }}
+        />
         <TextButton
           label="Your Friends"
           style={buttonStyle}
