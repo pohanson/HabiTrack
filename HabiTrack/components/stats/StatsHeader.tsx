@@ -32,6 +32,7 @@ export function StatsHeader({
       {badgesEarned > 0 && (
         <ThemedView testID="badge" style={{ justifyContent: 'center' }}>
           <Image
+            testID="badge-image"
             source={badgeImage}
             style={{
               height: 70,

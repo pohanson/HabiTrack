@@ -12,11 +12,6 @@ import {
 } from '@testing-library/react-native';
 import { useLocalSearchParams } from 'expo-router';
 
-// function scrollToImpl(ref, x, y, animated) {
-//    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-//    (0, _reactNativeReanimated.scrollTo)(ref, x, y, animated);
-//  }
-
 jest.mock('@/services', () => ({
   DatabaseService: {
     instance: {

@@ -4,8 +4,8 @@ import Svg, { G, Circle, Text as SvgText } from 'react-native-svg';
 
 export default function PieChart({
   testID = 'pie-chart',
-  actualNoOfDays = 10,
-  expectedNoOfDays = 20,
+  actualNoOfDays,
+  expectedNoOfDays,
   radius = 30,
   color = '#4CAF50',
   textColor = '#4CAF50',

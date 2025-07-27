@@ -6,7 +6,7 @@ import { UserInformation } from '@/components/user/UserInformation';
 import { User } from '@/db/schema';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { DatabaseService } from '@/services';
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { MaterialTabBar, Tabs } from 'react-native-collapsible-tab-view';
@@ -116,26 +116,12 @@ function FriendMilestoneScreen() {
   const friend = useContext(FriendContext);
   const { bottom: bottomInset } = useSafeAreaInsets();
 
-  const [data, setData] = useState<
-    { habit_id: string; habit_name: string; week_streak: number; badges_earned: number }[]
-  >([]);
-  const [refresh, setRefresh] = useState(0);
-  useFocusEffect(
-    useCallback(() => {
-      setRefresh((prev) => prev + 1);
-    }, []),
-  );
-  const databaseService = DatabaseService.instance;
-  useEffect(() => {
-    databaseService.habitMilestone.getAllMilestonesQuery(friend?.id).then(setData);
-  }, [databaseService.habitMilestone, friend?.id, refresh]);
-
   return (
     <ThemedView style={{ height: '100%', paddingBottom: bottomInset }}>
       {friend == null ? (
         <ThemedText>Invalid Friend Selected</ThemedText>
       ) : (
-        <HabitMilestoneList data={data} />
+        <HabitMilestoneList userId={friend.id} />
       )}
     </ThemedView>
   );

@@ -39,7 +39,7 @@ describe('CreateHabitPage', () => {
     });
   });
 
-  it('should not submit form data and show error', async () => {
+  it('should not submit form data and show error for missing day and name', async () => {
     const { getByText } = render(<CreateHabitPage />);
     await waitFor(() => {
       expect(getByText('Create Habit')).toBeTruthy();
@@ -53,7 +53,7 @@ describe('CreateHabitPage', () => {
     getByText('At least one day must be selected');
   });
 
-  it('should not submit form data and show for name only', async () => {
+  it('should not submit form data, missing name', async () => {
     const { getByText, getByTestId, queryByText } = render(<CreateHabitPage />);
     await waitFor(() => {
       expect(getByText('Create Habit')).toBeTruthy();

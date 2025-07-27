@@ -1,5 +1,5 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
+import React from 'react';
 import { StatsHeader } from '../StatsHeader';
 
 describe('<StatsHeader />', () => {
@@ -48,6 +48,34 @@ describe('<StatsHeader />', () => {
     );
 
     expect(getByTestId('habit-name').props.children).toBe('Test Habit');
+  });
+
+  it('displays badges correctly', () => {
+    const testCases: [number, string][] = [
+      [1, 'msb1.png'],
+      [2, 'msb2.png'],
+      [3, 'msb3.png'],
+      [4, 'msb4.png'],
+      [5, 'msb5.png'],
+    ];
+    for (const [badgesEarned, badgeImage] of testCases) {
+      const { getByTestId } = render(
+        <StatsHeader
+          badgesEarned={badgesEarned}
+          createdAt="2025-01-01"
+          habitName="Test Habit"
+          startDate="2025-01-01"
+          todayDate="2025-06-01"
+        />,
+      );
+
+      const image = getByTestId('badge-image');
+      console.log(image.props.source);
+      expect(image.props.source).toEqual(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require(`@/assets/images/badges/colored/${badgeImage}`),
+      );
+    }
   });
 
   it("it displays today's date correctly", () => {

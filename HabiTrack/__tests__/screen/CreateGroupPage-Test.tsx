@@ -1,7 +1,7 @@
 import CreateGroupPage from '@/app/(app)/habitCircles/create';
-import { mockUser2 } from '@/mocks/user';
+import { mockUser2, mockUser3 } from '@/mocks/user';
 import { DatabaseService } from '@/services';
-import { fireEvent, act, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, userEvent, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
 jest.mock('expo-router', () => ({
@@ -55,7 +55,7 @@ describe('CreateGroupPage', () => {
     expect(router.back).toHaveBeenCalled();
   });
 
-  it('should have error submitting', async () => {
+  it('should have error submitting, missing group name', async () => {
     const { getByText, getByTestId } = render(<CreateGroupPage />);
     await waitFor(() => {
       getByText(mockUser2.name);
@@ -67,5 +67,50 @@ describe('CreateGroupPage', () => {
     getByText('Group Name is required');
     expect(DatabaseService.instance.group.createGroup).not.toHaveBeenCalled();
     expect(router.back).not.toHaveBeenCalled();
+  });
+
+  it('should have error submitting, missing group name and member', async () => {
+    const { getByText, getByTestId } = render(<CreateGroupPage />);
+    await waitFor(() => {
+      getByText(mockUser2.name);
+    });
+    await act(async () => {
+      fireEvent.press(getByTestId('Create Group-button'));
+    });
+    getByText('Group Name is required');
+    getByText('At least one friend must be selected');
+    expect(DatabaseService.instance.group.createGroup).not.toHaveBeenCalled();
+    expect(router.back).not.toHaveBeenCalled();
+  });
+
+  it('should correctly remove added group member', async () => {
+    DatabaseService.instance.friend.getUserFriends = jest
+      .fn()
+      .mockResolvedValue([mockUser2, mockUser3]);
+    const { getByText, getByTestId } = render(<CreateGroupPage />);
+    await waitFor(() => {
+      getByText(mockUser2.name);
+    });
+
+    const user = userEvent.setup();
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'Tester Group');
+      await user.press(getByTestId(`${mockUser2.id}-add`));
+    });
+    await act(async () => {
+      await user.press(getByTestId(`${mockUser3.id}-add`));
+    });
+    await waitFor(() => {
+      getByTestId(`${mockUser2.id}-remove`);
+      getByTestId(`${mockUser3.id}-remove`);
+    });
+    await act(async () => {
+      await user.press(getByTestId(`${mockUser2.id}-remove`));
+      fireEvent.press(getByTestId('Create Group-button'));
+    });
+    expect(DatabaseService.instance.group.createGroup).toHaveBeenCalledWith({
+      name: 'Tester Group',
+      memberIds: [mockUser3.id],
+    });
   });
 });

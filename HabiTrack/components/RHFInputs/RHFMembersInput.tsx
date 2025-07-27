@@ -93,7 +93,6 @@ export function RHFMembersInput({
                   <View style={{ flexDirection: 'row', gap: 7 }}>
                     {value.map((friendId) => {
                       const friend = friends.find((f) => f.id === friendId);
-                      console.log(friend);
                       if (!friend) return null;
                       return (
                         <View

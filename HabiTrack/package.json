@@ -128,7 +128,10 @@
       "!**/mocks/**",
       "!**/hooks/**",
       "!**/context/**",
-      "!**/_layout.tsx"
+      "!**/_layout.tsx",
+      "!**/repositories/**",
+      "!**/services/**",
+      "!**/components/ui/**"
     ]
   }
 }

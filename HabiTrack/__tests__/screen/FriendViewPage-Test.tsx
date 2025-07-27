@@ -1,7 +1,8 @@
 import FriendViewPage from '@/app/(app)/friend/view';
 import { mockUser2 } from '@/mocks/user';
 import { DatabaseService } from '@/services';
-import { render, waitFor, screen, act, userEvent, fireEvent } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 jest.mock('@/services', () => ({
   DatabaseService: {
@@ -161,5 +162,15 @@ describe('FriendViewPage', () => {
         mockPendingUser.id,
       ); // the pending userid
     });
+  });
+
+  it('should navigate to friend page', async () => {
+    const { getByText, getByTestId } = render(<FriendViewPage />);
+    getByText('Your Friends');
+    await waitFor(() => {
+      getByText(mockUser2.name);
+    });
+    fireEvent.press(getByTestId('friend-card-' + mockUser2.id));
+    expect(router.push).toHaveBeenCalledWith('/friend/' + mockUser2.id);
   });
 });
