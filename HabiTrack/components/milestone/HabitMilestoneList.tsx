@@ -38,12 +38,6 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
 
   return (
     <ThemedView testID="habit-milestone-list" style={{ flex: 1 }}>
-      {data?.length === 0 && (
-        <ThemedView testID="no-habits-container">
-          <ThemedText testID="no-habits-text">No habits</ThemedText>
-        </ThemedView>
-      )}
-
       <ScrollView testID="habit-milestone-scrollview">
         <ThemedView
           testID="habit-milestone-ranks-section"
@@ -58,17 +52,29 @@ export function HabitMilestoneList({ userId = undefined }: { userId?: string | n
           />
         </ThemedView>
 
-        <ThemedView testID="milestone-list-container" style={{ gap: 10, padding: 10 }}>
-          {data.map(({ habit_name, habit_id, week_streak, badges_earned }) => (
-            <HabitMilestoneCard
-              testID={`habit-milestone-card-${habit_id}`}
-              key={`${habit_id}`}
-              habitName={habit_name || 'No name'}
-              weekStreak={week_streak}
-              badgesEarned={badges_earned}
-            />
-          ))}
-        </ThemedView>
+        {data?.length === 0 ? (
+          <ThemedView
+            testID="no-habits-container"
+            style={{ flex: 1, height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <ThemedText
+              testID="no-habits-text"
+              style={{ fontWeight: '600', fontSize: 24, padding: 20, verticalAlign: 'middle' }}>
+              No habits
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          <ThemedView testID="milestone-list-container" style={{ gap: 10, padding: 10 }}>
+            {data.map(({ habit_name, habit_id, week_streak, badges_earned }) => (
+              <HabitMilestoneCard
+                testID={`habit-milestone-card-${habit_id}`}
+                key={`${habit_id}`}
+                habitName={habit_name || 'No name'}
+                weekStreak={week_streak}
+                badgesEarned={badges_earned}
+              />
+            ))}
+          </ThemedView>
+        )}
       </ScrollView>
     </ThemedView>
   );
