@@ -32,7 +32,7 @@ describe('AccountPage', () => {
       mockUseFocusEffect.mock.calls[0][0]();
     });
 
-    expect(getByText('User Profile')).toBeTruthy();
+    expect(getByText('Your Profile')).toBeTruthy();
 
     await waitFor(() => {
       // ensure the usercontext is set
