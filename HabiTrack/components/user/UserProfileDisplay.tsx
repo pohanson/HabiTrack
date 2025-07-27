@@ -19,7 +19,7 @@ export function UserProfileDisplay({
   marginBottom?: number;
 }) {
   return (
-    <View style={{ marginBottom }}>
+    <View testID={testID} style={{ marginBottom }}>
       <ProfilePicture user={user} profileSize={profileSize} />
       <ThemedText style={{ fontWeight: 'bold', fontSize: nameSize, textAlign: 'center' }}>
         {user.name}
