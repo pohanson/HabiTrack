@@ -30,7 +30,7 @@ export function FriendCard({
   return (
     <Pressable
       testID={`friend-card-${friend.id}`}
-      style={{ width: '100%' }}
+      style={{ width: '100%', alignItems: 'center' }}
       disabled={onPress === undefined}
       onPress={onPress}>
       <ThemedView
@@ -38,7 +38,7 @@ export function FriendCard({
         style={[
           {
             display: 'flex',
-            width: '90%',
+            width: '100%',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -52,7 +52,9 @@ export function FriendCard({
           <ProfilePicture user={friend} />
           <View testID={`friend-text-info-${friend.id}`}>
             <ThemedText testID={`friend-name-${friend.id}`}>{friend.name}</ThemedText>
-            <ThemedText testID={`friend-username-${friend.id}`}>@{friend.username}</ThemedText>
+            <ThemedText testID={`friend-username-${friend.id}`} style={{ fontSize: 14 }}>
+              @{friend.username}
+            </ThemedText>
           </View>
         </View>
         <View testID={`friend-buttons-${friend.id}`} style={{ flexDirection: 'row', gap: 10 }}>

@@ -9,7 +9,7 @@ import { DatabaseService } from '@/services';
 import { SyncService } from '@/services/SyncService';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { ScrollView, TextInput, View } from 'react-native';
 
 export default function FriendViewPage() {
   const [refresh, setRefresh] = useState(0);
@@ -92,7 +92,7 @@ export default function FriendViewPage() {
         onChangeText={(text) => setSearchStr(text.toLowerCase())}
         placeholder="Search for friends..."
       />
-      <View style={{ gap: 10, marginTop: 20 }}>
+      <ScrollView style={{ marginTop: 10, padding: 14 }} contentContainerStyle={{ gap: 10 }}>
         {filteredFriend.length === 0 ? (
           <ThemedText type="default">No friends found.</ThemedText>
         ) : (
@@ -104,7 +104,7 @@ export default function FriendViewPage() {
             />
           ))
         )}
-      </View>
+      </ScrollView>
     </ThemedView>
   );
 }
