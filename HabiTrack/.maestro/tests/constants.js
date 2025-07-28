@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 function getDayOfWeekString(dayOfWeek) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   if (dayOfWeek >= 0 && dayOfWeek <= 6) {
@@ -6,7 +7,6 @@ function getDayOfWeekString(dayOfWeek) {
   return 'Invalid DOW';
 }
 
-const output = {};
 output.oldAccount = {
   username: '88420.0',
   password: '123456',
