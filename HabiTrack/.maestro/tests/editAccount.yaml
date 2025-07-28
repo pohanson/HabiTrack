@@ -1,0 +1,24 @@
+appId: com.habitrack.HabiTrack
+# The app should be running and logged in
+# This file tests editing of user profile
+---
+- launchApp
+- runScript: ./constants.js
+- tapOn: 'Account'
+- tapOn: 'Edit Profile'
+- tapOn:
+    id: 'RHFTextInput-name'
+- eraseText
+- inputText: '${output.editProfile.name}'
+- back
+- tapOn:
+    id: 'RHFTextInput-bio'
+- eraseText
+- inputText: '${output.editProfile.bio}'
+- back
+- tapOn: 'Update'
+- back
+- extendedWaitUntil:
+    visible: 'Account'
+- assertVisible: '${output.editProfile.name}'
+- assertVisible: '${output.editProfile.bio}'

@@ -1,0 +1,23 @@
+appId: com.habitrack.HabiTrack
+# Try to login user at first if not login
+---
+- tapOn:
+    text: 'Go to Sign In'
+    optional: true
+- extendedWaitUntil:
+    visible: 'Login'
+    timeout: 10000 # 10s
+- tapOn:
+    id: 'RHFTextInput-username'
+- inputText: ${output.oldAccount.username}
+- back
+- tapOn:
+    id: 'RHFTextInput-password'
+- inputText: ${output.oldAccount.password}
+- back
+- tapOn:
+    text: 'Login'
+    index: 1
+- extendedWaitUntil:
+    visible: "Today's Habits"
+    timeout: 10000 # 10s

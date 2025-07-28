@@ -1,0 +1,28 @@
+appId: com.habitrack.HabiTrack
+# The app should be running and logged in
+# This file tests editing of habit
+---
+- launchApp
+- tapOn: 'Habits'
+- assertVisible: Today's Habits
+- tapOn:
+    id: 'pencil-icon-button'
+- extendedWaitUntil:
+    visible: 'Edit Habit'
+- tapOn:
+    id: 'RHFTextInput-name'
+- eraseText
+- inputText: '${output.newHabit.name}'
+- back
+- tapOn:
+    id: 'RHFTextInput-description'
+- eraseText
+- inputText: '${output.newHabit.description}'
+- back
+- tapOn: 'Save Changes'
+- tapOn:
+    id: 'list.bullet-icon-button'
+- extendedWaitUntil:
+    visible: 'All Habits'
+- assertVisible: '${output.newHabit.name}'
+- assertVisible: '${output.newHabit.description}'

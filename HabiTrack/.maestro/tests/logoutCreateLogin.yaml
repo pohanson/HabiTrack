@@ -1,0 +1,40 @@
+appId: com.habitrack.HabiTrack
+# The app user should be logged in
+# This file tests logout, create account and login
+---
+- launchApp
+- runScript: ./constants.js
+- tapOn: 'Account'
+- tapOn: 'Log Out'
+- tapOn: 'Go to Sign Up'
+- tapOn:
+    id: 'RHFTextInput-username'
+- inputText: ${output.newAccount.username}
+- back
+- tapOn:
+    id: 'RHFTextInput-name'
+- inputText: ${output.newAccount.name}
+- back
+- tapOn:
+    id: 'RHFTextInput-password'
+- inputText: ${output.newAccount.password}
+- back
+- tapOn: 'Sign Up'
+- extendedWaitUntil:
+    visible: 'Login'
+    timeout: 10000 # 10s
+- tapOn:
+    id: 'RHFTextInput-username'
+- inputText: ${output.newAccount.username}
+- back
+- tapOn:
+    id: 'RHFTextInput-password'
+- inputText: ${output.newAccount.password}
+- back
+- tapOn:
+    text: 'Login'
+    index: 1
+- extendedWaitUntil:
+    visible: "Today's Habits"
+    timeout: 10000 # 10s
+- assertVisible: 'No habits for today.'

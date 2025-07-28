@@ -65,7 +65,7 @@ export function AddFriendModal({
             width: '90%',
             backgroundColor: cardBackgroundColor,
             gap: 10,
-            padding: 30,
+            padding: 20,
             borderRadius: 20,
           }}>
           <ThemedText testID="add-friend-modal-title" type="title">

@@ -59,7 +59,11 @@ export default function HomePage() {
             router.push('/habit/full-list');
           }}
         />
-        <IconButton iconName="plus" onPress={() => router.push('/habit/create')} />
+        <IconButton
+          iconName="plus"
+          id={'addHabitButton'}
+          onPress={() => router.push('/habit/create')}
+        />
       </ThemedView>
       {data?.length === 0 && (
         <ThemedText style={{ padding: 10, color: subTextColor }}>No habits for today.</ThemedText>

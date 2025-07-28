@@ -100,6 +100,9 @@ export default function SignupPage() {
         useFormReturn={useFormReturn}
         label="Username (Case Sensitive)"
         name="username"
+        rules={{
+          maxLength: { value: 12, message: 'Too Long! Username length must be less than 12.' },
+        }}
         isRequired={true}
         spellCheck={false}
       />

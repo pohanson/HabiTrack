@@ -1,0 +1,17 @@
+appId: com.habitrack.HabiTrack
+# used to run all test cases
+---
+- launchApp
+- runScript: './constants.js'
+- runFlow:
+    when:
+      visible: 'Create Account'
+    file: tryLogin.yaml
+- runFlow:
+    file: logoutCreateLogin.yaml
+- runFlow:
+    file: overview.yaml
+- runFlow:
+    file: createHabit.yaml
+- runFlow:
+    file: editAccount.yaml
