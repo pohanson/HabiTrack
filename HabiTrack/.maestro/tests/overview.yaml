@@ -1,8 +1,11 @@
 appId: com.habitrack.HabiTrack
-# The app user should be logged in
+# The app should be running and logged in
+# This file tests navigation between pages
 ---
 - launchApp
+- tapOn: 'Habits'
 - assertVisible: Today's Habits
+- assertVisible: 'No habits for today.'
 - tapOn: 'Milestones'
 - assertVisible: 'Milestones'
 - assertVisible: 'Ranks'

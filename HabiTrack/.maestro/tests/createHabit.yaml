@@ -1,0 +1,44 @@
+appId: com.habitrack.HabiTrack
+# The app should be running and logged in
+# This file tests creating a habit
+---
+- launchApp
+- runScript: ./constants.js
+- tapOn: 'Habits'
+- tapOn:
+    id: 'plus-icon-button'
+- assertVisible: 'Create Habit'
+- tapOn:
+    id: 'RHFTextInput-name'
+- inputText: '${output.newHabit.name}'
+- back
+- tapOn:
+    id: 'RHFTextInput-description'
+- inputText: '${output.newHabit.description}'
+- back
+- tapOn:
+    below: '${output.newHabit.freq}'
+- tapOn: 'Submit'
+- tapOn:
+    id: 'RHFTextInput-name'
+- inputText: '${output.notTodayHabit.name}'
+- back
+- tapOn:
+    id: 'RHFTextInput-description'
+- inputText: '${output.notTodayHabit.description}'
+- back
+- tapOn:
+    below: '${output.notTodayHabit.freq}'
+- tapOn: 'Submit'
+- back
+- extendedWaitUntil:
+    visible: "Today's Habits"
+- assertVisible: '${output.newHabit.name}'
+- assertNotVisible: '${output.notTodayHabit.name}'
+- tapOn:
+    id: 'list.bullet-icon-button'
+- extendedWaitUntil:
+    visible: 'All Habits'
+- assertVisible: '${output.newHabit.name}'
+- assertVisible: '${output.notTodayHabit.name}'
+- back

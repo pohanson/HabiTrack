@@ -59,16 +59,16 @@ describe('SignupPage', () => {
   it('should signup successfully', async () => {
     const { getByTestId } = render(<SignupPage />);
     await act(async () => {
-      fireEvent.changeText(getByTestId('RHFTextInput-username'), 'a');
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), '123456789012');
       fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
       fireEvent.changeText(getByTestId('RHFTextInput-password'), 'password');
       fireEvent.press(getByTestId('Sign Up-button'));
     });
 
     await waitFor(() => {
-      expect(DatabaseService.instance.user.checkValidUsername).toHaveBeenCalledWith('a');
+      expect(DatabaseService.instance.user.checkValidUsername).toHaveBeenCalledWith('123456789012');
       expect(DatabaseService.instance.user.signupUser).toHaveBeenCalledWith({
-        username: 'a',
+        username: '123456789012',
         name: 'name',
         password: 'password',
       });
@@ -114,6 +114,23 @@ describe('SignupPage', () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
+  it('should show error when username is too long', async () => {
+    const { getByTestId, getByText } = render(<SignupPage />);
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), '1234567890123');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), 'password');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+
+    await waitFor(() => {
+      getByText('Too Long! Username length must be less than 12.');
+      expect(DatabaseService.instance.user.checkValidUsername).not.toHaveBeenCalled();
+      expect(DatabaseService.instance.user.signupUser).not.toHaveBeenCalled();
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
   it('should show error when password is too short', async () => {
     DatabaseService.instance.user.checkValidUsername = jest.fn().mockResolvedValue(false);
 
@@ -144,6 +161,22 @@ describe('SignupPage', () => {
     });
     await waitFor(() => {
       getByText('Too Long! Password length must be between 6-18.');
+    });
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it('should show both error', async () => {
+    const { getByTestId, getByText } = render(<SignupPage />);
+    await act(async () => {
+      fireEvent.changeText(getByTestId('RHFTextInput-username'), '1234567890123');
+      fireEvent.changeText(getByTestId('RHFTextInput-name'), 'name');
+      fireEvent.changeText(getByTestId('RHFTextInput-password'), 'pas');
+      fireEvent.press(getByTestId('Sign Up-button'));
+    });
+
+    await waitFor(() => {
+      getByText('Too Long! Username length must be less than 12.');
+      getByText('Too Short! Password length must be between 6-18.');
     });
     expect(router.replace).not.toHaveBeenCalled();
   });
