@@ -9,10 +9,10 @@
 2 Main Ways:
 
 1. Have an Android device or emulator. Download the apk file and install directly here:
-https://expo.dev/artifacts/eas/nH7P1REBWThguRXw3wy9XF.apk
+https://expo.dev/artifacts/eas/hMpHNk7y7H58SeZ1q4adxQ.apk
 
 2. Go to the link and click install. Follow the instructions provided there:
-https://expo.dev/accounts/pohanson/projects/HabiTrack/builds/afcd9a86-3c1f-455b-87ae-a8c9ca8d7fdd
+https://expo.dev/accounts/pohanson/projects/HabiTrack/builds/87e94e7c-c4a7-4919-9fba-925b7e01e1fe
 
 ### Development (for Team Member only)
 1. Follow the instructions on the website to download npm:
